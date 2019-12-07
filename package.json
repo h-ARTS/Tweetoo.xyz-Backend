@@ -1,0 +1,29 @@
+{
+  "name": "tweetoo.xyz",
+  "version": "1.0.0",
+  "description": "A Twitter Clone",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h-ARTS/Tweetoo.xyz.git"
+  },
+  "keywords": [
+    "Twitter",
+    "Clone",
+    "Clone",
+    "app",
+    "test"
+  ],
+  "author": "Hanan Khan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/h-ARTS/Tweetoo.xyz/issues"
+  },
+  "homepage": "https://github.com/h-ARTS/Tweetoo.xyz#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
