@@ -1,2 +1,2 @@
-# Tweetoo
+# Tweetoo.xyz
 A Twitter Clone
