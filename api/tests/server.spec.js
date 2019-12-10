@@ -18,3 +18,31 @@ describe('Basic GET request:', () => {
     await getAny(req, res)
   })
 })
+
+describe('Tweet controllers:', () => {
+  test('getAllTweets', async () => {})
+
+  test('getTweet', async () => {})
+
+  test('createTweet', async () => {})
+
+  test('updateTweet', async () => {})
+
+  test('removeTweet', async () => {})
+
+  test('likeTweet', async () => {})
+
+  test('unlikeTweet', async () => {})
+
+  test('getAllRepliesOfTweet', async () => {})
+
+  test('replyOnTweet', async () => {})
+
+  test('updateReply', async () => {})
+
+  test('removeReply', async () => {})
+
+  test('createRetweet', async () => {})
+
+  test('removeRetweet', async () => {})
+})
