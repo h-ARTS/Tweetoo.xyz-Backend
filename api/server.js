@@ -1,13 +1,12 @@
 import express from 'express'
 import morgan from 'morgan'
+import config from '../config'
 
 export const app = express()
 
 app.disable('x-powered-by')
 
 app.use(morgan('dev'))
-
-const port = 3000
 
 export function getAny(req, res) {
   try {
@@ -21,7 +20,9 @@ app.get('/', getAny)
 
 export const start = () => {
   try {
-    app.listen(port, () => console.log(`Server listening on Port ${port}!`))
+    app.listen(config.port, () =>
+      console.log(`Server listening on Port ${config.port}!`)
+    )
   } catch (e) {
     console.error(e)
   }
