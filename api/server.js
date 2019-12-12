@@ -1,8 +1,12 @@
 import express from 'express'
 import morgan from 'morgan'
 
-const app = express()
+export const app = express()
+
+app.disable('x-powered-by')
+
 app.use(morgan('dev'))
+
 const port = 3000
 
 export function getAny(req, res) {
