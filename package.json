@@ -61,6 +61,7 @@
   "jest": {
     "testUrl": "http://localhost/",
     "testEnvironment": "node",
+    "setupFilesAfterEnv": ["./test-db-setup.js"],
     "testPathIgnorePatterns": [
       "dist/"
     ],
