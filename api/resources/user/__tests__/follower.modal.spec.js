@@ -6,7 +6,7 @@ describe('Follower Schema', () => {
     const userId = FollowerSchema.obj.userId
     expect(userId).toEqual({
       type: SchemaTypes.ObjectId,
-      ref: 'USER',
+      ref: 'user',
       required: true
     })
   })

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "babel api --out-dir dist",
     "dev": "nodemon --exec yarn restart",
+    "test-tweetmodel": "jest /api/resources/tweet/__tests__ --verbose",
     "test-usermodel": "jest /api/resources/user/__tests__ --verbose",
     "restart": "rimraf dist && yarn build && yarn start",
     "start": "node dist/index.js"

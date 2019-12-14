@@ -1,4 +1,5 @@
 import { User } from '../user.model'
+import { TweetSchema } from '../../tweet/tweet.model'
 import { FollowerSchema } from '../follower.model'
 
 describe('User model', () => {
@@ -81,6 +82,14 @@ describe('User model', () => {
       const followers = User.schema.obj.followers
       expect(followers).toEqual({
         type: [FollowerSchema],
+        default: undefined
+      })
+    })
+
+    test('has tweets as array', () => {
+      const tweets = User.schema.obj.tweets
+      expect(tweets).toEqual({
+        type: [TweetSchema],
         default: undefined
       })
     })

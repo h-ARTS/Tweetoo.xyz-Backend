@@ -6,7 +6,9 @@ export const FollowerSchema = new Schema({
   // It uses the same ObjectId as the users one for better quering.
   userId: {
     type: SchemaTypes.ObjectId,
-    ref: 'USER',
+    ref: 'user',
     required: true
   }
 })
+
+FollowerSchema.index({ user: 1 }, { unqiue: true })
