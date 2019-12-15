@@ -23,3 +23,24 @@ export const verifyToken = token => {
     )
   })
 }
+
+export const signup = async (req, res) => {
+  if (
+    !req.body.email ||
+    !req.body.password ||
+    !req.body.fullName ||
+    !req.body.handle
+  ) {
+    return res.status(400).send({
+      message: 'Email, password, full name and user handle are required.'
+    })
+  }
+
+  try {
+    const user = await User.create(req.body)
+    const token = newToken(user)
+    return res.status(201).json(token)
+  } catch (e) {
+    return res.status(500).end()
+  }
+}
