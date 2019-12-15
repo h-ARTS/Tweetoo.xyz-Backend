@@ -1,6 +1,6 @@
 import { Schema, SchemaTypes, model } from 'mongoose'
 
-export const TweetSchema = new Schema(
+const replySchema = new Schema(
   {
     full_text: {
       type: String,
@@ -12,10 +12,6 @@ export const TweetSchema = new Schema(
       default: 0
     },
     retweetCount: {
-      type: Number,
-      default: 0
-    },
-    replyCount: {
       type: Number,
       default: 0
     },
@@ -34,6 +30,6 @@ export const TweetSchema = new Schema(
   { timestamps: true }
 )
 
-TweetSchema.index({ user: 1, handle: 1 }, { unique: true })
+replySchema.index({ user: 1, handle: 1 }, { unique: true })
 
-export const Tweet = model('tweet', TweetSchema)
+export const Reply = model('reply', replySchema)
