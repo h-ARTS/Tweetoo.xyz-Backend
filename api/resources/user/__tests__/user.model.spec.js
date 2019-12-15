@@ -19,13 +19,14 @@ describe('User model', () => {
       expect(handle).toEqual({
         type: String,
         unqiue: true,
-        trim: true
+        trim: true,
+        required: true
       })
     })
 
-    test('has name', () => {
-      const name = User.schema.obj.name
-      expect(name).toEqual({
+    test('has fullName', () => {
+      const fullName = User.schema.obj.fullName
+      expect(fullName).toEqual({
         type: String,
         required: true,
         maxlength: 30
@@ -100,7 +101,8 @@ describe('User model', () => {
       await User.create({
         email: 'max@mustard.com',
         password: '123456',
-        name: 'Max Mustard'
+        fullName: 'Max Mustard',
+        handle: 'maxmustard'
       })
 
       const user = await User.findOne({
@@ -116,7 +118,8 @@ describe('User model', () => {
       await User.create({
         email: 'max@mustard.com',
         password: '123456',
-        name: 'Max Mustard'
+        fullName: 'Max Mustard',
+        handle: 'maxmustard'
       })
 
       const user = await User.findOne({
