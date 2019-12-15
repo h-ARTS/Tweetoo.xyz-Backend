@@ -18,7 +18,14 @@ describe('Authentication:', () => {
   })
 
   describe('verifyToken', () => {
-    test('validates the token and returns payload.', async () => {})
+    test('validates the token and returns payload.', async () => {
+      const id = 234
+      const token = jwt.sign({ id }, config.secrets.privateKey, {
+        algorithm: 'RS256'
+      })
+      const user = await verifyToken(token)
+      return expect(user.id).toBe(id)
+    })
   })
 
   describe('login', () => {
