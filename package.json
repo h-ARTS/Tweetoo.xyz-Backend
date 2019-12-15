@@ -9,6 +9,7 @@
     "test-usermodel": "jest /api/resources/user/__tests__ --verbose",
     "test-tweetmodel": "jest /api/resources/tweet/__tests__ --verbose",
     "test-replymodel": "jest /api/resources/reply/__tests__ --verbose",
+    "test-auth": "jest /api/utils/__tests__/auth.spec.js --verbose",
     "restart": "rimraf dist && yarn build && yarn start",
     "start": "node dist/index.js"
   },
@@ -31,8 +32,11 @@
   "homepage": "https://github.com/h-ARTS/Tweetoo.xyz#readme",
   "dependencies": {
     "bcrypt": "^3.0.2",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.8.0",
     "morgan": "^1.9.1"
   },
@@ -65,7 +69,9 @@
   "jest": {
     "testURL": "http://localhost/",
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["./test-db-setup.js"],
+    "setupFilesAfterEnv": [
+      "./test-db-setup.js"
+    ],
     "testPathIgnorePatterns": [
       "dist/"
     ],
