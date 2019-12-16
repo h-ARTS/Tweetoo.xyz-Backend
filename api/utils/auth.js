@@ -44,3 +44,33 @@ export const signup = async (req, res) => {
     return res.status(500).end()
   }
 }
+
+export const login = async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send({ message: 'Email and password required!' })
+  }
+
+  const invalid = { message: 'Wrong email and password combination.' }
+
+  try {
+    const user = await User.findOne({ email: req.body.email })
+      .select('email password')
+      .exec()
+
+    if (!user) {
+      return res.status(401).send(invalid)
+    }
+
+    const match = await user.verifyPassword(req.body.password)
+
+    if (!match) {
+      return res.status(401).send(invalid)
+    }
+
+    const token = newToken(user)
+    return res.status(201).json(token)
+  } catch (e) {
+    console.error(e)
+    res.status(500).end()
+  }
+}

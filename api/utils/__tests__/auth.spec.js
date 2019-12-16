@@ -1,4 +1,4 @@
-import { newToken, verifyToken, signup } from '../auth'
+import { newToken, verifyToken, signup, login } from '../auth'
 import jwt from 'jsonwebtoken'
 import { User } from '../../resources/user/user.model'
 import config from '../../../config'
@@ -29,13 +29,101 @@ describe('Authentication:', () => {
   })
 
   describe('login', () => {
-    test('requires email and password.', async () => {})
+    test('requires email and password.', async () => {
+      expect.assertions(2)
 
-    test('user must exist.', async () => {})
+      const req = { body: {} }
+      const res = {
+        status(code) {
+          expect(code).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
 
-    test('passwords must match.', async () => {})
+      await login(req, res)
+    })
 
-    test('creates a new token.', async () => {})
+    test('user must exist.', async () => {
+      expect.assertions(2)
+
+      const req = { body: { email: 'wrong@me.com', password: '1234' } }
+      const res = {
+        status(code) {
+          expect(code).toBe(401)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
+
+      await login(req, res)
+    })
+
+    test('passwords must match.', async () => {
+      expect.assertions(2)
+
+      await User.create({
+        email: 'william@wallace.com',
+        password: '1234567890',
+        fullName: 'William Wallace',
+        handle: '@WWallace'
+      })
+
+      const req = {
+        body: {
+          email: 'william@wallace.com',
+          password: 'thecompletewrongpw'
+        }
+      }
+      const res = {
+        status(code) {
+          expect(code).toBe(401)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
+
+      await login(req, res)
+    })
+
+    test('creates a new token.', async () => {
+      expect.assertions(2)
+      const fields = {
+        email: 'mao@han.com',
+        password: '12345',
+        fullName: 'Mao Han',
+        handle: '@maohan'
+      }
+      const savedUser = await User.create(fields)
+
+      const req = {
+        body: {
+          email: fields.email,
+          password: fields.password
+        }
+      }
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        async json(token) {
+          let user = await verifyToken(token)
+          user = await User.findById(user.id)
+            .lean()
+            .exec()
+          expect(user._id.toString()).toBe(savedUser._id.toString())
+        }
+      }
+
+      await login(req, res)
+    })
   })
 
   describe('signup', () => {
