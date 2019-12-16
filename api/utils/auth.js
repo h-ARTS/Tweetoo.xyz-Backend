@@ -54,7 +54,7 @@ export const login = async (req, res) => {
 
   try {
     const user = await User.findOne({ email: req.body.email })
-      .select('email password')
+      .select('email password') // We only include email and password and exclude the rest
       .exec()
 
     if (!user) {
@@ -73,4 +73,33 @@ export const login = async (req, res) => {
     console.error(e)
     res.status(500).end()
   }
+}
+
+export const authGuard = async (req, res, next) => {
+  const bearer = req.headers.authorization
+
+  if (!bearer || !bearer.startsWith('Bearer ')) {
+    return res.status(401).end()
+  }
+
+  const token = bearer.split('Bearer ')[1].trim()
+
+  let payload
+  try {
+    payload = await verifyToken(token)
+  } catch (e) {
+    return res.status(401).end()
+  }
+
+  const user = await User.findById(payload.id)
+    .select('-password') // We exclude password since it's not needed for protected routes.
+    .lean()
+    .exec()
+
+  if (!user) {
+    return res.status(401).end()
+  }
+
+  req.user = user
+  next()
 }

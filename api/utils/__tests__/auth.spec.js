@@ -1,5 +1,6 @@
-import { newToken, verifyToken, signup, login } from '../auth'
+import { newToken, verifyToken, signup, login, authGuard } from '../auth'
 import jwt from 'jsonwebtoken'
+import { Types } from 'mongoose'
 import { User } from '../../resources/user/user.model'
 import config from '../../../config'
 
@@ -174,12 +175,77 @@ describe('Authentication:', () => {
   })
 
   describe('authGuard', () => {
-    test('looks for Bearer token in headers.', async () => {})
+    test('looks for Bearer token in headers.', async () => {
+      expect.assertions(2)
 
-    test('looks for the token and must have correct prefix.', async () => {})
+      const req = { headers: {} }
+      const res = {
+        status(code) {
+          expect(code).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
 
-    test('checks for a real user.', async () => {})
+      await authGuard(req, res)
+    })
 
-    test('finds a user from token and passes on.', async () => {})
+    test('looks for the token and must have correct prefix.', async () => {
+      expect.assertions(2)
+
+      const req = { headers: { authorization: newToken({ id: '32758gf' }) } }
+      const res = {
+        status(code) {
+          expect(code).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await authGuard(req, res)
+    })
+
+    test('checks for a real user.', async () => {
+      expect.assertions(2)
+
+      const token = `Bearer ${newToken({ id: Types.ObjectId() })}`
+      const req = { headers: { authorization: token } }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await authGuard(req, res)
+    })
+
+    test('finds a user from token and passes on.', async () => {
+      expect.assertions(2)
+
+      const user = await User.create({
+        email: 'max@mustard.com',
+        password: '123456',
+        fullName: 'Max Mustard',
+        handle: '@maxmustard'
+      })
+
+      const token = `Bearer ${newToken(user)}`
+      const req = { headers: { authorization: token } }
+      const next = () => {}
+
+      await authGuard(req, {}, next)
+
+      expect(req.user._id.toString()).toBe(user._id.toString())
+      expect(req.user).not.toHaveProperty('password')
+    })
   })
 })
