@@ -12,7 +12,7 @@ describe('API Authentication:', () => {
       password: '123456',
       fullName: 'Dr. Max Mustard',
       handle: '@DrMustard'
-  })
+    })
     token = newToken(user)
   })
 
@@ -31,6 +31,32 @@ describe('API Authentication:', () => {
 
       response = await request(app).get('/api/notifications')
       expect(response.statusCode).toBe(401)
+    })
+
+    test('passes with JWT', async () => {
+      const jwt = `Bearer ${token}`
+      const id = mongoose.Types.ObjectId()
+      const results = await Promise.all([
+        request(app)
+          .get('/api/tweets')
+          .set('Authorization', jwt),
+        request(app)
+          .get(`/api/tweet/${id}`)
+          .set('Authorization', jwt),
+        request(app)
+          .post(`/api/tweet/${id}`)
+          .set('Authorization', jwt),
+        request(app)
+          .put(`/api/tweet/${id}`)
+          .set('Authorization', jwt),
+        request(app)
+          .delete(`/api/tweet/${id}`)
+          .set('Authorization', jwt)
+      ])
+
+      return results.forEach(res => {
+        expect(res.statusCode).not.toBe(401)
+      })
     })
   })
 })
