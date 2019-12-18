@@ -15,9 +15,10 @@ const userSchema = new Schema(
     handle: {
       type: String,
       unqiue: true,
-      trim: true
+      trim: true,
+      required: true
     },
-    name: {
+    fullName: {
       type: String,
       required: true,
       maxlength: 30

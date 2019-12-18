@@ -1,3 +1,4 @@
+require('dotenv').config()
 const fs = require('fs')
 const path = require('path')
 
@@ -9,9 +10,9 @@ const config = {
   secrets: {
     privateKey: fs.readFileSync(privateKeyPath, 'utf8'),
     publicKey: fs.readFileSync(publicKeyPath, 'utf8'),
-    jwtExp: '10d'
+    jwtExp: '30d'
   },
   dbUrl: 'mongodb://127.0.0.1:27017/api'
 }
 
-export default config
+module.exports = config
