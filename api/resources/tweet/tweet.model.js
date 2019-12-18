@@ -19,6 +19,10 @@ export const TweetSchema = new Schema(
       type: Number,
       default: 0
     },
+    fullName: {
+      type: String,
+      required: true
+    },
     userId: {
       type: SchemaTypes.ObjectId,
       required: true,
@@ -26,9 +30,7 @@ export const TweetSchema = new Schema(
     },
     handle: {
       type: String,
-      required: true,
-      trim: true,
-      ref: 'user'
+      required: true
     }
   },
   { timestamps: true }
