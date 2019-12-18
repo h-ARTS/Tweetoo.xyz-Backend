@@ -2,7 +2,7 @@ import { Schema, SchemaTypes, model } from 'mongoose'
 
 const replySchema = new Schema(
   {
-    full_text: {
+    fullText: {
       type: String,
       required: true,
       maxlength: 280

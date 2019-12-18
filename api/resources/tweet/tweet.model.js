@@ -2,7 +2,7 @@ import { Schema, SchemaTypes, model } from 'mongoose'
 
 export const TweetSchema = new Schema(
   {
-    full_text: {
+    fullText: {
       type: String,
       required: true,
       maxlength: 280

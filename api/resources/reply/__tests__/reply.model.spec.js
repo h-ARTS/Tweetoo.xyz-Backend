@@ -2,8 +2,8 @@ import { SchemaTypes } from 'mongoose'
 import { Reply } from '../reply.model'
 
 describe('Reply model schema', () => {
-  test('has full_text', () => {
-    const fullText = Reply.schema.obj.full_text
+  test('has fullText', () => {
+    const fullText = Reply.schema.obj.fullText
     expect(fullText).toEqual({
       type: String,
       required: true,

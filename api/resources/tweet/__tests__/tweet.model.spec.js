@@ -2,8 +2,8 @@ import { Tweet } from '../tweet.model'
 import { SchemaTypes } from 'mongoose'
 
 describe('Tweets model schema', () => {
-  test('has full_text', () => {
-    const fullText = Tweet.schema.obj.full_text
+  test('has fullText', () => {
+    const fullText = Tweet.schema.obj.fullText
     expect(fullText).toEqual({
       type: String,
       required: true,

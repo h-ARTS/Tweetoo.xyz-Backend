@@ -87,7 +87,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 
 // PSEUDO tweet and user JSON objects
 // tweet = {
-//   full_text: 'dasfsadasd',
+//   fullText: 'dasfsadasd',
 //   createdBy: 'babu',
 //   createdAt: 1873894234
 // }
@@ -99,7 +99,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 //   following: 943,
 //   tweets: [
 //     {
-//       full_text: 'dasfsadasd',
+//       fullText: 'dasfsadasd',
 //       createdBy: 'max',
 //       createdAt: 1873894234,
 //       retweet: false,
@@ -107,7 +107,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 //       retweetCount: 21
 //     },
 //     {
-//       full_text: 'dasfsadasd',
+//       fullText: 'dasfsadasd',
 //       createdBy: 'babu',
 //       createdAt: 1873891211,
 //       retweet: true,
