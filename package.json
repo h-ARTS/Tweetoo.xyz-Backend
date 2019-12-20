@@ -6,6 +6,7 @@
   "scripts": {
     "build": "babel api --out-dir dist",
     "dev": "nodemon --exec yarn restart",
+    "test-routes": "jest -t router:",
     "test-usermodel": "jest /api/resources/user/__tests__",
     "test-tweetmodel": "jest /api/resources/tweet/__tests__",
     "test-replymodel": "jest /api/resources/reply/__tests__",
