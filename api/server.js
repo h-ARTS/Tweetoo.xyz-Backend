@@ -7,8 +7,8 @@ import config from '../config'
 import { authGuard, login, signup } from './utils/auth'
 import { Tweet } from './resources/tweet/tweet.model'
 import tweetRouter from './resources/tweet/tweet.router'
-import { Reply } from './resources/reply/reply.model'
 import replyRouter from './resources/reply/reply.router'
+import userRouter from './resources/user/user.router'
 import { getAll } from './utils/crud'
 
 export const app = express()
@@ -24,7 +24,7 @@ app.post('/login', login)
 app.post('/signup', signup)
 
 app.use('/api', authGuard)
-app.use('/api/user', () => {})
+app.use('/api/user', userRouter)
 app.use('/api/tweet', tweetRouter)
 app.use('/api/tweets', getAll(Tweet))
 app.use('/api/tweet/:tweetId', replyRouter)
@@ -35,7 +35,7 @@ export const start = async () => {
     await connect()
     app.listen(config.port, () =>
       console.log(
-        `REST API Server running on  http://localhost:${config.port}/api`
+        `REST API Server running on http://localhost:${config.port}/api`
       )
     )
   } catch (e) {
