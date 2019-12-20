@@ -1,9 +1,9 @@
 import { Tweet } from '../tweet.model'
 import { SchemaTypes } from 'mongoose'
 
-describe('Tweets model schema', () => {
-  test('has full_text', () => {
-    const fullText = Tweet.schema.obj.full_text
+describe('Tweets model:', () => {
+  test('has fullText', () => {
+    const fullText = Tweet.schema.obj.fullText
     expect(fullText).toEqual({
       type: String,
       required: true,
@@ -35,9 +35,9 @@ describe('Tweets model schema', () => {
     })
   })
 
-  test('has userId', () => {
-    const userId = Tweet.schema.obj.userId
-    expect(userId).toEqual({
+  test('has createdBy', () => {
+    const createdBy = Tweet.schema.obj.createdBy
+    expect(createdBy).toEqual({
       type: SchemaTypes.ObjectId,
       required: true,
       ref: 'user'
@@ -48,9 +48,7 @@ describe('Tweets model schema', () => {
     const handle = Tweet.schema.obj.handle
     expect(handle).toEqual({
       type: String,
-      required: true,
-      trim: true,
-      ref: 'user'
+      required: true
     })
   })
 })

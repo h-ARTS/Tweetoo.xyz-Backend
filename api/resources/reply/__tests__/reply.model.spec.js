@@ -1,9 +1,17 @@
 import { SchemaTypes } from 'mongoose'
 import { Reply } from '../reply.model'
 
-describe('Reply model schema', () => {
-  test('has full_text', () => {
-    const fullText = Reply.schema.obj.full_text
+describe('Reply model:', () => {
+  test('has tweetId', () => {
+    const tweetId = Reply.schema.obj.tweetId
+    expect(tweetId).toEqual({
+      type: SchemaTypes.ObjectId,
+      required: true,
+      ref: 'tweet'
+    })
+  })
+  test('has fullText', () => {
+    const fullText = Reply.schema.obj.fullText
     expect(fullText).toEqual({
       type: String,
       required: true,
@@ -24,9 +32,9 @@ describe('Reply model schema', () => {
       default: 0
     })
   })
-  test('has userId', () => {
-    const userId = Reply.schema.obj.userId
-    expect(userId).toEqual({
+  test('has createdBy', () => {
+    const createdBy = Reply.schema.obj.createdBy
+    expect(createdBy).toEqual({
       type: SchemaTypes.ObjectId,
       required: true,
       ref: 'user'
@@ -36,9 +44,7 @@ describe('Reply model schema', () => {
     const handle = Reply.schema.obj.handle
     expect(handle).toEqual({
       type: String,
-      required: true,
-      trim: true,
-      ref: 'user'
+      required: true
     })
   })
 })

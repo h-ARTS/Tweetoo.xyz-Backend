@@ -2,7 +2,7 @@ import { Schema, SchemaTypes, model } from 'mongoose'
 
 export const TweetSchema = new Schema(
   {
-    full_text: {
+    fullText: {
       type: String,
       required: true,
       maxlength: 280
@@ -19,16 +19,18 @@ export const TweetSchema = new Schema(
       type: Number,
       default: 0
     },
-    userId: {
+    fullName: {
+      type: String,
+      required: true
+    },
+    createdBy: {
       type: SchemaTypes.ObjectId,
       required: true,
       ref: 'user'
     },
     handle: {
       type: String,
-      required: true,
-      trim: true,
-      ref: 'user'
+      required: true
     }
   },
   { timestamps: true }

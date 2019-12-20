@@ -1,8 +1,8 @@
 import { User } from '../user.model'
 import { TweetSchema } from '../../tweet/tweet.model'
-import { FollowerSchema } from '../follower.model'
+import { FollowerSchema } from '../follower.schema'
 
-describe('User model', () => {
+describe('User model:', () => {
   describe('schema', () => {
     test('has email', () => {
       const email = User.schema.obj.email
@@ -61,9 +61,9 @@ describe('User model', () => {
       expect(birthday).toEqual(Date)
     })
 
-    test('has profileImage', () => {
-      const profileImage = User.schema.obj.profileImage
-      expect(profileImage).toEqual(String)
+    test('has userImage', () => {
+      const userImage = User.schema.obj.userImage
+      expect(userImage).toEqual(String)
     })
 
     test('has coverImage', () => {
