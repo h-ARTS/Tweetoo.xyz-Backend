@@ -2,6 +2,11 @@ import { Schema, SchemaTypes, model } from 'mongoose'
 
 const replySchema = new Schema(
   {
+    tweetId: {
+      type: SchemaTypes.ObjectId,
+      required: true,
+      ref: 'tweet'
+    },
     fullText: {
       type: String,
       required: true,
@@ -22,14 +27,12 @@ const replySchema = new Schema(
     },
     handle: {
       type: String,
-      required: true,
-      trim: true,
-      ref: 'user'
+      required: true
     }
   },
   { timestamps: true }
 )
 
-replySchema.index({ user: 1, handle: 1 }, { unique: true })
+replySchema.index({ user: 1, tweet: 1 }, { unique: true })
 
 export const Reply = model('reply', replySchema)

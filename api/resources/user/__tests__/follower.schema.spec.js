@@ -1,4 +1,4 @@
-import { FollowerSchema } from '../follower.model'
+import { FollowerSchema } from '../follower.schema'
 import { SchemaTypes } from 'mongoose'
 
 describe('Follower Schema', () => {

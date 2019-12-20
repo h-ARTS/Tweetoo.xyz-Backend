@@ -5,8 +5,10 @@ import { json, urlencoded } from 'body-parser'
 import cors from 'cors'
 import config from '../config'
 import { authGuard, login, signup } from './utils/auth'
-import tweetRouter from './resources/tweet/tweet.router'
 import { Tweet } from './resources/tweet/tweet.model'
+import tweetRouter from './resources/tweet/tweet.router'
+import { Reply } from './resources/reply/reply.model'
+import replyRouter from './resources/reply/reply.router'
 import { getAll } from './utils/crud'
 
 export const app = express()
@@ -25,7 +27,7 @@ app.use('/api', authGuard)
 app.use('/api/user', () => {})
 app.use('/api/tweet', tweetRouter)
 app.use('/api/tweets', getAll(Tweet))
-// app.use('/api/tweet/:tweetId/reply', replyRouter)
+app.use('/api/tweet/:tweetId', replyRouter)
 app.use('/api/notifications', () => {})
 
 export const start = async () => {

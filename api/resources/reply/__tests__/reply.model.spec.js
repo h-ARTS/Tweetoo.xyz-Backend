@@ -1,7 +1,15 @@
 import { SchemaTypes } from 'mongoose'
 import { Reply } from '../reply.model'
 
-describe('Reply model schema', () => {
+describe('Reply model:', () => {
+  test('has tweetId', () => {
+    const tweetId = Reply.schema.obj.tweetId
+    expect(tweetId).toEqual({
+      type: SchemaTypes.ObjectId,
+      required: true,
+      ref: 'tweet'
+    })
+  })
   test('has fullText', () => {
     const fullText = Reply.schema.obj.fullText
     expect(fullText).toEqual({
@@ -36,9 +44,7 @@ describe('Reply model schema', () => {
     const handle = Reply.schema.obj.handle
     expect(handle).toEqual({
       type: String,
-      required: true,
-      trim: true,
-      ref: 'user'
+      required: true
     })
   })
 })

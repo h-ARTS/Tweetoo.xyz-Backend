@@ -1,6 +1,6 @@
-import controllers from '../tweet.controllers'
+import controllers from '../reply.controllers'
 
-describe('tweet controllers:', () => {
+describe('reply controllers:', () => {
   test('has crud controllers', () => {
     const crudMethods = [
       'getOne',

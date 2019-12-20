@@ -1,7 +1,7 @@
 import { Tweet } from '../tweet.model'
 import { SchemaTypes } from 'mongoose'
 
-describe('Tweets model schema', () => {
+describe('Tweets model:', () => {
   test('has fullText', () => {
     const fullText = Tweet.schema.obj.fullText
     expect(fullText).toEqual({
@@ -48,9 +48,7 @@ describe('Tweets model schema', () => {
     const handle = Tweet.schema.obj.handle
     expect(handle).toEqual({
       type: String,
-      required: true,
-      trim: true,
-      ref: 'user'
+      required: true
     })
   })
 })
