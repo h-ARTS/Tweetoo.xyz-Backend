@@ -31,7 +31,7 @@ const userSchema = new Schema(
     location: String,
     website: String,
     birthday: Date,
-    profileImage: String,
+    userImage: String,
     coverImage: String,
     following: {
       type: [FollowerSchema],

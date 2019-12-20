@@ -61,9 +61,9 @@ describe('User model:', () => {
       expect(birthday).toEqual(Date)
     })
 
-    test('has profileImage', () => {
-      const profileImage = User.schema.obj.profileImage
-      expect(profileImage).toEqual(String)
+    test('has userImage', () => {
+      const userImage = User.schema.obj.userImage
+      expect(userImage).toEqual(String)
     })
 
     test('has coverImage', () => {
