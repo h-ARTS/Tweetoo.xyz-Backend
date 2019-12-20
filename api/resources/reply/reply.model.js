@@ -15,7 +15,7 @@ const replySchema = new Schema(
       type: Number,
       default: 0
     },
-    userId: {
+    createdBy: {
       type: SchemaTypes.ObjectId,
       required: true,
       ref: 'user'

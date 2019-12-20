@@ -23,7 +23,7 @@ export const TweetSchema = new Schema(
       type: String,
       required: true
     },
-    userId: {
+    createdBy: {
       type: SchemaTypes.ObjectId,
       required: true,
       ref: 'user'
