@@ -19,6 +19,8 @@ export const updateProfile = async (req, res) => {
   }
 }
 
+// TODO: Create imageUpload controller
+
 export const controllers = {
   myProfile: myProfile,
   updateProfile: updateProfile
