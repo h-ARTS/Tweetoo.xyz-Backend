@@ -10,6 +10,7 @@
     "test-tweetmodel": "jest /api/resources/tweet/__tests__",
     "test-replymodel": "jest /api/resources/reply/__tests__",
     "test-auth": "jest -t Authentication: --detectOpenHandles",
+    "test-crud": "jest /api/utils/__tests__/crud.spec.js",
     "restart": "rimraf dist && yarn build && yarn start",
     "start": "node dist/index.js"
   },

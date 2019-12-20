@@ -35,9 +35,9 @@ describe('Tweets model schema', () => {
     })
   })
 
-  test('has userId', () => {
-    const userId = Tweet.schema.obj.userId
-    expect(userId).toEqual({
+  test('has createdBy', () => {
+    const createdBy = Tweet.schema.obj.createdBy
+    expect(createdBy).toEqual({
       type: SchemaTypes.ObjectId,
       required: true,
       ref: 'user'

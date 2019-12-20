@@ -1,88 +1,306 @@
-// This is just a stupid example
-//
-// import { getAny } from '../server'
-//
-// describe('Basic GET request:', () => {
-//   test('getAny should return 200 with a text', async () => {
-//     expect.assertions(2)
-//
-//     const req = {}
-//     const res = {
-//       status(code) {
-//         expect(code).toBe(200)
-//         return this
-//       },
-//       send(result) {
-//         expect(typeof result).toBe('string')
-//       }
-//     }
-//
-//     await getAny(req, res)
-//   })
-// })
+import { getAll, getOne, createOne, updateOne, removeOne } from '../crud'
+import { Tweet } from '../../resources/tweet/tweet.model'
+import mongoose from 'mongoose'
 
 describe('CRUD controllers for Tweets and Replies:', () => {
   describe('getAll', () => {
-    test('finds an array of docs.', async () => {})
+    test('finds an array of docs.', async () => {
+      expect.assertions(2)
 
-    test('responds 404 if no doc was found.', async () => {})
+      const user = mongoose.Types.ObjectId()
+
+      await Tweet.create([
+        {
+          createdBy: user,
+          fullText: 'My tweet 1. Yaaay!',
+          fullName: 'Dr Maxx',
+          handle: '@drmxx'
+        },
+        {
+          createdBy: user,
+          fullText: 'Wow this is awesome!',
+          fullName: 'Dr Maxx',
+          handle: '@drmxx'
+        },
+        {
+          createdBy: user,
+          fullText: 'Great news here now at TV.',
+          fullName: 'Dr Maxx',
+          handle: '@drmxx'
+        }
+      ])
+
+      const req = {
+        user: {
+          _id: user
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data).toHaveLength(3)
+        }
+      }
+
+      await getAll(Tweet)(req, res)
+    })
   })
 
   describe('getOne', () => {
-    test('finds a doc by id.', async () => {})
+    test('finds a doc by id.', async () => {
+      expect.assertions(2)
 
-    test('responds 404 if no doc was found.', async () => {})
+      const tweet = await Tweet.create({
+        createdBy: mongoose.Types.ObjectId(),
+        fullText: 'This is my new tweet.',
+        fullName: 'Dr Maxx',
+        handle: '@Drmaxx'
+      })
+
+      const req = {
+        params: {
+          tweetId: tweet._id
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data._id.toString()).toBe(tweet._id.toString())
+        }
+      }
+
+      await getOne(Tweet)(req, res)
+    })
+
+    test('responds 404 if no doc was found.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        params: {
+          tweetId: mongoose.Types.ObjectId()
+        }
+      }
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await getOne(Tweet)(req, res)
+    })
   })
 
   describe('createOne', () => {
-    test('creates a new doc.', async () => {})
+    test('creates a new doc.', async () => {
+      expect.assertions(2)
 
-    test('createdBy should be the authenticated user.', async () => {})
+      const createdBy = mongoose.Types.ObjectId()
+      const body = {
+        fullText: 'My new tweet!'
+      }
+
+      const req = {
+        user: { _id: createdBy, fullName: 'Max', handle: '@max' },
+        body
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(results) {
+          expect(results.data.fullText).toBe(body.fullText)
+        }
+      }
+
+      await createOne(Tweet)(req, res)
+    })
+
+    test('createdBy should be the authenticated user.', async () => {
+      expect.assertions(2)
+
+      const createdBy = mongoose.Types.ObjectId()
+      const body = {
+        fullText: 'This is another test tweet.'
+      }
+
+      const req = {
+        user: { _id: createdBy, fullName: 'Max Fritz', handle: '@maxFritz' },
+        body
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(results) {
+          expect(results.data.createdBy.toString()).toBe(createdBy.toString())
+        }
+      }
+
+      await createOne(Tweet)(req, res)
+    })
   })
 
   describe('updateOne', () => {
-    test('finds a doc by authenticated user and id to update.', async () => {})
+    test('finds a doc by authenticated user and id to update.', async () => {
+      expect.assertions(3)
 
-    test('responds 404 if no doc was found.', async () => {})
+      const user = mongoose.Types.ObjectId()
+      const tweet = await Tweet.create({
+        fullText: 'My new tweet for update',
+        createdBy: user,
+        fullName: 'Max',
+        handle: '@max'
+      })
+
+      const update = { fullText: 'Hot news here now! 🔥 #hot_news' }
+
+      const req = {
+        params: { tweetId: tweet._id },
+        user: { _id: user },
+        body: update
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data._id.toString()).toBe(tweet._id.toString())
+          expect(result.data.fullText).toBe(update.fullText)
+        }
+      }
+
+      await updateOne(Tweet)(req, res)
+    })
+
+    test('responds 404 if no doc was found.', async () => {
+      expect.assertions(2)
+
+      const user = mongoose.Types.ObjectId()
+      const update = { fullText: 'hello' }
+
+      const req = {
+        params: { tweetId: mongoose.Types.ObjectId() },
+        user: { _id: user },
+        body: update
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await updateOne(Tweet)(req, res)
+    })
   })
 
   describe('removeOne', () => {
-    test('removes one doc by authenticated user and id.', async () => {})
+    test('removes one doc by authenticated user and id.', async () => {
+      expect.assertions(2)
 
-    test('responds 404 if no doc was found.', async () => {})
+      const user = mongoose.Types.ObjectId()
+      const tweet = await Tweet.create({
+        fullText: 'My new tweet for update',
+        createdBy: user,
+        fullName: 'Max',
+        handle: '@max'
+      })
+
+      const req = {
+        params: { tweetId: tweet._id },
+        user: { _id: user }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data._id.toString()).toEqual(tweet._id.toString())
+        }
+      }
+
+      await removeOne(Tweet)(req, res)
+    })
+
+    test('responds 404 if no doc was found.', async () => {
+      expect.assertions(2)
+
+      const user = mongoose.Types.ObjectId()
+
+      const req = {
+        params: { tweetId: mongoose.Types.ObjectId() },
+        user: { _id: user }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(400)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
+
+      await removeOne(Tweet)(req, res)
+    })
   })
 
-  describe('likeTweet', () => {
-    test('finds a doc by id and increases the like count by 1.', async () => {})
+  // describe('likeTweet', () => {
+  //   test('finds a doc by id and increases the like count by 1.', async () => {})
 
-    test('responds 404 if no doc was found.', async () => {})
-  })
+  //   test('responds 404 if no doc was found.', async () => {})
+  // })
 
-  describe('unlikeTweet', () => {
-    test('finds a doc by id and decreases the like count by 1.', async () => {})
+  // describe('unlikeTweet', () => {
+  //   test('finds a doc by id and decreases the like count by 1.', async () => {})
 
-    test('responds 404 if no doc was found.', async () => {})
-  })
+  //   test('responds 404 if no doc was found.', async () => {})
+  // })
 
-  describe('reTweet', () => {
-    test('finds a doc by id and increases the retweet count by 1.', async () => {})
+  // describe('reTweet', () => {
+  //   test('finds a doc by id and increases the retweet count by 1.', async () => {})
 
-    test('copies the tweet and adds it to the user object.', async () => {})
+  //   test('copies the tweet and adds it to the user object.', async () => {})
 
-    test('sets the retweet property to true.', async () => {})
+  //   test('sets the retweet property to true.', async () => {})
 
-    test('responds 404 if no tweet was found.', async () => {})
-  })
+  //   test('responds 404 if no tweet was found.', async () => {})
+  // })
 
-  describe('undoRetweet', () => {
-    test('finds the tweet by id and decreases the retweet count by 1.', async () => {})
+  // describe('undoRetweet', () => {
+  //   test('finds the tweet by id and decreases the retweet count by 1.', async () => {})
 
-    test('removes the tweet by id from the user object.', async () => {})
+  //   test('removes the tweet by id from the user object.', async () => {})
 
-    test('sets the retweet property to false.', async () => {})
+  //   test('sets the retweet property to false.', async () => {})
 
-    test('responds 404 if no tweet was found.', async () => {})
-  })
+  //   test('responds 404 if no tweet was found.', async () => {})
+  // })
 })
 
 // PSEUDO tweet and user JSON objects
