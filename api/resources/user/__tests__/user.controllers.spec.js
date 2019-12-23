@@ -106,9 +106,10 @@ describe('user controllers:', () => {
         },
         json(result) {
           expect(result.data.target.followers).not.toHaveLength(0)
-          result.data.target.followers.forEach(f => {
-            expect(f.userId.toString()).toBe(loggedInUser._id.toString())
+          const follower = result.data.target.followers.find(f => {
+            return f.userId.toString() === loggedInUser._id.toString()
           })
+          expect(follower).toBeTruthy()
         }
       }
 
@@ -145,9 +146,15 @@ describe('user controllers:', () => {
         },
         json(result) {
           expect(result.data.updated.following).not.toHaveLength(0)
-          result.data.updated.following.forEach(f => {
-            expect(f.userId.toString()).toBe(userToFollow._id.toString())
+          const following = result.data.updated.following.find(f => {
+            return f.userId.toString() === userToFollow._id.toString()
           })
+          expect(following).toBeTruthy()
+        }
+      }
+
+      await followHandler(req, res)
+    })
         }
       }
 
