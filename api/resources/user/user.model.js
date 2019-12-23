@@ -35,15 +35,15 @@ const userSchema = new Schema(
     coverImage: String,
     following: {
       type: [FollowerSchema],
-      default: undefined
+      default: []
     },
     followers: {
       type: [FollowerSchema],
-      default: undefined
+      default: []
     },
     tweets: {
       type: [TweetSchema],
-      default: undefined
+      default: []
     }
   },
   {

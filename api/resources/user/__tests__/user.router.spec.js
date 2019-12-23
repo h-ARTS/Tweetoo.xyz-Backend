@@ -4,7 +4,9 @@ describe('user router:', () => {
   test('has user routes', () => {
     const routes = [
       { path: '/', method: 'get' },
-      { path: '/', method: 'put' }
+      { path: '/', method: 'put' },
+      { path: '/:handle', method: 'get' },
+      { path: '/:handle', method: 'put' }
     ]
 
     routes.forEach(route => {
