@@ -5,6 +5,7 @@ import {
   followHandler
 } from '../user.controllers'
 import { User } from '../user.model'
+import mongoose from 'mongoose'
 
 describe('user controllers:', () => {
   test('has functions to display user profile and to update.', () => {
@@ -155,6 +156,50 @@ describe('user controllers:', () => {
 
       await followHandler(req, res)
     })
+
+    test('removes a follower from the target user and a following from the authenticated user.', async () => {
+      expect.assertions(3)
+
+      const objId = mongoose.Types.ObjectId()
+      const objId2 = mongoose.Types.ObjectId()
+
+      const userToUnfollow = await User.create({
+        email: 'max2@aol.com',
+        password: '123456',
+        fullName: 'Max 2Ol',
+        handle: '@max_o2'
+      })
+      const user = await User.create({
+        email: 'max@aol.com',
+        password: '123456',
+        fullName: 'Max Ol',
+        handle: '@max_o'
+      })
+
+      userToUnfollow.followers.push({ _id: objId2, userId: user._id })
+      await userToUnfollow.save()
+
+      user.following.push({ _id: objId, userId: userToUnfollow._id })
+      await user.save()
+
+      const req = {
+        params: { handle: userToUnfollow.handle },
+        user: { _id: user._id },
+        body: { toFollow: false }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.data.target.followers).not.toEqual(
+            expect.arrayContaining([{ _id: objId2, userId: user._id }])
+          )
+          expect(result.data.updated.following).not.toEqual(
+            expect.arrayContaining([{ _id: objId, userId: userToUnfollow._id }])
+          )
         }
       }
 
