@@ -36,29 +36,29 @@ export const updateProfile = async (req, res) => {
 
 export const followHandler = async (req, res) => {
   try {
-    const userToFollow = await User.findOne({ handle: req.params.handle })
+    const targetUser = await User.findOne({ handle: req.params.handle })
 
     if (req.body.toFollow) {
-      userToFollow.followers.push({ userId: req.user._id })
+      targetUser.followers.push({ userId: req.user._id })
     } else {
-      const followerToRemove = userToFollow.followers.find(
+      const followerToRemove = targetUser.followers.find(
         f => f.userId.toString() === req.user._id.toString()
       )
-      userToFollow.followers.pull({ _id: followerToRemove._id })
+      targetUser.followers.pull({ _id: followerToRemove._id })
     }
-    await userToFollow.save()
+    await targetUser.save()
 
-    if (!userToFollow) {
+    if (!targetUser) {
       return res.status(400).end()
     }
 
     const me = await User.findById(req.user._id)
 
     if (req.body.toFollow) {
-      me.following.push({ userId: userToFollow._id })
+      me.following.push({ userId: targetUser._id })
     } else {
       const followingToRemove = me.following.find(
-        f => f.userId.toString() === userToFollow._id.toString()
+        f => f.userId.toString() === targetUser._id.toString()
       )
       me.following.pull({ _id: followingToRemove._id })
     }
@@ -68,7 +68,7 @@ export const followHandler = async (req, res) => {
       return res.status(400).end()
     }
 
-    res.status(200).json({ data: { target: userToFollow, updated: me } })
+    res.status(200).json({ data: { target: targetUser, updated: me } })
   } catch (e) {
     console.error(e)
     return res.status(400).end()
