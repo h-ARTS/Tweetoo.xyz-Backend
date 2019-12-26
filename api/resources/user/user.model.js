@@ -3,6 +3,7 @@ import { Schema, model } from 'mongoose'
 import bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
 import { TweetSchema } from '../tweet/tweet.model'
+import { ImageFileSchema } from './image-upload/imagefile.schema'
 
 const userSchema = new Schema(
   {
@@ -31,8 +32,8 @@ const userSchema = new Schema(
     location: String,
     website: String,
     birthday: Date,
-    userImage: String,
-    coverImage: String,
+    userImage: ImageFileSchema,
+    coverImage: ImageFileSchema,
     following: {
       type: [FollowerSchema],
       default: []

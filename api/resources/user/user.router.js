@@ -5,6 +5,8 @@ import {
   getUser,
   followHandler
 } from './user.controllers'
+import { upload } from '../../utils/upload'
+import { uploadImage } from './image-upload/upload.controller'
 
 const router = Router()
 
@@ -12,7 +14,6 @@ router.get('/', myProfile)
 router.put('/', updateProfile)
 router.get('/:handle', getUser)
 router.put('/:handle', followHandler)
-
-// TODO: Create router for image upload
+router.post('/image', upload, uploadImage)
 
 export default router
