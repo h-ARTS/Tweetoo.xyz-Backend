@@ -16,13 +16,17 @@ export const app = express()
 app.disable('x-powered-by')
 
 app.use(cors())
+app.use('/media', express.static('media'))
+app.use(morgan('dev'))
 app.use(json())
 app.use(urlencoded({ extended: true }))
-app.use(morgan('dev'))
 
 app.post('/login', login)
 app.post('/signup', signup)
-
+//
+// TODO: Implement a getter for uploaded images
+// app.get('/image/:filename', getImage)
+//
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
 app.use('/api/tweet', tweetRouter)
@@ -42,3 +46,8 @@ export const start = async () => {
     console.error(e)
   }
 }
+
+app.use(function(err, req, res, next) {
+  console.log('This is the invalid field -> ', err.field)
+  next(err)
+})

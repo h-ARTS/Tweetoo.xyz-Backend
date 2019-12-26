@@ -1,6 +1,7 @@
 import { User } from '../user.model'
 import { TweetSchema } from '../../tweet/tweet.model'
 import { FollowerSchema } from '../follower.schema'
+import { ImageFileSchema } from '../image-upload/imagefile.schema'
 
 describe('User model:', () => {
   describe('schema', () => {
@@ -63,19 +64,19 @@ describe('User model:', () => {
 
     test('has userImage', () => {
       const userImage = User.schema.obj.userImage
-      expect(userImage).toEqual(String)
+      expect(userImage).toEqual(ImageFileSchema)
     })
 
     test('has coverImage', () => {
       const coverImage = User.schema.obj.coverImage
-      expect(coverImage).toEqual(String)
+      expect(coverImage).toEqual(ImageFileSchema)
     })
 
     test('has following as array', () => {
       const following = User.schema.obj.following
       expect(following).toEqual({
         type: [FollowerSchema],
-        default: undefined
+        default: []
       })
     })
 
@@ -83,7 +84,7 @@ describe('User model:', () => {
       const followers = User.schema.obj.followers
       expect(followers).toEqual({
         type: [FollowerSchema],
-        default: undefined
+        default: []
       })
     })
 
@@ -91,7 +92,7 @@ describe('User model:', () => {
       const tweets = User.schema.obj.tweets
       expect(tweets).toEqual({
         type: [TweetSchema],
-        default: undefined
+        default: []
       })
     })
   })

@@ -34,12 +34,15 @@
   "dependencies": {
     "bcrypt": "^3.0.2",
     "body-parser": "^1.19.0",
+    "busboy-body-parser": "^0.3.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "mongo-gridfs": "^1.1.0",
     "mongoose": "^5.8.2",
-    "morgan": "^1.9.1"
+    "morgan": "^1.9.1",
+    "multer": "^1.4.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
