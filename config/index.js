@@ -12,7 +12,8 @@ const config = {
     publicKey: fs.readFileSync(publicKeyPath, 'utf8'),
     jwtExp: '30d'
   },
-  dbUrl: 'mongodb://127.0.0.1:27017/api'
+  dbUrl:
+    'mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/api?=replicaSet=tweetoo'
 }
 
 module.exports = config
