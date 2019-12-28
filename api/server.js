@@ -23,10 +23,7 @@ app.use(urlencoded({ extended: true }))
 
 app.post('/login', login)
 app.post('/signup', signup)
-//
-// TODO: Implement a getter for uploaded images
-// app.get('/image/:filename', getImage)
-//
+
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
 app.use('/api/tweet', tweetRouter)
