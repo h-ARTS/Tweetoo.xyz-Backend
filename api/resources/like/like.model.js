@@ -4,11 +4,13 @@ const likeSchema = new Schema(
   {
     tweetId: {
       type: SchemaTypes.ObjectId,
-      required: true
+      required: true,
+      ref: 'tweet'
     },
-    userId: {
+    createdBy: {
       type: SchemaTypes.ObjectId,
-      required: true
+      required: true,
+      ref: 'user'
     },
     handle: {
       type: String,
