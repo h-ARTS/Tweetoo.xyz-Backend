@@ -6,11 +6,11 @@
   "scripts": {
     "build": "babel api --out-dir dist",
     "dev": "nodemon --exec yarn restart",
-    "test-router": "jest -t router:",
-    "test-controllers": "jest -t controllers:",
-    "test-model": "jest -t model:",
-    "test-auth": "jest -t Authentication: --detectOpenHandles",
-    "test-crud": "jest /api/utils/__tests__/crud.spec.js",
+    "test-router": "jest -t router: --runInBand",
+    "test-controllers": "jest -t controllers: --runInBand --detectOpenHandles",
+    "test-model": "jest -t model: --runInBand",
+    "test-auth": "jest -t Authentication: --runInBand",
+    "test-crud": "jest /api/utils/__tests__/crud.spec.js --runInBand",
     "restart": "rimraf dist && yarn build && yarn start",
     "start": "node --inspect dist/index.js"
   },
