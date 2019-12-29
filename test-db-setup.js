@@ -1,7 +1,10 @@
 import mongoose from 'mongoose'
-// import { User } from './api/resources/user/user.model'
+mongoose.set('useFindAndModify', false)
+mongoose.set('useUnifiedTopology', true)
+mongoose.set('useCreateIndex', true)
+mongoose.set('useNewUrlParser', true)
 
-const testingDbUrl = 'mongodb://localhost:27017/hanan-api-testing'
+const testingDbUrl = 'mongodb://localhost:27017/testing-api?replicaSet=tweetoo'
 
 beforeEach(async done => {
   if (mongoose.connection.readyState === 0) {
