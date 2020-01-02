@@ -7,7 +7,9 @@ describe('tweet controllers:', () => {
       'getAll',
       'createOne',
       'updateOne',
-      'removeOne'
+      'removeOne',
+      'likeDoc',
+      'unlikeDoc'
     ]
 
     crudMethods.forEach(method => {

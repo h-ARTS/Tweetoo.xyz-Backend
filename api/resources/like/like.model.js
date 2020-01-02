@@ -2,10 +2,9 @@ import { Schema, SchemaTypes, model } from 'mongoose'
 
 const likeSchema = new Schema(
   {
-    tweetId: {
+    docId: {
       type: SchemaTypes.ObjectId,
-      required: true,
-      ref: 'tweet'
+      required: true
     },
     createdBy: {
       type: SchemaTypes.ObjectId,

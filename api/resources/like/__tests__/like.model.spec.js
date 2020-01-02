@@ -2,12 +2,11 @@ import { Like } from '../like.model'
 import { SchemaTypes } from 'mongoose'
 
 describe('Like model:', () => {
-  test('has tweetId', () => {
-    const tweetId = Like.schema.obj.tweetId
-    expect(tweetId).toEqual({
+  test('has docId', () => {
+    const docId = Like.schema.obj.docId
+    expect(docId).toEqual({
       type: SchemaTypes.ObjectId,
-      required: true,
-      ref: 'tweet'
+      required: true
     })
   })
 

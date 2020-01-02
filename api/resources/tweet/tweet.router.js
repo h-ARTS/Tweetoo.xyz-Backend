@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import controllers from './tweet.controllers'
-import { likeDoc, unlikeDoc } from '../like/like.controller'
 
 const router = Router()
 
@@ -20,8 +19,8 @@ router
   .delete(controllers.removeOne)
 
 // /api/tweet/:tweetId
-router.route('/:tweetId/like').put(likeDoc)
-router.route('/:tweetId/unlike').put(unlikeDoc)
+router.route('/:tweetId/like').put(controllers.likeDoc)
+router.route('/:tweetId/unlike').put(controllers.unlikeDoc)
 
 // TODO: Add reply handler
 

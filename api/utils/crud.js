@@ -1,3 +1,5 @@
+import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
+
 export const getAll = model => async (req, res) => {
   try {
     const docs = await model
@@ -96,6 +98,10 @@ export const controllers = model => {
     getOne: getOne(model),
     createOne: createOne(model),
     updateOne: updateOne(model),
-    removeOne: removeOne(model)
+    removeOne: removeOne(model),
+    likeDoc: likeDoc(model),
+    unlikeDoc: unlikeDoc(model)
+    // reTweet: reTweet(model),
+    // undoRetweet: undoRetweet(model)
   }
 }
