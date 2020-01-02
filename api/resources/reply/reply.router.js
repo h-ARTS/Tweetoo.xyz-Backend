@@ -10,6 +10,9 @@ router
   .put(controllers.updateOne)
   .delete(controllers.removeOne)
 
+router.route('/reply/like').put(controllers.likeDoc)
+router.route('/reply/unlike').put(controllers.unlikeDoc)
+
 router.route('/replies').get(controllers.getAll)
 
 export default router

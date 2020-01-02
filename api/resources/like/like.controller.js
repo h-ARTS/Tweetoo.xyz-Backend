@@ -1,11 +1,13 @@
 import { Like } from './like.model'
-import { Tweet } from '../tweet/tweet.model'
 import { Types } from 'mongoose'
 
-export const likeDoc = async (req, res) => {
+export const likeDoc = model => async (req, res) => {
+  const docId = req.body.hasOwnProperty('replyId')
+    ? req.body.replyId
+    : req.params.tweetId
   try {
     const alreadyLiked = await Like.findOne({
-      tweetId: req.params.tweetId,
+      docId: docId,
       createdBy: req.user._id
     })
     if (alreadyLiked) {
@@ -14,47 +16,49 @@ export const likeDoc = async (req, res) => {
         .send({ message: 'Client already liked this tweet.' })
     }
 
-    const tweet = await Tweet.findByIdAndUpdate(
-      req.params.tweetId,
-      { $inc: { likeCount: 1 } },
-      { new: true }
-    )
+    const doc = await model
+      .findByIdAndUpdate(docId, { $inc: { likeCount: 1 } }, { new: true })
       .lean()
       .exec()
 
     const like = await Like.create({
-      tweetId: Types.ObjectId(req.params.tweetId),
+      docId: Types.ObjectId(docId),
       createdBy: req.user._id,
       handle: req.user.handle
     })
 
-    res.status(201).json({ tweet, like })
+    res.status(201).json({ doc, like })
   } catch (e) {
     console.error(e)
     res.status(400).end(e)
   }
 }
 
-export const unlikeDoc = async (req, res) => {
+export const unlikeDoc = model => async (req, res) => {
+  const docId = req.body.hasOwnProperty('replyId')
+    ? req.body.replyId
+    : req.params.tweetId
+
   try {
-    const tweet = await Tweet.findById(req.params.tweetId)
-    if (tweet.likeCount === 0) {
+    const doc = await model.findById(docId)
+    if (doc.likeCount === 0) {
       return res
         .status(400)
         .send({ message: 'Cannot unlike this tweet when likeCount 0.' })
     }
-
-    tweet
+    await doc
       .updateOne({ $inc: { likeCount: -1 } })
       .lean()
       .exec()
 
     const removedLike = await Like.findOneAndRemove({
-      tweetId: Types.ObjectId(req.params.tweetId),
+      docId: docId,
       createdBy: req.user._id
     })
+      .lean()
+      .exec()
 
-    res.status(201).json({ tweet, removedLike })
+    return res.status(201).json({ doc, removedLike })
   } catch (e) {
     console.error(e)
     res.status(400).end(e)
