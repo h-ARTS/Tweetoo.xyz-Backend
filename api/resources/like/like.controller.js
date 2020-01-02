@@ -2,9 +2,8 @@ import { Like } from './like.model'
 import { Types } from 'mongoose'
 
 export const likeDoc = model => async (req, res) => {
-  const docId = req.body.hasOwnProperty('replyId')
-    ? req.body.replyId
-    : req.params.tweetId
+  const docId = req.params.replyId || req.params.tweetId
+
   try {
     const alreadyLiked = await Like.findOne({
       docId: docId,
@@ -35,9 +34,7 @@ export const likeDoc = model => async (req, res) => {
 }
 
 export const unlikeDoc = model => async (req, res) => {
-  const docId = req.body.hasOwnProperty('replyId')
-    ? req.body.replyId
-    : req.params.tweetId
+  const docId = req.params.replyId || req.params.tweetId
 
   try {
     const doc = await model.findById(docId)
