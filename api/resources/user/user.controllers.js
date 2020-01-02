@@ -1,4 +1,30 @@
 import { User } from './user.model'
+import { Like } from '../like/like.model'
+import { Reply } from '../reply/reply.model'
+import { Tweet } from '../tweet/tweet.model'
+
+const watchUsers = User.watch()
+
+watchUsers.on('change', async result => {
+  if (result.operationType === 'delete') {
+    const user = result.documentKey
+
+    await Tweet.find()
+      .where('createdBy')
+      .all(user._id)
+      .remove()
+
+    await Like.find()
+      .where('createdBy')
+      .all(user._id)
+      .remove()
+
+    await Reply.find()
+      .where('createdBy')
+      .all(user._id)
+      .remove()
+  }
+})
 
 export const myProfile = (req, res) => {
   return res.status(200).json({ data: req.user })
