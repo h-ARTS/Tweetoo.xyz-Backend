@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, SchemaTypes } from 'mongoose'
 // Safer than md5 hash which can be cracked faster by a super computer.
 import bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
@@ -43,7 +43,7 @@ const userSchema = new Schema(
       default: []
     },
     tweets: {
-      type: [TweetSchema],
+      type: [SchemaTypes.ObjectId],
       default: []
     }
   },

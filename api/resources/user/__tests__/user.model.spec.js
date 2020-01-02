@@ -1,7 +1,7 @@
 import { User } from '../user.model'
-import { TweetSchema } from '../../tweet/tweet.model'
 import { FollowerSchema } from '../follower.schema'
 import { ImageFileSchema } from '../image-upload/imagefile.schema'
+import { SchemaTypes } from 'mongoose'
 
 describe('User model:', () => {
   describe('schema', () => {
@@ -91,7 +91,7 @@ describe('User model:', () => {
     test('has tweets as array', () => {
       const tweets = User.schema.obj.tweets
       expect(tweets).toEqual({
-        type: [TweetSchema],
+        type: [SchemaTypes.ObjectId],
         default: []
       })
     })
