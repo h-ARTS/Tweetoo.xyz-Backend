@@ -29,6 +29,7 @@ describe('Like controllers:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
+        body: {},
         user: user
       }
 
@@ -38,10 +39,10 @@ describe('Like controllers:', () => {
           return this
         },
         json(result) {
-          const tweetIds = [tweet._id, result.tweet._id]
-          const userIds = [user._id, result.tweet.createdBy]
+          const tweetIds = [tweet._id, result.doc._id]
+          const userIds = [user._id, result.doc.createdBy]
           tweetIds.forEach(tweetId => {
-            expect(tweetId.toString()).toBe(result.like.tweetId.toString())
+            expect(tweetId.toString()).toBe(result.like.docId.toString())
           })
           userIds.forEach(userId => {
             expect(userId.toString()).toBe(result.like.createdBy.toString())
@@ -49,16 +50,17 @@ describe('Like controllers:', () => {
         }
       }
 
-      await likeDoc(req, res)
+      await likeDoc(Tweet)(req, res)
     })
 
-    test('increased the likeCount by 1.', async () => {
+    test('increases the likeCount by 1.', async () => {
       expect.assertions(3)
 
       const req = {
         params: {
           tweetId: tweet._id
         },
+        body: {},
         user: user
       }
 
@@ -68,12 +70,12 @@ describe('Like controllers:', () => {
           return this
         },
         json(result) {
-          expect(result.tweet.likeCount).toBe(1)
+          expect(result.doc.likeCount).toBe(1)
           expect(result.like).not.toEqual({})
         }
       }
 
-      await likeDoc(req, res)
+      await likeDoc(Tweet)(req, res)
     })
 
     test('does not increase the likeCount and create a new doc again if already liked.', async () => {
@@ -83,11 +85,12 @@ describe('Like controllers:', () => {
         params: {
           tweetId: tweet._id
         },
+        body: {},
         user: user
       }
 
       await Like.create({
-        tweetId: Types.ObjectId(req.params.tweetId),
+        docId: Types.ObjectId(req.params.tweetId),
         createdBy: req.user._id,
         handle: req.user.handle
       })
@@ -108,7 +111,7 @@ describe('Like controllers:', () => {
         }
       }
 
-      await likeDoc(req, res)
+      await likeDoc(Tweet)(req, res)
     })
   })
 
@@ -133,7 +136,7 @@ describe('Like controllers:', () => {
       })
 
       await Like.create({
-        tweetId: tweet._id,
+        docId: tweet._id,
         createdBy: user._id,
         handle: user.handle
       })
@@ -144,25 +147,26 @@ describe('Like controllers:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
+        body: {},
         user: user
       }
 
       const res = {
         status(code) {
-          expect(code).toBe(200)
+          expect(code).toBe(201)
           return this
         },
         json(result) {
-          expect(result.tweet._id.toString()).toBe(
-            result.removedLike.tweetId.toString()
+          expect(result.doc._id.toString()).toBe(
+            result.removedLike.docId.toString()
           )
-          expect(result.tweet.createdBy.toString()).toBe(
+          expect(result.doc.createdBy.toString()).toBe(
             result.removedLike.createdBy.toString()
           )
         }
       }
 
-      await unlikeDoc(req, res)
+      await unlikeDoc(Tweet)(req, res)
     })
 
     test('decreases the likeCount by 1.', async () => {
@@ -170,35 +174,37 @@ describe('Like controllers:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
+        body: {},
         user: user
       }
 
       const res = {
         status(code) {
-          expect(code).toBe(200)
+          expect(code).toBe(201)
           return this
         },
         async json(result) {
-          const updatedTweet = await Tweet.findById(result.tweet._id)
+          const updatedTweet = await Tweet.findById(result.doc._id)
+
           expect(updatedTweet.likeCount).toBe(0)
         }
       }
 
-      await unlikeDoc(req, res)
+      await unlikeDoc(Tweet)(req, res)
     })
 
     test('does not decrease the likeCount if is set to 0.', async () => {
-      const like = await Like.findOne({
-        tweetId: tweet._id,
+      expect.assertions(3)
+
+      await Like.findOneAndDelete({
+        docId: tweet._id,
         createdBy: user._id
       })
-      await like.deleteOne()
       await tweet.updateOne({ $inc: { likeCount: -1 } })
-
-      expect.assertions(3)
 
       const req = {
         params: { tweetId: tweet._id },
+        body: {},
         user: user
       }
 
@@ -213,7 +219,7 @@ describe('Like controllers:', () => {
         }
       }
 
-      await unlikeDoc(req, res)
+      await unlikeDoc(Tweet)(req, res)
     })
   })
 })
