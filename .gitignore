@@ -105,3 +105,6 @@ dist
 
 # SSH keys
 .ssh/
+
+# vscode config
+.vscode/
