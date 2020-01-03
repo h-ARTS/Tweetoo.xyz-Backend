@@ -29,7 +29,7 @@ describe('Like controllers:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
-        body: {},
+        query: {},
         user: user
       }
 
@@ -60,7 +60,7 @@ describe('Like controllers:', () => {
         params: {
           tweetId: tweet._id
         },
-        body: {},
+        query: {},
         user: user
       }
 
@@ -85,7 +85,7 @@ describe('Like controllers:', () => {
         params: {
           tweetId: tweet._id
         },
-        body: {},
+        query: {},
         user: user
       }
 
@@ -147,7 +147,7 @@ describe('Like controllers:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
-        body: {},
+        query: {},
         user: user
       }
 
@@ -174,7 +174,7 @@ describe('Like controllers:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
-        body: {},
+        query: {},
         user: user
       }
 
@@ -204,7 +204,7 @@ describe('Like controllers:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
-        body: {},
+        query: {},
         user: user
       }
 

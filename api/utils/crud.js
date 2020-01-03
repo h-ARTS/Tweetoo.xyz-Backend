@@ -41,11 +41,15 @@ export const createOne = model => async (req, res, next) => {
     handle: req.user.handle
   }
 
+  let doc
   try {
-    const doc = await model.create({ ...req.body, ...userBody })
-    if (!doc.hasOwnProperty('replyCount')) {
-      await doc.updateOne({ tweetId: Types.ObjectId(req.params.tweetId) })
+    doc = await model.create({ ...req.body, ...userBody })
+
+    if (req.query.hasOwnProperty('tweetId')) {
+      // update reply
+      await doc.updateOne({ tweetId: Types.ObjectId(req.query.tweetId) })
     }
+
     req.body.doc = doc
     next()
   } catch (e) {
@@ -56,11 +60,12 @@ export const createOne = model => async (req, res, next) => {
 
 export const updateOne = model => async (req, res) => {
   try {
+    const docId = req.params.tweetId || req.query.replyId
     const updatedDoc = await model
       .findOneAndUpdate(
         {
           createdBy: req.user._id,
-          _id: req.params.tweetId
+          _id: docId
         },
         req.body,
         { new: true }
@@ -81,9 +86,10 @@ export const updateOne = model => async (req, res) => {
 
 export const removeOne = model => async (req, res) => {
   try {
+    const docId = req.params.tweetId || req.query.replyId
     const removedDoc = await model.findOneAndRemove({
       createdBy: req.user._id,
-      _id: req.params.tweetId
+      _id: docId
     })
 
     if (!removedDoc) {

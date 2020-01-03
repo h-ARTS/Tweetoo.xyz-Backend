@@ -10,6 +10,7 @@ import tweetRouter from './resources/tweet/tweet.router'
 import replyRouter from './resources/reply/reply.router'
 import userRouter from './resources/user/user.router'
 import { getAll } from './utils/crud'
+import { Reply } from './resources/reply/reply.model'
 
 export const app = express()
 
@@ -27,8 +28,9 @@ app.post('/signup', signup)
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
 app.use('/api/tweet', tweetRouter)
-app.use('/api/tweet', replyRouter)
 app.use('/api/tweets', getAll(Tweet))
+app.use('/api/reply', replyRouter)
+app.use('/api/replies', getAll(Reply))
 app.use('/api/notifications', () => {})
 
 export const start = async () => {
