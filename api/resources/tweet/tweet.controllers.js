@@ -25,7 +25,7 @@ watchTweets.on('change', async result => {
 export const handleReplyCount = async (req, res) => {
   try {
     const tweet = await Tweet.findOneAndUpdate(
-      { _id: req.params.tweetId },
+      { _id: req.query.tweetId },
       {
         $inc: { replyCount: req.method === 'DELETE' ? -1 : 1 }
       },

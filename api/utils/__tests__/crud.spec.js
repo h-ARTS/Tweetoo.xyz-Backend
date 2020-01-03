@@ -103,56 +103,44 @@ describe('CRUD controllers for Tweets and Replies:', () => {
   })
 
   describe('createOne', () => {
-    test('creates a new doc.', async () => {
-      expect.assertions(2)
+    const createdBy = mongoose.Types.ObjectId()
 
-      const createdBy = mongoose.Types.ObjectId()
+    test('creates a new doc.', async () => {
       const body = {
         fullText: 'My new tweet!'
       }
 
       const req = {
         user: { _id: createdBy, fullName: 'Max', handle: '@max' },
+        query: {},
         body
       }
+      const next = () => {}
 
-      const res = {
-        status(code) {
-          expect(code).toBe(201)
-          return this
-        },
-        json(results) {
-          expect(results.data.fullText).toBe(body.fullText)
-        }
-      }
+      await createOne(Tweet)(req, {}, next)
 
-      await createOne(Tweet)(req, res)
+      expect(req.body.hasOwnProperty('doc')).toBe(true)
     })
 
     test('createdBy should be the authenticated user.', async () => {
-      expect.assertions(2)
-
-      const createdBy = mongoose.Types.ObjectId()
       const body = {
         fullText: 'This is another test tweet.'
       }
 
       const req = {
         user: { _id: createdBy, fullName: 'Max Fritz', handle: '@maxFritz' },
+        query: {},
         body
       }
+      const next = () => {}
 
-      const res = {
-        status(code) {
-          expect(code).toBe(201)
-          return this
-        },
-        json(results) {
-          expect(results.data.createdBy.toString()).toBe(createdBy.toString())
-        }
-      }
+      await createOne(Tweet)(req, {}, next)
 
-      await createOne(Tweet)(req, res)
+      expect(req.body.doc).toEqual(
+        expect.objectContaining({
+          createdBy: req.user._id
+        })
+      )
     })
   })
 
