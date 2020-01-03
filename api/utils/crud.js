@@ -1,4 +1,5 @@
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
+import { Types } from 'mongoose'
 
 export const getAll = model => async (req, res) => {
   try {
@@ -33,16 +34,20 @@ export const getOne = model => async (req, res) => {
   }
 }
 
-export const createOne = model => async (req, res) => {
+export const createOne = model => async (req, res, next) => {
   const userBody = {
     createdBy: req.user._id,
     fullName: req.user.fullName,
     handle: req.user.handle
   }
+
   try {
     const doc = await model.create({ ...req.body, ...userBody })
-
-    return res.status(201).json({ data: doc })
+    if (!doc.hasOwnProperty('replyCount')) {
+      await doc.updateOne({ tweetId: Types.ObjectId(req.params.tweetId) })
+    }
+    req.body.doc = doc
+    next()
   } catch (e) {
     console.error(e)
     return res.status(400).end()

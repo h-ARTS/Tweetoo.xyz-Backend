@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import controllers from './tweet.controllers'
+import { appendTweetToUser } from '../user/user.controllers'
 
 const router = Router()
 
@@ -7,7 +8,7 @@ const router = Router()
 router
   .route('/')
   .get(controllers.getOne)
-  .post(controllers.createOne)
+  .post(controllers.createOne, appendTweetToUser)
   .put(controllers.updateOne)
   .delete(controllers.removeOne)
 
@@ -21,7 +22,5 @@ router
 // /api/tweet/:tweetId
 router.route('/:tweetId/like').put(controllers.likeDoc)
 router.route('/:tweetId/unlike').put(controllers.unlikeDoc)
-
-// TODO: Add reply handler
 
 export default router

@@ -27,8 +27,8 @@ app.post('/signup', signup)
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
 app.use('/api/tweet', tweetRouter)
+app.use('/api/tweet', replyRouter)
 app.use('/api/tweets', getAll(Tweet))
-app.use('/api/tweet/:tweetId', replyRouter)
 app.use('/api/notifications', () => {})
 
 export const start = async () => {
