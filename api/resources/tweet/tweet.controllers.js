@@ -22,4 +22,23 @@ watchTweets.on('change', async result => {
   }
 })
 
+export const handleReplyCount = async (req, res) => {
+  try {
+    const tweet = await Tweet.findOneAndUpdate(
+      { _id: req.params.tweetId },
+      {
+        $inc: { replyCount: req.method === 'DELETE' ? -1 : 1 }
+      },
+      { new: true }
+    )
+      .lean()
+      .exec()
+
+    res.status(201).send({ reply: req.body.doc, tweet })
+  } catch (e) {
+    console.errror(e)
+    res.status(500).end()
+  }
+}
+
 export default controllers(Tweet)

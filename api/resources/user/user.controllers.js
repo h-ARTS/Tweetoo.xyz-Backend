@@ -101,11 +101,23 @@ export const followHandler = async (req, res) => {
   }
 }
 
-// TODO: Create imageUpload controller
+export const appendTweetToUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    user.tweets.push({ _id: req.body.doc._id })
+    await user.save()
+
+    return res.status(201).json({ doc: req.body.doc, user })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).end()
+  }
+}
 
 export const controllers = {
   myProfile: myProfile,
   updateProfile: updateProfile,
   getUser: getUser,
-  followHandler: followHandler
+  followHandler: followHandler,
+  appendTweetToUser: appendTweetToUser
 }

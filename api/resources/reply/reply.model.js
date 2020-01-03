@@ -4,7 +4,7 @@ const replySchema = new Schema(
   {
     tweetId: {
       type: SchemaTypes.ObjectId,
-      required: true,
+      // required: true,
       ref: 'tweet'
     },
     fullText: {

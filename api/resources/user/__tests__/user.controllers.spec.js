@@ -9,7 +9,13 @@ import mongoose from 'mongoose'
 
 describe('user controllers:', () => {
   test('has functions to display user profile and to update.', () => {
-    const methods = ['myProfile', 'updateProfile', 'getUser', 'followHandler']
+    const methods = [
+      'myProfile',
+      'updateProfile',
+      'getUser',
+      'followHandler',
+      'appendTweetToUser'
+    ]
 
     methods.forEach(method => {
       expect(typeof controllers[method]).toBe('function')
