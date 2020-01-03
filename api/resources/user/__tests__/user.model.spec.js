@@ -1,7 +1,8 @@
 import { User } from '../user.model'
 import { FollowerSchema } from '../follower.schema'
 import { ImageFileSchema } from '../image-upload/imagefile.schema'
-import { SchemaTypes } from 'mongoose'
+import { SchemaTypes, Schema } from 'mongoose'
+import { UserTweetSchema } from '../../tweet/tweet.model'
 
 describe('User model:', () => {
   describe('schema', () => {
@@ -91,8 +92,32 @@ describe('User model:', () => {
     test('has tweets as array', () => {
       const tweets = User.schema.obj.tweets
       expect(tweets).toEqual({
+        type: [UserTweetSchema],
+        default: []
+      })
+    })
+
+    test('has replies as array', () => {
+      const replies = User.schema.obj.replies
+      expect(replies).toEqual({
         type: [SchemaTypes.ObjectId],
         default: []
+      })
+    })
+
+    test('has isBanned', () => {
+      const isBanned = User.schema.obj.isBanned
+      expect(isBanned).toEqual({
+        type: Boolean,
+        default: false
+      })
+    })
+
+    test('has isVerified', () => {
+      const isVerified = User.schema.obj.isVerified
+      expect(isVerified).toEqual({
+        type: Boolean,
+        default: false
       })
     })
   })

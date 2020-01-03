@@ -11,17 +11,17 @@ watchUsers.on('change', async result => {
 
     await Tweet.find()
       .where('createdBy')
-      .all(user._id)
+      .all([user._id])
       .remove()
 
     await Like.find()
       .where('createdBy')
-      .all(user._id)
+      .all([user._id])
       .remove()
 
     await Reply.find()
       .where('createdBy')
-      .all(user._id)
+      .all([user._id])
       .remove()
   }
 })
