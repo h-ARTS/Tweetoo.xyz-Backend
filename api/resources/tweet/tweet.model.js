@@ -36,6 +36,17 @@ export const TweetSchema = new Schema(
   { timestamps: true }
 )
 
-TweetSchema.index({ user: 1, handle: 1 }, { unique: true })
+export const UserTweetSchema = new Schema({
+  retweet: {
+    type: Boolean,
+    default: false
+  },
+  tweetId: {
+    type: SchemaTypes.ObjectId,
+    required: true
+  }
+})
+
+// TweetSchema.index({ user: 1, handle: 1 }, { unique: true })
 
 export const Tweet = model('tweet', TweetSchema)

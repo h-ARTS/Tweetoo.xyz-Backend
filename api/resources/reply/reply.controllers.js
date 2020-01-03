@@ -10,7 +10,7 @@ watchReplies.on('change', async result => {
 
     await Like.find()
       .where('replyId')
-      .all(reply._id)
+      .all([reply._id])
       .remove()
   }
 })
