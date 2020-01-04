@@ -1,5 +1,6 @@
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
 import { Types } from 'mongoose'
+import { Reply } from '../resources/reply/reply.model'
 
 export const getAll = model => async (req, res) => {
   try {
@@ -42,14 +43,9 @@ export const createOne = model => async (req, res, next) => {
   }
 
   let doc
+  const tweetId = req.query.tweetId
   try {
-    doc = await model.create({ ...req.body, ...userBody })
-
-    if (req.query.hasOwnProperty('tweetId')) {
-      // update reply
-      await doc.updateOne({ tweetId: Types.ObjectId(req.query.tweetId) })
-    }
-
+    doc = await model.create({ ...req.body, ...userBody, tweetId })
     req.body.doc = doc
     next()
   } catch (e) {
