@@ -2,8 +2,6 @@ import { controllers } from '../../utils/crud'
 import { Tweet } from './tweet.model'
 import { Like } from '../like/like.model'
 import { Reply } from '../reply/reply.model'
-import { Types } from 'mongoose'
-import { User } from '../user/user.model'
 
 // Watcher works only on mongodb replica sets
 const watchTweets = Tweet.watch()
@@ -24,22 +22,17 @@ watchTweets.on('change', async result => {
   }
 })
 
-export const handleReplyCount = async (req, res) => {
+export const appendToTweet = async (req, res, next) => {
   try {
-    const tweet = await Tweet.findOneAndUpdate(
-      { _id: Types.ObjectId(req.query.tweetId) },
-      {
-        $inc: { replyCount: req.method === 'DELETE' ? -1 : 1 }
-      },
-      { new: true }
-    )
-      .lean()
-      .exec()
+    const tweet = await Tweet.findById(req.body.doc.tweetId)
+    tweet.replies.push(req.body.doc._id)
+    await tweet.save()
 
-    res.status(201).send({ reply: req.body.doc, tweet })
+    req.body.tweet = tweet
+    next()
   } catch (e) {
-    console.errror(e)
-    res.status(500).end()
+    console.error(e)
+    res.status(400).end()
   }
 }
 
