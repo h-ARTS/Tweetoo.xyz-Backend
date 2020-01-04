@@ -2,7 +2,8 @@ import {
   controllers,
   myProfile,
   updateProfile,
-  followHandler
+  followHandler,
+  appendToUser
 } from '../user.controllers'
 import { User } from '../user.model'
 import mongoose from 'mongoose'
@@ -14,7 +15,7 @@ describe('user controllers:', () => {
       'updateProfile',
       'getUser',
       'followHandler',
-      'appendTweetToUser'
+      'appendToUser'
     ]
 
     methods.forEach(method => {
@@ -210,6 +211,75 @@ describe('user controllers:', () => {
       }
 
       await followHandler(req, res)
+    })
+  })
+
+  describe('appendToUser', () => {
+    let user
+
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'max@aol.com',
+        password: '123456',
+        fullName: 'Max Ol',
+        handle: '@max_o'
+      })
+    })
+
+    test('if tweets, it appends to the authenticated users tweets object.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        body: {
+          doc: { _id: mongoose.Types.ObjectId() }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          result.user.tweets.forEach(tweet => {
+            expect(tweet.tweetId.toString()).toEqual(
+              req.body.doc._id.toString()
+            )
+          })
+        }
+      }
+
+      await appendToUser(req, res)
+    })
+
+    test('if reply, it appends to the authenticated users replies object.', async () => {
+      expect.assertions(2)
+
+      const tweetId = mongoose.Types.ObjectId()
+      const req = {
+        user,
+        body: {
+          doc: { _id: mongoose.Types.ObjectId(), tweetId },
+          tweet: { _id: tweetId }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          result.user.replies.forEach(reply => {
+            expect(reply.replyId.toString()).toEqual(
+              req.body.doc._id.toString()
+            )
+          })
+        }
+      }
+
+      await appendToUser(req, res)
     })
   })
 })
