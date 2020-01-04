@@ -15,9 +15,9 @@ export const TweetSchema = new Schema(
       type: Number,
       default: 0
     },
-    replyCount: {
-      type: Number,
-      default: 0
+    replies: {
+      type: [SchemaTypes.ObjectId],
+      default: []
     },
     fullName: {
       type: String,
