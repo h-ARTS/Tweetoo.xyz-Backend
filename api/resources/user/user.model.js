@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
 import { UserTweetSchema } from '../tweet/tweet.model'
 import { ImageFileSchema } from './image-upload/imagefile.schema'
+import { UserReplySchema } from '../reply/reply.model'
 
 const userSchema = new Schema(
   {
@@ -47,7 +48,7 @@ const userSchema = new Schema(
       default: []
     },
     replies: {
-      type: [SchemaTypes.ObjectId],
+      type: [UserReplySchema],
       default: []
     },
     isBanned: {

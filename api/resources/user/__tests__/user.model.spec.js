@@ -3,6 +3,7 @@ import { FollowerSchema } from '../follower.schema'
 import { ImageFileSchema } from '../image-upload/imagefile.schema'
 import { SchemaTypes, Schema } from 'mongoose'
 import { UserTweetSchema } from '../../tweet/tweet.model'
+import { UserReplySchema } from '../../reply/reply.model'
 
 describe('User model:', () => {
   describe('schema', () => {
@@ -100,7 +101,7 @@ describe('User model:', () => {
     test('has replies as array', () => {
       const replies = User.schema.obj.replies
       expect(replies).toEqual({
-        type: [SchemaTypes.ObjectId],
+        type: [UserReplySchema],
         default: []
       })
     })
