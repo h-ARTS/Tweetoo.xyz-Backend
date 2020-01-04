@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import controllers from './tweet.controllers'
-import { appendTweetToUser } from '../user/user.controllers'
+import { appendToUser } from '../user/user.controllers'
 
 const router = Router()
 
@@ -8,7 +8,7 @@ const router = Router()
 router
   .route('/')
   .get(controllers.getOne)
-  .post(controllers.createOne, appendTweetToUser)
+  .post(controllers.createOne, appendToUser)
   .put(controllers.updateOne)
   .delete(controllers.removeOne)
 

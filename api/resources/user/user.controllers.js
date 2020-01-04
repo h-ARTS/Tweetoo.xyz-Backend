@@ -101,13 +101,29 @@ export const followHandler = async (req, res) => {
   }
 }
 
-export const appendTweetToUser = async (req, res) => {
+export const appendToUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
-    user.tweets.push({ _id: req.body.doc._id })
+
+    let result
+    if (req.body.doc.tweetId) {
+      user.replies.push({ replyId: req.body.doc._id })
+      result = {
+        reply: req.body.doc,
+        tweet: req.body.tweet,
+        user
+      }
+    } else {
+      user.tweets.push({ tweetId: req.body.doc._id })
+      result = {
+        tweet: req.body.doc,
+        user
+      }
+    }
+
     await user.save()
 
-    return res.status(201).json({ doc: req.body.doc, user })
+    return res.status(201).json(result)
   } catch (e) {
     console.error(e)
     return res.status(500).end()
@@ -119,5 +135,5 @@ export const controllers = {
   updateProfile: updateProfile,
   getUser: getUser,
   followHandler: followHandler,
-  appendTweetToUser: appendTweetToUser
+  appendToUser: appendToUser
 }
