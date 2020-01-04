@@ -1,7 +1,7 @@
 import controllers from '../tweet.controllers'
 
 describe('tweet controllers:', () => {
-  test('has crud controllers', () => {
+  test('has crud and like/unlike controllers', () => {
     const crudMethods = [
       'getOne',
       'getAll',
