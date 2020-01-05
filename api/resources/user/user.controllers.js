@@ -32,7 +32,9 @@ export const myProfile = (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-    const user = await User.findOne({ handle: req.params.handle })
+    const user = await User.findOne({ handle: req.params.handle }).select(
+      '-password'
+    )
 
     if (!user) {
       return res.status(404).end()
@@ -50,6 +52,7 @@ export const updateProfile = async (req, res) => {
     const updated = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true
     })
+      .select('-password')
       .lean()
       .exec()
 
@@ -62,7 +65,9 @@ export const updateProfile = async (req, res) => {
 
 export const followHandler = async (req, res) => {
   try {
-    const targetUser = await User.findOne({ handle: req.params.handle })
+    const targetUser = await User.findOne({ handle: req.params.handle }).select(
+      '-password'
+    )
 
     if (req.body.toFollow) {
       targetUser.followers.push({ userId: req.user._id })
@@ -78,7 +83,7 @@ export const followHandler = async (req, res) => {
       return res.status(400).end()
     }
 
-    const me = await User.findById(req.user._id)
+    const me = await User.findById(req.user._id).select('-password')
 
     if (req.body.toFollow) {
       me.following.push({ userId: targetUser._id })
@@ -103,7 +108,7 @@ export const followHandler = async (req, res) => {
 
 export const appendToUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id)
+    const user = await User.findById(req.user._id).select('-password')
 
     let result
     if (req.body.doc.tweetId) {
