@@ -3,7 +3,8 @@ import {
   myProfile,
   updateProfile,
   followHandler,
-  appendToUser
+  appendToUser,
+  removeFromUser
 } from '../user.controllers'
 import { User } from '../user.model'
 import mongoose from 'mongoose'
@@ -280,6 +281,81 @@ describe('user controllers:', () => {
       }
 
       await appendToUser(req, res)
+    })
+  })
+
+  describe('removeFromUser', () => {
+    let user
+    const tweetId = mongoose.Types.ObjectId()
+    const replyId = mongoose.Types.ObjectId()
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'max@aol.com',
+        password: '123456',
+        fullName: 'Max Ol',
+        handle: '@max_o'
+      })
+      await user.replies.push({ replyId })
+      await user.tweets.push({ tweetId })
+      await user.save()
+    })
+
+    test('removes a reply object from the user document.', async () => {
+      expect.assertions(3)
+
+      const req = {
+        user,
+        body: {
+          removed: {
+            _id: replyId,
+            tweetId
+          }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.removed._id.toString()).toEqual(
+            req.body.removed._id.toString()
+          )
+          expect(result.user.replies).toHaveLength(0)
+        }
+      }
+
+      await removeFromUser(req, res)
+    })
+
+    test('removes a tweet object from the user document.', async () => {
+      expect.assertions(3)
+
+      const req = {
+        user,
+        body: {
+          removed: {
+            _id: tweetId,
+            replies: []
+          }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.removed._id.toString()).toEqual(
+            req.body.removed._id.toString()
+          )
+          expect(result.user.tweets).toHaveLength(0)
+        }
+      }
+
+      await removeFromUser(req, res)
     })
   })
 })

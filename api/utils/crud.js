@@ -1,6 +1,4 @@
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
-import { Types } from 'mongoose'
-import { Reply } from '../resources/reply/reply.model'
 
 export const getAll = model => async (req, res) => {
   try {
@@ -80,7 +78,7 @@ export const updateOne = model => async (req, res) => {
   }
 }
 
-export const removeOne = model => async (req, res) => {
+export const removeOne = model => async (req, res, next) => {
   try {
     const docId = req.params.tweetId || req.query.replyId
     const removedDoc = await model.findOneAndRemove({
@@ -89,13 +87,14 @@ export const removeOne = model => async (req, res) => {
     })
 
     if (!removedDoc) {
-      return res.status(400).send({ message: 'Not found for removal' })
+      return res.status(404).send({ message: 'Not found for removal' })
     }
 
-    return res.status(200).json({ data: removedDoc })
+    req.body.removed = removedDoc
+    next()
   } catch (e) {
     console.error(e)
-    return res.status(400).send({ message: 'Not found for removal' })
+    return res.status(404).send({ message: 'Not found for removal' })
   }
 }
 

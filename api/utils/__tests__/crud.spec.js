@@ -218,20 +218,20 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
-        user: { _id: user }
+        user: { _id: user },
+        body: {}
       }
+      const next = () => {}
 
-      const res = {
-        status(code) {
-          expect(code).toBe(200)
-          return this
-        },
-        json(result) {
-          expect(result.data._id.toString()).toEqual(tweet._id.toString())
-        }
-      }
+      await removeOne(Tweet)(req, {}, next)
 
-      await removeOne(Tweet)(req, res)
+      expect(req.body.removed).not.toBe({})
+      expect(req.body.removed).toEqual(
+        expect.objectContaining({
+          _id: req.params.tweetId,
+          createdBy: req.user._id
+        })
+      )
     })
 
     test('responds 404 if no doc was found.', async () => {
@@ -243,10 +243,11 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         params: { tweetId: mongoose.Types.ObjectId() },
         user: { _id: user }
       }
+      const next = () => {}
 
       const res = {
         status(code) {
-          expect(code).toBe(400)
+          expect(code).toBe(404)
           return this
         },
         send(result) {
@@ -254,21 +255,9 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         }
       }
 
-      await removeOne(Tweet)(req, res)
+      await removeOne(Tweet)(req, res, next)
     })
   })
-
-  // describe('likeTweet', () => {
-  //   test('finds a doc by id and increases the like count by 1.', async () => {})
-
-  //   test('responds 404 if no doc was found.', async () => {})
-  // })
-
-  // describe('unlikeTweet', () => {
-  //   test('finds a doc by id and decreases the like count by 1.', async () => {})
-
-  //   test('responds 404 if no doc was found.', async () => {})
-  // })
 
   // describe('reTweet', () => {
   //   test('finds a doc by id and increases the retweet count by 1.', async () => {})

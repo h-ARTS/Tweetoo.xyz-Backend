@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import controllers from './tweet.controllers'
-import { appendToUser } from '../user/user.controllers'
+import { appendToUser, removeFromUser } from '../user/user.controllers'
 
 const router = Router()
 
@@ -17,7 +17,7 @@ router
   .route('/:tweetId')
   .get(controllers.getOne)
   .put(controllers.updateOne)
-  .delete(controllers.removeOne)
+  .delete(controllers.removeOne, removeFromUser)
 
 // /api/tweet/:tweetId
 router.route('/:tweetId/like').put(controllers.likeDoc)
