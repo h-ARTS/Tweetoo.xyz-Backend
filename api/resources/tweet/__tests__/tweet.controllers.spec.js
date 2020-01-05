@@ -1,4 +1,7 @@
-import controllers, { appendToTweet } from '../tweet.controllers'
+import controllers, {
+  appendReplyToTweet,
+  removeReplyFromTweet
+} from '../tweet.controllers'
 import mongoose from 'mongoose'
 import { Tweet } from '../tweet.model'
 
@@ -19,15 +22,18 @@ describe('tweet controllers:', () => {
     })
   })
 
-  describe('appendToTweet', () => {
-    test('appends reply Id to the tweet replies object.', async () => {
-      const tweet = await Tweet.create({
+  let tweet
+  beforeEach(async () => {
+    tweet = await Tweet.create({
         createdBy: mongoose.Types.ObjectId(),
         fullText: 'This is my new tweet.',
         fullName: 'Dr Maxx',
         handle: '@Drmaxx'
       })
+  })
 
+  describe('appendReplyToTweet', () => {
+    test('appends reply Id to the tweet replies object.', async () => {
       const req = {
         body: {
           doc: {
@@ -38,7 +44,7 @@ describe('tweet controllers:', () => {
       }
       const next = () => {}
 
-      await appendToTweet(req, {}, next)
+      await appendReplyToTweet(req, {}, next)
 
       req.body.tweet.replies.forEach(replyId => {
         expect(replyId.toString()).toEqual(req.body.doc._id.toString())
