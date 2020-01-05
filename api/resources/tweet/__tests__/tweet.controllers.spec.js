@@ -25,11 +25,11 @@ describe('tweet controllers:', () => {
   let tweet
   beforeEach(async () => {
     tweet = await Tweet.create({
-        createdBy: mongoose.Types.ObjectId(),
-        fullText: 'This is my new tweet.',
-        fullName: 'Dr Maxx',
-        handle: '@Drmaxx'
-      })
+      createdBy: mongoose.Types.ObjectId(),
+      fullText: 'This is my new tweet.',
+      fullName: 'Dr Maxx',
+      handle: '@Drmaxx'
+    })
   })
 
   describe('appendReplyToTweet', () => {
@@ -49,6 +49,26 @@ describe('tweet controllers:', () => {
       req.body.tweet.replies.forEach(replyId => {
         expect(replyId.toString()).toEqual(req.body.doc._id.toString())
       })
+    })
+  })
+
+  describe('removeReplyFromTweet', () => {
+    test('removes a reply id from tweet document.', async () => {
+      const replyId = mongoose.Types.ObjectId()
+      tweet.replies.push(replyId)
+      await tweet.save()
+
+      const req = {
+        body: {
+          removed: { _id: replyId, tweetId: tweet._id }
+        }
+      }
+      const next = () => {}
+
+      await removeReplyFromTweet(req, {}, next)
+
+      const expectedTweet = await Tweet.findById(tweet._id)
+      expect(expectedTweet.replies).toHaveLength(0)
     })
   })
 })

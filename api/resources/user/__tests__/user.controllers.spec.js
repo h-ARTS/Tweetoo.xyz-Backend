@@ -16,7 +16,8 @@ describe('user controllers:', () => {
       'updateProfile',
       'getUser',
       'followHandler',
-      'appendToUser'
+      'appendToUser',
+      'removeFromUser'
     ]
 
     methods.forEach(method => {
