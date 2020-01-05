@@ -27,11 +27,11 @@ describe('Tweets model:', () => {
     })
   })
 
-  test('has replyCount', () => {
-    const replyCount = Tweet.schema.obj.replyCount
-    expect(replyCount).toEqual({
-      type: Number,
-      default: 0
+  test('has replies', () => {
+    const replies = Tweet.schema.obj.replies
+    expect(replies).toEqual({
+      type: [SchemaTypes.ObjectId],
+      default: []
     })
   })
 
