@@ -13,7 +13,6 @@ describe('reply router:', () => {
 
     routes.forEach(route => {
       const match = router.stack.find(s => {
-        console.log(route.path)
         return s.route.path === route.path && s.route.methods[route.method]
       })
       expect(match).toBeTruthy()
