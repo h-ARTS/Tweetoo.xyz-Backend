@@ -22,7 +22,7 @@ watchTweets.on('change', async result => {
   }
 })
 
-export const appendToTweet = async (req, res, next) => {
+export const appendReplyToTweet = async (req, res, next) => {
   try {
     const tweet = await Tweet.findById(req.body.doc.tweetId)
     tweet.replies.push(req.body.doc._id)

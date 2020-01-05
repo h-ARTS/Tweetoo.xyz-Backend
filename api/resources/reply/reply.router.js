@@ -1,14 +1,17 @@
 import { Router } from 'express'
 import controllers from './reply.controllers'
 import { appendToUser, removeFromUser } from '../user/user.controllers'
-import { appendToTweet } from '../tweet/tweet.controllers'
+import {
+  appendReplyToTweet,
+  removeReplyFromTweet
+} from '../tweet/tweet.controllers'
 
 const router = Router()
 
 // /api/reply
 router
   .route('/')
-  .post(controllers.createOne, appendToTweet, appendToUser)
+  .post(controllers.createOne, appendReplyToTweet, appendToUser)
   .put(controllers.updateOne)
   .delete(controllers.removeOne, removeFromUser)
 
