@@ -11,7 +11,7 @@ watchTweets.on('change', async result => {
     const tweet = result.documentKey
 
     await Like.find()
-      .where('tweetId')
+      .where('docId')
       .all([tweet._id])
       .remove()
 
@@ -29,6 +29,21 @@ export const appendReplyToTweet = async (req, res, next) => {
     await tweet.save()
 
     req.body.tweet = tweet
+    next()
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const removeReplyFromTweet = async (req, res, next) => {
+  const doc = req.body.removed
+  try {
+    const tweet = await Tweet.findById(doc.tweetId)
+    tweet.replies.pull(doc._id)
+    await tweet.save()
+
+    req.body.removed = doc
     next()
   } catch (e) {
     console.error(e)

@@ -13,7 +13,7 @@ router
   .route('/')
   .post(controllers.createOne, appendReplyToTweet, appendToUser)
   .put(controllers.updateOne)
-  .delete(controllers.removeOne, removeFromUser)
+  .delete(controllers.removeOne, removeReplyFromTweet, removeFromUser)
 
 router.route('/like').put(controllers.likeDoc)
 router.route('/unlike').put(controllers.unlikeDoc)

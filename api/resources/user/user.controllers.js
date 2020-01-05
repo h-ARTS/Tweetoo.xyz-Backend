@@ -166,5 +166,6 @@ export const controllers = {
   updateProfile: updateProfile,
   getUser: getUser,
   followHandler: followHandler,
-  appendToUser: appendToUser
+  appendToUser: appendToUser,
+  removeFromUser: removeFromUser
 }

@@ -9,7 +9,7 @@ watchReplies.on('change', async result => {
     const reply = result.documentKey
 
     await Like.find()
-      .where('replyId')
+      .where('docId')
       .all([reply._id])
       .remove()
   }
