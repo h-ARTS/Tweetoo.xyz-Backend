@@ -135,6 +135,32 @@ export const appendToUser = async (req, res) => {
   }
 }
 
+export const removeFromUser = async (req, res) => {
+  const doc = req.body.removed
+  const itHasRepliesArray = doc.replies
+  try {
+    const user = await User.findById(req.user._id).select('-password')
+
+    if (itHasRepliesArray) {
+      const tweetObj = user.tweets.find(
+        t => t.tweetId.toString() === doc._id.toString()
+      )
+      user.tweets.pull({ _id: tweetObj._id })
+    } else {
+      const replyObj = user.replies.find(
+        r => r.replyId.toString() === doc._id.toString()
+      )
+      user.replies.pull({ _id: replyObj._id })
+    }
+    await user.save()
+
+    return res.status(200).json({ removed: doc, user })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 export const controllers = {
   myProfile: myProfile,
   updateProfile: updateProfile,
