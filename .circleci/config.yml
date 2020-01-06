@@ -13,9 +13,9 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       - image: circleci/mongo:4.0.3
-        command: mongod --replSet tweetoo --logpath "0.log" --dbpath mongodb/rs0-0 --port 27017  &
-                 mongod --replSet tweetoo --logpath "1.log" --dbpath mongodb/rs0-1 --port 27018  &
-                 mongod --replSet tweetoo --logpath "2.log" --dbpath mongodb/rs0-2 --port 27019  &
+        # command: mongod --replSet tweetoo --logpath "0.log" --dbpath mongodb/rs0-0 --port 27017  &
+        #          mongod --replSet tweetoo --logpath "1.log" --dbpath mongodb/rs0-1 --port 27018  &
+        #          mongod --replSet tweetoo --logpath "2.log" --dbpath mongodb/rs0-2 --port 27019  &
 
     working_directory: ~/
 
