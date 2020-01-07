@@ -100,9 +100,6 @@ export const removeOne = model => async (req, res, next) => {
 }
 
 export const reTweet = model => async (req, res) => {
-  const ref = {
-    retweet: true
-  }
   const docId = req.params.tweetId || req.query.replyId
   try {
     const user = await User.findById(req.user._id).select('-password')
@@ -117,6 +114,7 @@ export const reTweet = model => async (req, res) => {
       .lean()
       .exec()
 
+    const ref = { retweet: true }
     if (req.query) {
       ref.replyId = doc._id
       user.replies.push(ref)
@@ -139,30 +137,27 @@ export const undoRetweet = model => async (req, res) => {
   const docId = req.params.tweetId || req.query.replyId
   try {
     const user = await User.findById(req.user._id).select('-password')
-
-    let ref
-    if (req.query.replyId) {
-      ref = user.replies.find(
-        r => r.replyId.toString() === req.query.replyId.toString()
-      )
-      user.replies.pull(ref._id)
-    } else {
-      ref = user.tweets.find(
-        t => t.tweetId.toString() === req.params.tweetId.toString()
-      )
-      user.tweets.pull(ref._id)
-    }
-    await user.save()
-
-    const updated = await model
+    const doc = await model
       .findByIdAndUpdate(docId, { $inc: { retweetCount: -1 } }, { new: true })
       .lean()
       .exec()
 
-    res.status(201).json({ user, updated })
+    let ref
+    if (req.query) {
+      ref = user.replies.find(r => r.replyId.toString() === doc._id.toString())
+      user.replies.pull(ref._id)
+    } else {
+      ref = user.tweets.find(t => t.tweetId.toString() === doc._id.toString())
+      user.tweets.pull(ref._id)
+    }
+    await user.save()
+
+    res.status(201).json({ user, doc })
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    res
+      .status(404)
+      .send({ message: 'This doc does not exist in the database.' })
   }
 }
 
