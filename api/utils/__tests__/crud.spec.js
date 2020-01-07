@@ -4,7 +4,8 @@ import {
   createOne,
   updateOne,
   removeOne,
-  reTweet
+  reTweet,
+  undoRetweet
 } from '../crud'
 import { Tweet } from '../../resources/tweet/tweet.model'
 import { User } from '../../resources/user/user.model'
@@ -415,15 +416,122 @@ describe('CRUD controllers for Tweets and Replies:', () => {
     })
   })
 
-  // describe('undoRetweet', () => {
-  //   test('finds the tweet by id and decreases the retweet count by 1.', async () => {})
+  describe('undoRetweet', () => {
+    let user
+    let tweet
+    let reply
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'max2@aol.com',
+        password: '123456',
+        fullName: 'Max 2Ol',
+        handle: '@max_o2'
+      })
+      tweet = await Tweet.create({
+        createdBy: mongoose.Types.ObjectId(),
+        fullText: 'This is my new tweet.',
+        fullName: 'Dr Maxx',
+        handle: '@Drmaxx',
+        retweetCount: 1
+      })
+      reply = await Reply.create({
+        createdBy: mongoose.Types.ObjectId(),
+        fullText: 'This is my new reply.',
+        fullName: 'Dr Maxx',
+        handle: '@Drmaxx',
+        tweetId: tweet._id,
+        retweetCount: 1
+      })
+      user.tweets.push({ retweet: true, tweetId: tweet._id })
+      user.replies.push({ retweet: true, replyId: reply._id })
+      await user.save()
+    })
 
-  //   test('removes the tweet by id from the user object.', async () => {})
+    test('removes the tweet by id from the authenticated user.', async () => {
+      expect.assertions(2)
 
-  //   test('sets the retweet property to false.', async () => {})
+      const req = {
+        user,
+        params: { tweetId: tweet._id }
+      }
 
-  //   test('responds 404 if no tweet was found.', async () => {})
-  // })
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.user.tweets).toHaveLength(0)
+        }
+      }
+
+      await undoRetweet(Tweet)(req, res)
+    })
+
+    test('removes the reply by id from the authenticated user.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: {},
+        query: { replyId: reply._id }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.user.replies).toHaveLength(0)
+        }
+      }
+
+      await undoRetweet(Reply)(req, res)
+    })
+
+    test('decreases the retweet count by 1.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: { tweetId: tweet._id }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.doc.retweetCount).toBe(0)
+        }
+      }
+
+      await undoRetweet(Tweet)(req, res)
+    })
+
+    test('responds 404 if no tweet was found.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: { tweetId: mongoose.Types.ObjectId() }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
+
+      await undoRetweet(Tweet)(req, res)
+    })
+  })
 })
 
 // PSEUDO tweet and user JSON objects
