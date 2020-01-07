@@ -10,6 +10,7 @@ import tweetRouter from './resources/tweet/tweet.router'
 import replyRouter from './resources/reply/reply.router'
 import userRouter from './resources/user/user.router'
 import { getAll } from './utils/crud'
+import { Reply } from './resources/reply/reply.model'
 
 export const app = express()
 
@@ -23,15 +24,13 @@ app.use(urlencoded({ extended: true }))
 
 app.post('/login', login)
 app.post('/signup', signup)
-//
-// TODO: Implement a getter for uploaded images
-// app.get('/image/:filename', getImage)
-//
+
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
 app.use('/api/tweet', tweetRouter)
 app.use('/api/tweets', getAll(Tweet))
-app.use('/api/tweet/:tweetId', replyRouter)
+app.use('/api/reply', replyRouter)
+app.use('/api/replies', getAll(Reply))
 app.use('/api/notifications', () => {})
 
 export const start = async () => {

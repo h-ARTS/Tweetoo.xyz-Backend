@@ -1,6 +1,16 @@
-import { getAll, getOne, createOne, updateOne, removeOne } from '../crud'
+import {
+  getAll,
+  getOne,
+  createOne,
+  updateOne,
+  removeOne,
+  reTweet,
+  undoRetweet
+} from '../crud'
 import { Tweet } from '../../resources/tweet/tweet.model'
+import { User } from '../../resources/user/user.model'
 import mongoose from 'mongoose'
+import { Reply } from '../../resources/reply/reply.model'
 
 describe('CRUD controllers for Tweets and Replies:', () => {
   describe('getAll', () => {
@@ -103,56 +113,44 @@ describe('CRUD controllers for Tweets and Replies:', () => {
   })
 
   describe('createOne', () => {
-    test('creates a new doc.', async () => {
-      expect.assertions(2)
+    const createdBy = mongoose.Types.ObjectId()
 
-      const createdBy = mongoose.Types.ObjectId()
+    test('creates a new doc.', async () => {
       const body = {
         fullText: 'My new tweet!'
       }
 
       const req = {
         user: { _id: createdBy, fullName: 'Max', handle: '@max' },
+        query: {},
         body
       }
+      const next = () => {}
 
-      const res = {
-        status(code) {
-          expect(code).toBe(201)
-          return this
-        },
-        json(results) {
-          expect(results.data.fullText).toBe(body.fullText)
-        }
-      }
+      await createOne(Tweet)(req, {}, next)
 
-      await createOne(Tweet)(req, res)
+      expect(req.body.hasOwnProperty('doc')).toBe(true)
     })
 
     test('createdBy should be the authenticated user.', async () => {
-      expect.assertions(2)
-
-      const createdBy = mongoose.Types.ObjectId()
       const body = {
         fullText: 'This is another test tweet.'
       }
 
       const req = {
         user: { _id: createdBy, fullName: 'Max Fritz', handle: '@maxFritz' },
+        query: {},
         body
       }
+      const next = () => {}
 
-      const res = {
-        status(code) {
-          expect(code).toBe(201)
-          return this
-        },
-        json(results) {
-          expect(results.data.createdBy.toString()).toBe(createdBy.toString())
-        }
-      }
+      await createOne(Tweet)(req, {}, next)
 
-      await createOne(Tweet)(req, res)
+      expect(req.body.doc).toEqual(
+        expect.objectContaining({
+          createdBy: req.user._id
+        })
+      )
     })
   })
 
@@ -230,20 +228,20 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 
       const req = {
         params: { tweetId: tweet._id },
-        user: { _id: user }
+        user: { _id: user },
+        body: {}
       }
+      const next = () => {}
 
-      const res = {
-        status(code) {
-          expect(code).toBe(200)
-          return this
-        },
-        json(result) {
-          expect(result.data._id.toString()).toEqual(tweet._id.toString())
-        }
-      }
+      await removeOne(Tweet)(req, {}, next)
 
-      await removeOne(Tweet)(req, res)
+      expect(req.body.removed).not.toBe({})
+      expect(req.body.removed).toEqual(
+        expect.objectContaining({
+          _id: req.params.tweetId,
+          createdBy: req.user._id
+        })
+      )
     })
 
     test('responds 404 if no doc was found.', async () => {
@@ -255,10 +253,11 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         params: { tweetId: mongoose.Types.ObjectId() },
         user: { _id: user }
       }
+      const next = () => {}
 
       const res = {
         status(code) {
-          expect(code).toBe(400)
+          expect(code).toBe(404)
           return this
         },
         send(result) {
@@ -266,41 +265,273 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         }
       }
 
-      await removeOne(Tweet)(req, res)
+      await removeOne(Tweet)(req, res, next)
     })
   })
 
-  // describe('likeTweet', () => {
-  //   test('finds a doc by id and increases the like count by 1.', async () => {})
+  describe('reTweet', () => {
+    let user
+    let tweet
+    let reply
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'max2@aol.com',
+        password: '123456',
+        fullName: 'Max 2Ol',
+        handle: '@max_o2'
+      })
+      reply = await Reply.create({
+        createdBy: mongoose.Types.ObjectId(),
+        fullText: 'This is my new tweet.',
+        fullName: 'Dr Maxx',
+        handle: '@Drmaxx',
+        tweetId: mongoose.Types.ObjectId()
+      })
+      tweet = await Tweet.create({
+        createdBy: mongoose.Types.ObjectId(),
+        fullText: 'This is my new tweet.',
+        fullName: 'Dr Maxx',
+        handle: '@Drmaxx'
+      })
+    })
 
-  //   test('responds 404 if no doc was found.', async () => {})
-  // })
+    test('adds a reply reference doc to the authenticated user.', async () => {
+      expect.assertions(3)
 
-  // describe('unlikeTweet', () => {
-  //   test('finds a doc by id and decreases the like count by 1.', async () => {})
+      const req = {
+        user,
+        params: {},
+        query: { replyId: reply._id }
+      }
 
-  //   test('responds 404 if no doc was found.', async () => {})
-  // })
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          result.user.replies.forEach(reply => {
+            expect(reply.replyId.toString()).toEqual(
+              req.query.replyId.toString()
+            )
+          })
+          expect(result.user.replies).toHaveLength(1)
+        }
+      }
 
-  // describe('reTweet', () => {
-  //   test('finds a doc by id and increases the retweet count by 1.', async () => {})
+      await reTweet(Reply)(req, res)
+    })
 
-  //   test('copies the tweet and adds it to the user object.', async () => {})
+    test('adds a tweet reference doc to the authenticated user.', async () => {
+      expect.assertions(3)
 
-  //   test('sets the retweet property to true.', async () => {})
+      const req = {
+        user,
+        params: { tweetId: tweet._id }
+      }
 
-  //   test('responds 404 if no tweet was found.', async () => {})
-  // })
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          result.user.tweets.forEach(tweet => {
+            expect(tweet.tweetId.toString()).toEqual(
+              req.params.tweetId.toString()
+            )
+          })
+          expect(result.user.tweets).toHaveLength(1)
+        }
+      }
 
-  // describe('undoRetweet', () => {
-  //   test('finds the tweet by id and decreases the retweet count by 1.', async () => {})
+      await reTweet(Tweet)(req, res)
+    })
 
-  //   test('removes the tweet by id from the user object.', async () => {})
+    test('sets the retweet count by 1.', async () => {
+      expect.assertions(3)
 
-  //   test('sets the retweet property to false.', async () => {})
+      const req = {
+        user,
+        params: { tweetId: tweet._id }
+      }
 
-  //   test('responds 404 if no tweet was found.', async () => {})
-  // })
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.user.tweets).toHaveLength(1)
+          expect(result.doc.retweetCount).toBe(1)
+        }
+      }
+
+      await reTweet(Tweet)(req, res)
+    })
+
+    test('sets the retweet property to true.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: { tweetId: tweet._id }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          const doc = result.user.tweets.find(
+            t => t.tweetId.toString() === req.params.tweetId.toString()
+          )
+          expect(doc.retweet).toBe(true)
+        }
+      }
+
+      await reTweet(Tweet)(req, res)
+    })
+
+    test('responds 404 if no tweet or reply was found.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: { tweetId: mongoose.Types.ObjectId() }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
+
+      await reTweet(Tweet)(req, res)
+    })
+  })
+
+  describe('undoRetweet', () => {
+    let user
+    let tweet
+    let reply
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'max2@aol.com',
+        password: '123456',
+        fullName: 'Max 2Ol',
+        handle: '@max_o2'
+      })
+      tweet = await Tweet.create({
+        createdBy: mongoose.Types.ObjectId(),
+        fullText: 'This is my new tweet.',
+        fullName: 'Dr Maxx',
+        handle: '@Drmaxx',
+        retweetCount: 1
+      })
+      reply = await Reply.create({
+        createdBy: mongoose.Types.ObjectId(),
+        fullText: 'This is my new reply.',
+        fullName: 'Dr Maxx',
+        handle: '@Drmaxx',
+        tweetId: tweet._id,
+        retweetCount: 1
+      })
+      user.tweets.push({ retweet: true, tweetId: tweet._id })
+      user.replies.push({ retweet: true, replyId: reply._id })
+      await user.save()
+    })
+
+    test('removes the tweet by id from the authenticated user.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: { tweetId: tweet._id }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.user.tweets).toHaveLength(0)
+        }
+      }
+
+      await undoRetweet(Tweet)(req, res)
+    })
+
+    test('removes the reply by id from the authenticated user.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: {},
+        query: { replyId: reply._id }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.user.replies).toHaveLength(0)
+        }
+      }
+
+      await undoRetweet(Reply)(req, res)
+    })
+
+    test('decreases the retweet count by 1.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: { tweetId: tweet._id }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          expect(result.doc.retweetCount).toBe(0)
+        }
+      }
+
+      await undoRetweet(Tweet)(req, res)
+    })
+
+    test('responds 404 if no tweet was found.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        params: { tweetId: mongoose.Types.ObjectId() }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(typeof result.message).toBe('string')
+        }
+      }
+
+      await undoRetweet(Tweet)(req, res)
+    })
+  })
 })
 
 // PSEUDO tweet and user JSON objects

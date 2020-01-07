@@ -6,7 +6,6 @@ describe('Reply model:', () => {
     const tweetId = Reply.schema.obj.tweetId
     expect(tweetId).toEqual({
       type: SchemaTypes.ObjectId,
-      required: true,
       ref: 'tweet'
     })
   })

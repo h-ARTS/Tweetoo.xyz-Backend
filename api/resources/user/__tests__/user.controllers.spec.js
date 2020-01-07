@@ -2,14 +2,23 @@ import {
   controllers,
   myProfile,
   updateProfile,
-  followHandler
+  followHandler,
+  appendToUser,
+  removeFromUser
 } from '../user.controllers'
 import { User } from '../user.model'
 import mongoose from 'mongoose'
 
 describe('user controllers:', () => {
   test('has functions to display user profile and to update.', () => {
-    const methods = ['myProfile', 'updateProfile', 'getUser', 'followHandler']
+    const methods = [
+      'myProfile',
+      'updateProfile',
+      'getUser',
+      'followHandler',
+      'appendToUser',
+      'removeFromUser'
+    ]
 
     methods.forEach(method => {
       expect(typeof controllers[method]).toBe('function')
@@ -204,6 +213,150 @@ describe('user controllers:', () => {
       }
 
       await followHandler(req, res)
+    })
+  })
+
+  describe('appendToUser', () => {
+    let user
+
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'max@aol.com',
+        password: '123456',
+        fullName: 'Max Ol',
+        handle: '@max_o'
+      })
+    })
+
+    test('if tweets, it appends to the authenticated users tweets object.', async () => {
+      expect.assertions(2)
+
+      const req = {
+        user,
+        body: {
+          doc: { _id: mongoose.Types.ObjectId() }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          result.user.tweets.forEach(tweet => {
+            expect(tweet.tweetId.toString()).toEqual(
+              req.body.doc._id.toString()
+            )
+          })
+        }
+      }
+
+      await appendToUser(req, res)
+    })
+
+    test('if reply, it appends to the authenticated users replies object.', async () => {
+      expect.assertions(2)
+
+      const tweetId = mongoose.Types.ObjectId()
+      const req = {
+        user,
+        body: {
+          doc: { _id: mongoose.Types.ObjectId(), tweetId },
+          tweet: { _id: tweetId }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+          return this
+        },
+        json(result) {
+          result.user.replies.forEach(reply => {
+            expect(reply.replyId.toString()).toEqual(
+              req.body.doc._id.toString()
+            )
+          })
+        }
+      }
+
+      await appendToUser(req, res)
+    })
+  })
+
+  describe('removeFromUser', () => {
+    let user
+    const tweetId = mongoose.Types.ObjectId()
+    const replyId = mongoose.Types.ObjectId()
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'max@aol.com',
+        password: '123456',
+        fullName: 'Max Ol',
+        handle: '@max_o'
+      })
+      await user.replies.push({ replyId })
+      await user.tweets.push({ tweetId })
+      await user.save()
+    })
+
+    test('removes a reply object from the user document.', async () => {
+      expect.assertions(3)
+
+      const req = {
+        user,
+        body: {
+          removed: {
+            _id: replyId,
+            tweetId
+          }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.removed._id.toString()).toEqual(
+            req.body.removed._id.toString()
+          )
+          expect(result.user.replies).toHaveLength(0)
+        }
+      }
+
+      await removeFromUser(req, res)
+    })
+
+    test('removes a tweet object from the user document.', async () => {
+      expect.assertions(3)
+
+      const req = {
+        user,
+        body: {
+          removed: {
+            _id: tweetId,
+            replies: []
+          }
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.removed._id.toString()).toEqual(
+            req.body.removed._id.toString()
+          )
+          expect(result.user.tweets).toHaveLength(0)
+        }
+      }
+
+      await removeFromUser(req, res)
     })
   })
 })

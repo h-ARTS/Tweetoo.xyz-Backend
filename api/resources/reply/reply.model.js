@@ -4,7 +4,7 @@ const replySchema = new Schema(
   {
     tweetId: {
       type: SchemaTypes.ObjectId,
-      required: true,
+      // required: true,
       ref: 'tweet'
     },
     fullText: {
@@ -33,6 +33,17 @@ const replySchema = new Schema(
   { timestamps: true }
 )
 
-replySchema.index({ user: 1, tweet: 1 }, { unique: true })
+export const UserReplySchema = new Schema({
+  retweet: {
+    type: Boolean,
+    default: false
+  },
+  replyId: {
+    type: SchemaTypes.ObjectId,
+    required: true
+  }
+})
+
+// replySchema.index({ user: 1, tweet: 1 }, { unique: true })
 
 export const Reply = model('reply', replySchema)
