@@ -17,5 +17,7 @@ router
 
 router.route('/like').put(controllers.likeDoc)
 router.route('/unlike').put(controllers.unlikeDoc)
+router.route('/retweet').put(controllers.reTweet)
+router.route('/undoretweet').put(controllers.undoRetweet)
 
 export default router

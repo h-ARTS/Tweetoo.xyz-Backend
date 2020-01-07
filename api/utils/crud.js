@@ -1,4 +1,5 @@
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
+import { User } from '../resources/user/user.model'
 
 export const getAll = model => async (req, res) => {
   try {
@@ -98,6 +99,73 @@ export const removeOne = model => async (req, res, next) => {
   }
 }
 
+export const reTweet = model => async (req, res) => {
+  const ref = {
+    retweet: true
+  }
+  const docId = req.params.tweetId || req.query.replyId
+  try {
+    const user = await User.findById(req.user._id).select('-password')
+    const doc = await model
+      .findByIdAndUpdate(
+        docId,
+        {
+          $inc: { retweetCount: 1 }
+        },
+        { new: true }
+      )
+      .lean()
+      .exec()
+
+    if (req.query) {
+      ref.replyId = doc._id
+      user.replies.push(ref)
+    } else {
+      ref.tweetId = doc._id
+      user.tweets.push(ref)
+    }
+    await user.save()
+
+    res.status(201).json({ user, doc })
+  } catch (e) {
+    console.error(e)
+    res
+      .status(404)
+      .send({ message: 'This doc does not exist in the database.' })
+  }
+}
+
+export const undoRetweet = model => async (req, res) => {
+  const docId = req.params.tweetId || req.query.replyId
+  try {
+    const user = await User.findById(req.user._id).select('-password')
+
+    let ref
+    if (req.query.replyId) {
+      ref = user.replies.find(
+        r => r.replyId.toString() === req.query.replyId.toString()
+      )
+      user.replies.pull(ref._id)
+    } else {
+      ref = user.tweets.find(
+        t => t.tweetId.toString() === req.params.tweetId.toString()
+      )
+      user.tweets.pull(ref._id)
+    }
+    await user.save()
+
+    const updated = await model
+      .findByIdAndUpdate(docId, { $inc: { retweetCount: -1 } }, { new: true })
+      .lean()
+      .exec()
+
+    res.status(201).json({ user, updated })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 export const controllers = model => {
   return {
     getAll: getAll(model),
@@ -106,8 +174,8 @@ export const controllers = model => {
     updateOne: updateOne(model),
     removeOne: removeOne(model),
     likeDoc: likeDoc(model),
-    unlikeDoc: unlikeDoc(model)
-    // reTweet: reTweet(model),
-    // undoRetweet: undoRetweet(model)
+    unlikeDoc: unlikeDoc(model),
+    reTweet: reTweet(model),
+    undoRetweet: undoRetweet(model)
   }
 }
