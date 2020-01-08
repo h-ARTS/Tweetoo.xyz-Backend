@@ -2,7 +2,7 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2.1
+version: 2.0
 jobs:
   build:
     docker:
@@ -17,7 +17,7 @@ jobs:
         #          mongod --replSet tweetoo --logpath "1.log" --dbpath mongodb/rs0-1 --port 27018  &
         #          mongod --replSet tweetoo --logpath "2.log" --dbpath mongodb/rs0-2 --port 27019  &
 
-    working_directory: ~/
+    working_directory: ~/repo
 
     steps:
       - checkout
@@ -25,7 +25,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
@@ -36,7 +36,7 @@ jobs:
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
 
       # run tests!
       - run:
