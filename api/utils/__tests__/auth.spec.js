@@ -1,8 +1,16 @@
-import { newToken, verifyToken, signup, login, authGuard } from '../auth'
+import {
+  newToken,
+  verifyToken,
+  signup,
+  login,
+  authGuard,
+  logout
+} from '../auth'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import { User } from '../../resources/user/user.model'
 import config from '../../../config'
+import { Blacklist } from '../../resources/blacklist-token/blacklist.model'
 
 describe('Authentication:', () => {
   describe('newToken', () => {
@@ -246,6 +254,69 @@ describe('Authentication:', () => {
 
       expect(req.user._id.toString()).toBe(user._id.toString())
       expect(req.user).not.toHaveProperty('password')
+    })
+
+    test('if blacklisted token is used it will return 401.', async () => {
+      expect.assertions(2)
+
+      const user = await User.create({
+        email: 'max@mustard.com',
+        password: '123456',
+        fullName: 'Max Mustard',
+        handle: '@maxmustard'
+      })
+
+      const bearer = `Bearer ${newToken(user)}`
+      const token = bearer.split('Bearer ')[1]
+      const { exp, iat } = jwt.decode(token)
+
+      const req = { headers: { authorization: bearer } }
+      await Blacklist.create({ token, exp, iat })
+
+      const res = {
+        status(code) {
+          expect(code).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await authGuard(req, res)
+    })
+
+    test('if a blacklisted expired token is used it will return 401 unauthorized.', async () => {
+      expect.assertions(2)
+
+      const user = await User.create({
+        email: 'max@mustard.com',
+        password: '123456',
+        fullName: 'Max Mustard',
+        handle: '@maxmustard'
+      })
+
+      const bearer = `Bearer ${newToken(user)}`
+      const token = bearer.split('Bearer ')[1]
+
+      const req = { headers: { authorization: bearer } }
+      await Blacklist.create({
+        token,
+        exp: 1578683384,
+        iat: 1578683264
+      })
+
+      const res = {
+        status(code) {
+          expect(code).toBe(401)
+          return this
+        },
+        end() {
+          expect(true).toBe(true)
+        }
+      }
+
+      await authGuard(req, res)
     })
   })
 })
