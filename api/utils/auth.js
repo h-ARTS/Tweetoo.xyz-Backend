@@ -1,6 +1,8 @@
 import config from '../../config'
 import { User } from '../resources/user/user.model'
 import jwt from 'jsonwebtoken'
+import { Blacklist } from '../resources/blacklist-token/blacklist.model'
+import { checkBlacklisted } from '../resources/blacklist-token/blacklist.util'
 
 export const newToken = user => {
   const options = {
@@ -76,6 +78,20 @@ export const login = async (req, res) => {
   }
 }
 
+export const logout = async (req, res) => {
+  const token = req.headers.authorization.split('Bearer ')[1]
+  const { exp, iat } = jwt.decode(token)
+  try {
+    const blacklisted = await Blacklist.create({ token, exp, iat })
+    delete req.user
+    delete req.headers.authorization
+    res.status(200).send({ blacklisted })
+  } catch (e) {
+    console.error(e)
+    res.status(500).end()
+  }
+}
+
 export const authGuard = async (req, res, next) => {
   const bearer = req.headers.authorization
 
@@ -86,9 +102,16 @@ export const authGuard = async (req, res, next) => {
   const token = bearer.split('Bearer ')[1].trim()
 
   let payload
+  const isBlacklistedToken = await checkBlacklisted(token)
+
   try {
-    payload = await verifyToken(token)
+    if (!isBlacklistedToken) {
+      payload = await verifyToken(token)
+    } else {
+      return res.status(401).end()
+    }
   } catch (e) {
+    console.error(e)
     return res.status(401).end()
   }
 

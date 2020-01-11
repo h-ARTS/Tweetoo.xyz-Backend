@@ -4,7 +4,7 @@ import { connect } from './utils/db'
 import { json, urlencoded } from 'body-parser'
 import cors from 'cors'
 import config from '../config'
-import { authGuard, login, signup } from './utils/auth'
+import { authGuard, login, signup, logout } from './utils/auth'
 import { Tweet } from './resources/tweet/tweet.model'
 import tweetRouter from './resources/tweet/tweet.router'
 import replyRouter from './resources/reply/reply.router'
@@ -24,6 +24,7 @@ app.use(urlencoded({ extended: true }))
 
 app.post('/login', login)
 app.post('/signup', signup)
+app.post('/logout', logout)
 
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
