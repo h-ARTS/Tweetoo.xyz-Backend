@@ -2,6 +2,7 @@ import { User } from './user.model'
 import { Like } from '../like/like.model'
 import { Reply } from '../reply/reply.model'
 import { Tweet } from '../tweet/tweet.model'
+import { Types } from 'mongoose'
 
 const watchUsers = User.watch()
 
@@ -112,7 +113,10 @@ export const appendToUser = async (req, res) => {
 
     let result
     if (req.body.doc.tweetId) {
-      user.replies.push({ replyId: req.body.doc._id })
+      user.replies.push({
+        replyId: req.body.doc._id,
+        tweetId: req.body.doc.tweetId
+      })
       result = {
         reply: req.body.doc,
         tweet: req.body.tweet,
@@ -145,7 +149,12 @@ export const removeFromUser = async (req, res) => {
       const tweetObj = user.tweets.find(
         t => t.tweetId.toString() === doc._id.toString()
       )
+      const replyDocs = user.replies
+        .filter(r => r.tweetId.toString() === doc._id.toString())
+        .map(r => Types.ObjectId(r._id))
+
       user.tweets.pull({ _id: tweetObj._id })
+      user.replies.pull(...replyDocs)
     } else {
       const replyObj = user.replies.find(
         r => r.replyId.toString() === doc._id.toString()

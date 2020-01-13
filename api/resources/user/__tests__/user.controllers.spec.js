@@ -296,7 +296,7 @@ describe('user controllers:', () => {
         fullName: 'Max Ol',
         handle: '@max_o'
       })
-      await user.replies.push({ replyId })
+      await user.replies.push({ replyId, tweetId })
       await user.tweets.push({ tweetId })
       await user.save()
     })
@@ -330,8 +330,8 @@ describe('user controllers:', () => {
       await removeFromUser(req, res)
     })
 
-    test('removes a tweet object from the user document.', async () => {
-      expect.assertions(3)
+    test('removes a tweet doc and the associated reply docs from the user document.', async () => {
+      expect.assertions(4)
 
       const req = {
         user,
@@ -353,6 +353,12 @@ describe('user controllers:', () => {
             req.body.removed._id.toString()
           )
           expect(result.user.tweets).toHaveLength(0)
+          const replyDocs = user.replies.filter(
+            r => r.tweetId.toString() === req.body.removed._id.toString()
+          )
+          expect(result.user.replies).toEqual(
+            expect.not.objectContaining(...replyDocs)
+          )
         }
       }
 

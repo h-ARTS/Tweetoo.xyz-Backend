@@ -117,6 +117,7 @@ export const reTweet = model => async (req, res) => {
     const ref = { retweet: true }
     if (req.query) {
       ref.replyId = doc._id
+      ref.tweetId = doc.tweetId
       user.replies.push(ref)
     } else {
       ref.tweetId = doc._id
@@ -126,7 +127,6 @@ export const reTweet = model => async (req, res) => {
 
     res.status(201).json({ user, doc })
   } catch (e) {
-    console.error(e)
     res
       .status(404)
       .send({ message: 'This doc does not exist in the database.' })
