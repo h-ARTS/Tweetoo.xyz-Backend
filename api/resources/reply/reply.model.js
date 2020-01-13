@@ -41,6 +41,10 @@ export const UserReplySchema = new Schema({
   replyId: {
     type: SchemaTypes.ObjectId,
     required: true
+  },
+  tweetId: {
+    type: SchemaTypes.ObjectId,
+    required: true
   }
 })
 

@@ -443,7 +443,11 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         retweetCount: 1
       })
       user.tweets.push({ retweet: true, tweetId: tweet._id })
-      user.replies.push({ retweet: true, replyId: reply._id })
+      user.replies.push({
+        retweet: true,
+        replyId: reply._id,
+        tweetId: tweet._id
+      })
       await user.save()
     })
 
