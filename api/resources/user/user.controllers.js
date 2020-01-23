@@ -1,3 +1,4 @@
+import fs from 'fs'
 import { User } from './user.model'
 import { Like } from '../like/like.model'
 import { Reply } from '../reply/reply.model'
@@ -170,11 +171,32 @@ export const removeFromUser = async (req, res) => {
   }
 }
 
+export const deleteProfile = (req, res) => {
+  // NOTE: recursive removal is experimental according to docs.
+  fs.rmdir(`media/${req.user.handle}`, { recursive: true }, async err => {
+    if (err) console.error(err)
+
+    try {
+      const removedProfile = await User.findByIdAndRemove(req.user._id).exec()
+
+      if (!removedProfile) {
+        return res.status(500).send({ message: 'Not working' })
+      }
+
+      res.status(200).json({ removed: removedProfile })
+    } catch (e) {
+      console.error(e)
+      return res.status(500).end()
+    }
+  })
+}
+
 export const controllers = {
   myProfile: myProfile,
   updateProfile: updateProfile,
   getUser: getUser,
   followHandler: followHandler,
   appendToUser: appendToUser,
-  removeFromUser: removeFromUser
+  removeFromUser: removeFromUser,
+  deleteProfile: deleteProfile
 }
