@@ -1,8 +1,12 @@
 import multer from 'multer'
+import fs from 'fs'
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, './media/')
+    const targetPath = `./media/${req.user.handle}/`
+    return fs.mkdir(targetPath, { recursive: true }, () => {
+      cb(null, targetPath)
+    })
   },
   filename: function(req, file, cb) {
     cb(null, Date.now() + file.originalname)
@@ -32,4 +36,4 @@ export const upload = multer({
   },
   preservePath: true,
   fileFilter: fileFilter
-}).single('profileImage')
+}).single('image')

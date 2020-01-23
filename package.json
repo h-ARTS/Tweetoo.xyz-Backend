@@ -6,6 +6,7 @@
   "scripts": {
     "build": "babel api --out-dir dist",
     "dev": "nodemon --exec yarn restart",
+    "test-upload": "jest -t uploads: --runInBand --detectOpenHandles",
     "test-router": "jest -t router: --runInBand --detectOpenHandles",
     "test-controllers": "jest -t controllers: --runInBand --detectOpenHandles",
     "test-model": "jest -t model: --runInBand",

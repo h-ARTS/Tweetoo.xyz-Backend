@@ -1,17 +1,21 @@
 import { uploadImage } from '../upload.controller'
 import { User } from '../../user.model'
+import fs from 'fs'
 
-describe('upload controllers:', () => {
+describe('uploads:', () => {
+  let user
+  beforeEach(async () => {
+    user = await User.create({
+      email: 'max@mustard.com',
+      password: '123456',
+      fullName: 'Max Mustard',
+      handle: 'maxmustard'
+    })
+  })
+
   describe('uploadImage', () => {
-    test('return authenticated user with dimension object', async () => {
+    test('returns authenticated user with dimension object', async () => {
       expect.assertions(2)
-
-      const user = await User.create({
-        email: 'max@mustard.com',
-        password: '123456',
-        fullName: 'Max Mustard',
-        handle: '@maxmustard'
-      })
 
       const req = {
         user: user,
@@ -22,10 +26,12 @@ describe('upload controllers:', () => {
           mimetype: 'image/png',
           destination: './uploads/',
           filename: '1577367080145optional.png',
-          path: 'uploads/1577367080145optional.png',
+          path: 'media/maxmustard/1577367080145optional.png',
           size: 17291
         },
-        body: { dimension: 'coverImage' }
+        body: {
+          dimension: 'coverImage'
+        }
       }
 
       const res = {
@@ -39,6 +45,43 @@ describe('upload controllers:', () => {
       }
 
       await uploadImage(req, res)
+    })
+  })
+
+  describe('removeFile', () => {
+    test('removes the file when dimension is not specified during upload.', async () => {
+      expect.assertions(3)
+
+      const req = {
+        user: user,
+        file: {
+          fieldname: 'image',
+          originalname: 'example.png',
+          encoding: '7bit',
+          mimetype: 'image/png',
+          destination: './uploads/',
+          filename: '1577367080145optional.png',
+          path: 'media/maxmustard/1577367080145optional.png',
+          size: 17291
+        },
+        body: { dimension: '' }
+      }
+
+      fs.copyFileSync(`media/maxmustard/_${req.file.filename}`, req.file.path)
+
+      const res = {
+        status(code) {
+          expect(code).toBe(500)
+          return this
+        },
+        send(result) {
+          expect(result.message).toEqual('Dimension not provided!')
+        }
+      }
+
+      await uploadImage(req, res)
+
+      expect(fs.existsSync(`media/maxmustard/${req.file.filename}`)).toBeFalsy()
     })
   })
 })

@@ -1,9 +1,16 @@
 import { User } from '../user.model'
+import fs from 'fs'
 
 export const uploadImage = async (req, res) => {
   try {
     const { originalname, mimetype, path } = req.file
     const { dimension } = req.body
+    if (!dimension) {
+      removeFile(path)
+      return res.status(500).send({
+        message: 'Dimension not provided!'
+      })
+    }
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
@@ -27,4 +34,11 @@ export const uploadImage = async (req, res) => {
     console.error(e)
     return res.status(500).end()
   }
+}
+
+export const removeFile = path => {
+  return fs.unlink(path, err => {
+    if (err) throw err
+    console.log(`${path} was deleted!`)
+  })
 }
