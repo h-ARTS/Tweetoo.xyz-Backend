@@ -8,12 +8,13 @@ import {
 } from './user.controllers'
 import { upload } from '../../utils/upload'
 import { uploadImage } from './user-uploads/upload.controller'
+import checkUserDir from './user-uploads/checkUserDir'
 
 const router = Router()
 
 router.get('/', myProfile)
 router.put('/', updateProfile)
-router.delete('/', deleteProfile)
+router.delete('/', checkUserDir, deleteProfile)
 router.get('/:handle', getUser)
 router.put('/:handle', followHandler)
 router.post('/image', upload, uploadImage)
