@@ -1,7 +1,6 @@
 import { User } from '../user.model'
 import { FollowerSchema } from '../follower.schema'
-import { ImageFileSchema } from '../image-upload/imagefile.schema'
-import { SchemaTypes, Schema } from 'mongoose'
+import { ImageFileSchema } from '../user-uploads/imagefile.schema'
 import { UserTweetSchema } from '../../tweet/tweet.model'
 import { UserReplySchema } from '../../reply/reply.model'
 

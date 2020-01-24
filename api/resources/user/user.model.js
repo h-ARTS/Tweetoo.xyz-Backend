@@ -1,9 +1,9 @@
-import { Schema, model, SchemaTypes } from 'mongoose'
+import { Schema, model } from 'mongoose'
 // Safer than md5 hash which can be cracked faster by a super computer.
 import bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
 import { UserTweetSchema } from '../tweet/tweet.model'
-import { ImageFileSchema } from './image-upload/imagefile.schema'
+import { ImageFileSchema } from './user-uploads/imagefile.schema'
 import { UserReplySchema } from '../reply/reply.model'
 
 const userSchema = new Schema(

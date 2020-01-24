@@ -7,7 +7,7 @@ import {
   deleteProfile
 } from './user.controllers'
 import { upload } from '../../utils/upload'
-import { uploadImage } from './image-upload/upload.controller'
+import { uploadImage } from './user-uploads/upload.controller'
 
 const router = Router()
 
