@@ -1,4 +1,4 @@
-import { uploadImage } from '../upload.controller'
+import { uploadImage, removeFile } from '../upload.controller'
 import { User } from '../../user.model'
 import fs from 'fs'
 
@@ -46,10 +46,8 @@ describe('uploads:', () => {
 
       await uploadImage(req, res)
     })
-  })
 
-  describe('removeFile', () => {
-    test('removes the file when dimension is not specified during upload.', async () => {
+    test('triggers to remove the file when dimension is not specified.', async () => {
       expect.assertions(3)
 
       const req = {
@@ -81,7 +79,18 @@ describe('uploads:', () => {
 
       await uploadImage(req, res)
 
-      expect(fs.existsSync(`media/maxmustard/${req.file.filename}`)).toBeFalsy()
+      expect(fs.existsSync(`media/maxmustard/${req.file.filename}`)).toBe(false)
+    })
+  })
+
+  describe('removeFile', () => {
+    test('removes one file from the specified path.', () => {
+      const path = 'media/maxmustard/1577367080145optional.png'
+      fs.copyFile('media/maxmustard/_1577367080145optional.png', path, () => {
+        removeFile(path)
+      })
+
+      expect(fs.existsSync(path)).toBe(false)
     })
   })
 })
