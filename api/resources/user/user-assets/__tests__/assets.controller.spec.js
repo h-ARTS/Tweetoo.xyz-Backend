@@ -1,7 +1,7 @@
 import fs from 'fs'
-import { removeFileRecursive } from '../checkUserDir'
+import { removeFileRecursive, removeFile } from '../assets.controller'
 
-describe('User asset uploads:', () => {
+describe('User assets controller:', () => {
   describe('removeFileRecursive:', () => {
     const reqUserHandle = 'JohnDoe'
     const path = `media/${reqUserHandle}`
@@ -15,12 +15,21 @@ describe('User asset uploads:', () => {
       })
     })
 
-    test('removes the directory and all the files', () => {
+    test('removes the directory including files', () => {
       removeFileRecursive(path, () => {
         expect(fs.existsSync(path)).toBeFalsy()
       })
     })
   })
 
-  // TODO: Create test for the checkUserDir middleware.
+  describe('removeFile', () => {
+    test('removes one file from the specified path.', () => {
+      const path = 'media/maxmustard/1577367080145optional.png'
+      fs.copyFile('media/maxmustard/_1577367080145optional.png', path, () => {
+        removeFile(path)
+      })
+
+      expect(fs.existsSync(path)).toBe(false)
+    })
+  })
 })

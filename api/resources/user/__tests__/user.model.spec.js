@@ -1,6 +1,6 @@
 import { User } from '../user.model'
 import { FollowerSchema } from '../follower.schema'
-import { ImageFileSchema } from '../user-uploads/imagefile.schema'
+import { ImageFileSchema } from '../user-assets/imagefile.schema'
 import { UserTweetSchema } from '../../tweet/tweet.model'
 import { UserReplySchema } from '../../reply/reply.model'
 

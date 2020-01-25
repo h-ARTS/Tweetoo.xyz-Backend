@@ -1,5 +1,5 @@
 import { User } from '../user.model'
-import fs from 'fs'
+import { removeFile } from './assets.controller'
 
 export const uploadImage = async (req, res) => {
   try {
@@ -34,11 +34,4 @@ export const uploadImage = async (req, res) => {
     console.error(e)
     return res.status(500).end()
   }
-}
-
-export const removeFile = path => {
-  return fs.unlink(path, err => {
-    if (err) throw err
-    console.log(`${path} was deleted!`)
-  })
 }

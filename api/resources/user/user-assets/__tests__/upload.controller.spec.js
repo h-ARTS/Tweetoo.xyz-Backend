@@ -1,4 +1,4 @@
-import { uploadImage, removeFile } from '../upload.controller'
+import { uploadImage } from '../upload.controller'
 import { User } from '../../user.model'
 import fs from 'fs'
 
@@ -80,17 +80,6 @@ describe('uploads:', () => {
       await uploadImage(req, res)
 
       expect(fs.existsSync(`media/maxmustard/${req.file.filename}`)).toBe(false)
-    })
-  })
-
-  describe('removeFile', () => {
-    test('removes one file from the specified path.', () => {
-      const path = 'media/maxmustard/1577367080145optional.png'
-      fs.copyFile('media/maxmustard/_1577367080145optional.png', path, () => {
-        removeFile(path)
-      })
-
-      expect(fs.existsSync(path)).toBe(false)
     })
   })
 })

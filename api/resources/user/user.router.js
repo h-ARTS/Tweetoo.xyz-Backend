@@ -7,14 +7,14 @@ import {
   deleteProfile
 } from './user.controllers'
 import { upload } from '../../utils/upload'
-import { uploadImage } from './user-uploads/upload.controller'
-import checkUserDir from './user-uploads/checkUserDir'
+import { uploadImage } from './user-assets/upload.controller'
+import { checkUserAssets } from './user-assets/assets.controller'
 
 const router = Router()
 
 router.get('/', myProfile)
 router.put('/', updateProfile)
-router.delete('/', checkUserDir, deleteProfile)
+router.delete('/', checkUserAssets, deleteProfile)
 router.get('/:handle', getUser)
 router.put('/:handle', followHandler)
 router.post('/image', upload, uploadImage)

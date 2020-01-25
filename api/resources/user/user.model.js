@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose'
 import bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
 import { UserTweetSchema } from '../tweet/tweet.model'
-import { ImageFileSchema } from './user-uploads/imagefile.schema'
+import { ImageFileSchema } from './user-assets/imagefile.schema'
 import { UserReplySchema } from '../reply/reply.model'
 
 const userSchema = new Schema(

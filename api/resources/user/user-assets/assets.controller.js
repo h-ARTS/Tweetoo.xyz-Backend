@@ -15,7 +15,14 @@ export const removeFileRecursive = (path, callback) => {
   callback()
 }
 
-export default (req, _, next) => {
+export const removeFile = path => {
+  return fs.unlink(path, err => {
+    if (err) throw err
+    console.log(`${path} was deleted!`)
+  })
+}
+
+export const checkUserAssets = (req, _, next) => {
   const path = `media/${req.user.handle}`
   if (fs.existsSync(path)) {
     removeFileRecursive(path, () => next())
