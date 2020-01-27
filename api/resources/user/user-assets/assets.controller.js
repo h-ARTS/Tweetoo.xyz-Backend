@@ -25,7 +25,10 @@ export const removeFile = path => {
 export const checkUserAssets = (req, _, next) => {
   const path = `media/${req.user.handle}`
   if (fs.existsSync(path)) {
-    removeFileRecursive(path, () => next())
+    return removeFileRecursive(path, () => {
+      console.log('removeFileRecursive called')
+      next()
+    })
   } else {
     return next()
   }
