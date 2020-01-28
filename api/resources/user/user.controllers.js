@@ -170,11 +170,27 @@ export const removeFromUser = async (req, res) => {
   }
 }
 
+export const deleteProfile = async (req, res) => {
+  try {
+    const removedProfile = await User.findByIdAndRemove(req.user._id).exec()
+
+    if (!removedProfile) {
+      return res.status(500).send({ message: 'Not working' })
+    }
+
+    res.status(200).json({ removed: removedProfile })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).end()
+  }
+}
+
 export const controllers = {
   myProfile: myProfile,
   updateProfile: updateProfile,
   getUser: getUser,
   followHandler: followHandler,
   appendToUser: appendToUser,
-  removeFromUser: removeFromUser
+  removeFromUser: removeFromUser,
+  deleteProfile: deleteProfile
 }

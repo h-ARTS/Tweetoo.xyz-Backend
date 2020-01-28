@@ -1,9 +1,16 @@
 import { User } from '../user.model'
+import { removeFile } from './assets.controller'
 
 export const uploadImage = async (req, res) => {
   try {
     const { originalname, mimetype, path } = req.file
     const { dimension } = req.body
+    if (!dimension) {
+      removeFile(path)
+      return res.status(500).send({
+        message: 'Dimension not provided!'
+      })
+    }
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
