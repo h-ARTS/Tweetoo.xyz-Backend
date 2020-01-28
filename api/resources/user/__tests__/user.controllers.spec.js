@@ -4,7 +4,8 @@ import {
   updateProfile,
   followHandler,
   appendToUser,
-  removeFromUser
+  removeFromUser,
+  deleteProfile
 } from '../user.controllers'
 import { User } from '../user.model'
 import mongoose from 'mongoose'
@@ -83,25 +84,98 @@ describe('user controllers:', () => {
 
       await updateProfile(req, res)
     })
+
+    test('returns 404 if no user found.', async () => {
+      expect.assertions(4)
+
+      const update = { location: 'Seattle, WA' }
+      const req = { user: { _id: mongoose.Types.ObjectId() }, body: update }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result).not.toBeFalsy()
+          expect(result.hasOwnProperty('message')).toBe(true)
+          expect(result.message).toBe('User not found.')
+        }
+      }
+
+      await updateProfile(req, res)
+    })
+  })
+
+  describe('deleteProfile', () => {
+    let user
+
+    beforeEach(async () => {
+      user = await User.create({
+        email: 'jane@doe-company.org',
+        password: '1234567',
+        fullName: 'Jane Doe',
+        handle: 'daneDoe'
+      })
+    })
+
+    test('removes the user from the database.', async () => {
+      expect.assertions(3)
+
+      const req = { user }
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result.removed).not.toBeFalsy()
+          expect(result.removed._id.toString()).toBe(req.user._id.toString())
+        }
+      }
+      await deleteProfile(req, res)
+    })
+
+    test('returns 404 if no user found.', async () => {
+      expect.assertions(4)
+
+      const req = { user: { _id: mongoose.Types.ObjectId() } }
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result).not.toEqual({})
+          expect(result.hasOwnProperty('message')).toBe(true)
+          expect(result.message).toBe('User not found.')
+        }
+      }
+
+      await deleteProfile(req, res)
+    })
   })
 
   describe('followHandler', () => {
-    test('adds user to followers array to the target user.', async () => {
-      expect.assertions(3)
-
-      const userToFollow = await User.create({
+    let userToFollow
+    let loggedInUser
+    beforeEach(async () => {
+      userToFollow = await User.create({
         email: 'mike@gmail.com',
         password: 'asdfgh',
         fullName: 'Mike Mors',
         handle: '@mikeMors'
       })
 
-      const loggedInUser = await User.create({
+      loggedInUser = await User.create({
         email: 'maxi@aol.com',
         password: 1234567,
         fullName: 'Maximum Ben',
         handle: '@maxi_ben'
       })
+    })
+    test('adds user to followers array to the target user.', async () => {
+      expect.assertions(3)
 
       const req = {
         params: { handle: userToFollow.handle },
@@ -128,20 +202,6 @@ describe('user controllers:', () => {
 
     test('adds user to following array to the authenticated user.', async () => {
       expect.assertions(3)
-
-      const userToFollow = await User.create({
-        email: 'mike@gmail.com',
-        password: 'asdfgh',
-        fullName: 'Mike Mors',
-        handle: '@mikeMors'
-      })
-
-      const loggedInUser = await User.create({
-        email: 'maxi@aol.com',
-        password: 1234567,
-        fullName: 'Maximum Ben',
-        handle: '@maxi_ben'
-      })
 
       const req = {
         params: { handle: userToFollow.handle },

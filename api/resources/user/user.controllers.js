@@ -50,14 +50,18 @@ export const getUser = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const updated = await User.findByIdAndUpdate(req.user._id, req.body, {
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true
     })
       .select('-password')
       .lean()
       .exec()
 
-    return res.status(200).json({ data: updated })
+    if (!updatedUser) {
+      return res.status(404).send({ message: 'User not found.' })
+    }
+
+    return res.status(200).json({ data: updatedUser })
   } catch (e) {
     console.error(e)
     return res.status(400).end()
@@ -175,7 +179,7 @@ export const deleteProfile = async (req, res) => {
     const removedProfile = await User.findByIdAndRemove(req.user._id).exec()
 
     if (!removedProfile) {
-      return res.status(500).send({ message: 'Not working' })
+      return res.status(404).send({ message: 'User not found.' })
     }
 
     res.status(200).json({ removed: removedProfile })
