@@ -13,7 +13,7 @@
     "test-auth": "jest -t Authentication: --runInBand --detectOpenHandles",
     "test-crud": "jest /api/utils/__tests__/crud.spec.js --runInBand --detectOpenHandles",
     "test-blacklist-utils": "jest /api/resources/blacklist-token/__tests__/blacklist.util.spec.js --runInBand --detectOpenHandles",
-    "test-assets": "jest -t assets: --detectOpenHandles --watch",
+    "test-assets": "jest -t assets-controller: --detectOpenHandles",
     "restart": "rimraf dist && yarn build && yarn start",
     "start": "node --inspect dist/index.js",
     "test": "jest"
