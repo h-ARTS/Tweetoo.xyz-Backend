@@ -84,6 +84,27 @@ describe('user controllers:', () => {
 
       await updateProfile(req, res)
     })
+
+    test('returns 404 if no user found.', async () => {
+      expect.assertions(4)
+
+      const update = { location: 'Seattle, WA' }
+      const req = { user: { _id: mongoose.Types.ObjectId() }, body: update }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result).not.toBeFalsy()
+          expect(result.hasOwnProperty('message')).toBe(true)
+          expect(result.message).toBe('User not found.')
+        }
+      }
+
+      await updateProfile(req, res)
+    })
   })
 
   describe('deleteProfile', () => {
@@ -115,7 +136,7 @@ describe('user controllers:', () => {
       await deleteProfile(req, res)
     })
 
-    test('throws 404 if no user found.', async () => {
+    test('returns 404 if no user found.', async () => {
       expect.assertions(4)
 
       const req = { user: { _id: mongoose.Types.ObjectId() } }
