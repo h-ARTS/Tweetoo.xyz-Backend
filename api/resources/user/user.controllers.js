@@ -175,7 +175,7 @@ export const deleteProfile = async (req, res) => {
     const removedProfile = await User.findByIdAndRemove(req.user._id).exec()
 
     if (!removedProfile) {
-      return res.status(500).send({ message: 'Not working' })
+      return res.status(404).send({ message: 'User not found.' })
     }
 
     res.status(200).json({ removed: removedProfile })
