@@ -3,7 +3,10 @@ import fs from 'fs'
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    const targetPath = `./media/${req.user.handle}/`
+    const targetPath =
+      !req.params || req.params.handle !== ''
+        ? `./media/user/${req.params.handle}/`
+        : `./media/tweet/${req.params.tweetId}/`
     return fs.mkdir(targetPath, { recursive: true }, () => {
       cb(null, targetPath)
     })
@@ -29,7 +32,7 @@ const fileFilter = (req, file, cb) => {
   }
 }
 
-export const upload = multer({
+export default multer({
   storage: storage,
   limits: {
     fileSize: 1024 * 1024 * 7

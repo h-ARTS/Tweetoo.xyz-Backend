@@ -8,11 +8,11 @@ import {
 describe('User assets-controller:', () => {
   describe('removeFileRecursive:', () => {
     const reqUserHandle = 'JohnDoe'
-    const path = `media/${reqUserHandle}`
+    const path = `media/user/${reqUserHandle}`
     beforeEach(() => {
       fs.mkdir(path, err => {
         if (err) throw err
-        console.log('media/JohnDoe directory has been created.')
+        console.log('media/user/JohnDoe directory has been created.')
         fs.writeFile(`${path}/test.txt`, 'A sample file', _ => {
           console.log('Test file has been created.')
         })
@@ -28,10 +28,14 @@ describe('User assets-controller:', () => {
 
   describe('removeFile', () => {
     test('removes one file from the specified path.', () => {
-      const path = 'media/maxmustard/1577367080145optional.png'
-      fs.copyFile('media/maxmustard/_1577367080145optional.png', path, () => {
-        removeFile(path)
-      })
+      const path = 'media/user/maxmustard/1577367080145optional.png'
+      fs.copyFile(
+        'media/user/maxmustard/_1577367080145optional.png',
+        path,
+        () => {
+          removeFile(path)
+        }
+      )
 
       expect(fs.existsSync(path)).toBe(false)
     })
@@ -46,13 +50,13 @@ describe('User assets-controller:', () => {
       }
       const next = () => {}
 
-      fs.mkdir('media/Kilza', err => {
+      fs.mkdir('media/user/Kilza', err => {
         if (err) console.error(err)
-        console.log('media/Kilza created for mock function')
+        console.log('media/user/Kilza created for mock function')
 
         checkUserAssets(req, {}, next)
 
-        expect(fs.existsSync(`/media/${req.user.handle}`)).toBe(false)
+        expect(fs.existsSync(`/media/user/${req.user.handle}`)).toBe(false)
       })
     })
   })
