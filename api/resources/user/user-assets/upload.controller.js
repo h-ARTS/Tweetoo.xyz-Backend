@@ -1,7 +1,7 @@
 import { User } from '../user.model'
 import { removeFile } from './assets.controller'
 
-export const uploadImage = async (req, res) => {
+export const assignImagePath = async (req, res) => {
   try {
     const { originalname, mimetype, path } = req.file
     const { dimension } = req.body
