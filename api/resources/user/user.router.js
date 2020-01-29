@@ -6,7 +6,7 @@ import {
   followHandler,
   deleteProfile
 } from './user.controllers'
-import { uploadImage } from '../../utils/uploadImage'
+import uploadImage from '../../utils/uploadImage'
 import { assignImagePath } from './user-assets/upload.controller'
 import { checkUserAssets } from './user-assets/assets.controller'
 
