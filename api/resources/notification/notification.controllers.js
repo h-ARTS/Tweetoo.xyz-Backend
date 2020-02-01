@@ -10,6 +10,4 @@ export const getNotifications = async (req, res) => {
   }
 }
 
-export const notifyOnLike = async (req, res) => {}
-
 export default { getNotifications }
