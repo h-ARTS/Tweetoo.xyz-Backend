@@ -27,4 +27,8 @@ const initNotificationEmitter = () => {
   notify.on('follow', follower => {})
 }
 
+export const removeNotifyListeners = () => {
+  notify.removeAllListeners()
+}
+
 export default initNotificationEmitter
