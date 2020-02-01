@@ -5,13 +5,16 @@ import { json, urlencoded } from 'body-parser'
 import cors from 'cors'
 import config from '../config'
 import { authGuard, login, signup, logout } from './utils/auth'
+import initNotificationEmitter from './utils/notificationEmitter'
+
+import { getAll } from './utils/crud'
 import { Tweet } from './resources/tweet/tweet.model'
+import { Reply } from './resources/reply/reply.model'
 import tweetRouter from './resources/tweet/tweet.router'
 import replyRouter from './resources/reply/reply.router'
 import userRouter from './resources/user/user.router'
 import mediaRouter from './resources/media/media.router'
-import { getAll } from './utils/crud'
-import { Reply } from './resources/reply/reply.model'
+import notificationRouter from './resources/notification/notification.router'
 
 export const app = express()
 
@@ -35,13 +38,14 @@ app.use('/api/tweet', tweetRouter)
 app.use('/api/tweets', getAll(Tweet))
 app.use('/api/reply', replyRouter)
 app.use('/api/replies', getAll(Reply))
-app.use('/api/notifications', () => {})
+app.use('/api/notifications', notificationRouter)
 
 // Assets route
 app.use('/media', authGuard, mediaRouter)
 
 export const start = async () => {
   try {
+    initNotificationEmitter()
     await connect()
     app.listen(config.port, () =>
       console.log(

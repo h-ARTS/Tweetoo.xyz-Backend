@@ -1,5 +1,6 @@
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
 import { User } from '../resources/user/user.model'
+import { notify } from './notificationEmitter'
 
 export const getAll = model => async (req, res) => {
   try {
@@ -44,6 +45,9 @@ export const createOne = model => async (req, res, next) => {
   let doc
   const tweetId = req.query.tweetId
   try {
+    if (tweetId) {
+      notify.emit('reply', userBody, tweetId)
+    }
     doc = await model.create({ ...req.body, ...userBody, tweetId })
     req.body.doc = doc
     next()
