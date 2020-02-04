@@ -18,10 +18,8 @@ export const notificationSchema = new Schema(
       type: Boolean,
       default: false
     },
-    tweetId: {
-      type: SchemaTypes.ObjectId,
-      required: true
-    }
+    tweetId: SchemaTypes.ObjectId,
+    replyId: SchemaTypes.ObjectId
   },
   { timestamps: true }
 )
