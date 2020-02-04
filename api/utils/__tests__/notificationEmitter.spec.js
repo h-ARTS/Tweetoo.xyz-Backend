@@ -11,6 +11,9 @@ import { Notification } from '../../resources/notification/notification.model'
 
 describe('Notification event emitter', () => {
   let user
+  let token
+  let tweet
+
   beforeEach(async () => {
     user = await User.create({
       email: 'jane@doe-company.org',
@@ -19,19 +22,7 @@ describe('Notification event emitter', () => {
       handle: 'janeDoe'
     })
     initNotificationEmitter()
-  })
 
-  test('should have reply, like, retweet and follow events', () => {
-    const events = notify.eventNames()
-
-    expect(events).toEqual(['reply', 'like', 'retweet', 'follow'])
-    expect(events).toHaveLength(4)
-  })
-
-  test('notifies on reply and creates a new notification document.', async () => {
-    expect.assertions(4)
-
-    let token
     await request(app)
       .post('/login')
       .set('Content-Type', 'application/json')
@@ -43,12 +34,23 @@ describe('Notification event emitter', () => {
         token = 'Bearer ' + res.text.replace(/['"]+/g, '')
       })
 
-    const tweet = await Tweet.create({
+    tweet = await Tweet.create({
       createdBy: mongoose.Types.ObjectId(),
       fullText: 'New tweet',
       fullName: 'Tom Boy',
       handle: 'tomBoy'
     })
+  })
+
+  test('should have reply, like, retweet and follow events', () => {
+    const events = notify.eventNames()
+
+    expect(events).toEqual(['reply', 'like', 'retweet', 'follow'])
+    expect(events).toHaveLength(4)
+  })
+
+  test('notifies on reply and creates a new notification document.', async () => {
+    expect.assertions(5)
 
     await request(app)
       .post(`/api/reply/?tweetId=${tweet._id}`)
@@ -61,6 +63,24 @@ describe('Notification event emitter', () => {
         expect(notifications).not.toHaveLength(0)
         expect(notifications[0].sender).toBe(user.handle)
         expect(notifications[0].sender).not.toBe('tomBoy')
+        expect(notifications[0].type).toBe('reply')
+      })
+  })
+
+  test('notifies on like and creates a new notification document.', async () => {
+    expect.assertions(5)
+
+    await request(app)
+      .put(`/api/tweet/${tweet._id}/like`)
+      .set('Authorization', token)
+      .expect(201)
+      .then(async () => {
+        const notifications = await Notification.find()
+        expect(notifications).toHaveLength(1)
+        expect(notifications).not.toHaveLength(0)
+        expect(notifications[0].sender).toBe(user.handle)
+        expect(notifications[0].sender).not.toBe('tomBoy')
+        expect(notifications[0].type).toBe('like')
       })
   })
 

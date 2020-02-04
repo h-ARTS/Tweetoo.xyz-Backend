@@ -14,13 +14,22 @@ const initNotificationEmitter = () => {
         type: 'reply',
         tweetId,
         sender: user.handle,
-        recipient: tweet.handle,
-        read: false
+        recipient: tweet.handle
       })
     }
   })
 
-  notify.on('like', (like, doc) => {})
+  notify.on('like', async (user, doc) => {
+    const docType = doc.hasOwnProperty('replies') ? 'tweetId' : 'replyId'
+    if (user.handle !== doc.handle) {
+      await Notification.create({
+        type: 'like',
+        [docType]: doc._id,
+        sender: user.handle,
+        recipient: doc.handle
+      })
+    }
+  })
 
   notify.on('retweet', (doc, user) => {})
 
