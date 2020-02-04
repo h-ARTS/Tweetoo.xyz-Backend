@@ -31,7 +31,17 @@ const initNotificationEmitter = () => {
     }
   })
 
-  notify.on('retweet', (doc, user) => {})
+  notify.on('retweet', async (user, doc) => {
+    const docType = doc.hasOwnProperty('tweetId') ? 'replyId' : 'tweetId'
+    if (user.handle !== doc.handle) {
+      await Notification.create({
+        type: 'retweet',
+        [docType]: doc._id,
+        sender: user.handle,
+        recipient: doc.handle
+      })
+    }
+  })
 
   notify.on('follow', follower => {})
 }

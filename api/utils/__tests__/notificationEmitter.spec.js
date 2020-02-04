@@ -84,6 +84,23 @@ describe('Notification event emitter', () => {
       })
   })
 
+  test('notifies on retweet and creates a new notification document.', async () => {
+    expect.assertions(5)
+
+    await request(app)
+      .post(`/api/tweet/${tweet._id}/retweet`)
+      .set('Authorization', token)
+      .expect(201)
+      .then(async () => {
+        const notifications = await Notification.find()
+        expect(notifications).toHaveLength(1)
+        expect(notifications).not.toHaveLength(0)
+        expect(notifications[0].sender).toBe(user.handle)
+        expect(notifications[0].sender).not.toBe('tomBoy')
+        expect(notifications[0].type).toBe('retweet')
+      })
+  })
+
   afterEach(() => {
     removeNotifyListeners()
   })
