@@ -180,7 +180,7 @@ describe('user controllers:', () => {
       const req = {
         params: { handle: userToFollow.handle },
         user: { _id: loggedInUser._id },
-        body: { toFollow: true }
+        query: { follow: true }
       }
 
       const res = {
@@ -206,7 +206,7 @@ describe('user controllers:', () => {
       const req = {
         params: { handle: userToFollow.handle },
         user: { _id: loggedInUser._id },
-        body: { toFollow: true }
+        query: { follow: true }
       }
 
       const res = {
@@ -254,7 +254,7 @@ describe('user controllers:', () => {
       const req = {
         params: { handle: userToUnfollow.handle },
         user: { _id: user._id },
-        body: { toFollow: false }
+        query: { follow: false }
       }
 
       const res = {

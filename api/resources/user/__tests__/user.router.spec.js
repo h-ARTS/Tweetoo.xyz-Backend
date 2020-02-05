@@ -6,7 +6,8 @@ describe('user router:', () => {
       { path: '/', method: 'get' },
       { path: '/', method: 'put' },
       { path: '/:handle', method: 'get' },
-      { path: '/:handle', method: 'put' }
+      { path: '/:handle', method: 'put' },
+      { path: '/:handle/image', method: 'post' }
     ]
 
     routes.forEach(route => {
