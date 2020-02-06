@@ -101,6 +101,30 @@ describe('Notification event emitter', () => {
       })
   })
 
+  test('notifies on follow and creates a new notification document.', async () => {
+    expect.assertions(5)
+
+    const targetUser = await User.create({
+      email: 'thomas@maccain.org',
+      password: '1234567',
+      fullName: 'Thomas K. Maccain',
+      handle: 'thomas_mac'
+    })
+
+    await request(app)
+      .put(`/api/user/${targetUser.handle}?follow=true`)
+      .set('Authorization', token)
+      .expect(200)
+      .then(async () => {
+        const notifications = await Notification.find()
+        expect(notifications).toHaveLength(1)
+        expect(notifications).not.toHaveLength(0)
+        expect(notifications[0].sender).toBe(user.handle)
+        expect(notifications[0].sender).not.toBe('thomas_mac')
+        expect(notifications[0].type).toBe('follow')
+      })
+  })
+
   afterEach(() => {
     removeNotifyListeners()
   })
