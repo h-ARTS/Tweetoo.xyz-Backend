@@ -43,7 +43,15 @@ const initNotificationEmitter = () => {
     }
   })
 
-  notify.on('follow', follower => {})
+  notify.on('follow', async (me, targetUser) => {
+    if (me.handle !== targetUser.handle) {
+      await Notification.create({
+        type: 'follow',
+        sender: me.handle,
+        recipient: targetUser.handle
+      })
+    }
+  })
 }
 
 export const removeNotifyListeners = () => {
