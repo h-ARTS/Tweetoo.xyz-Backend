@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import request from 'supertest'
 import { app } from '../../server'
+import { newToken } from '../auth'
 import initNotificationEmitter, {
   notify,
   removeNotifyListeners
@@ -23,16 +24,7 @@ describe('Notification event emitter', () => {
     })
     initNotificationEmitter()
 
-    await request(app)
-      .post('/login')
-      .set('Content-Type', 'application/json')
-      .send({
-        email: 'jane@doe-company.org',
-        password: '1234567'
-      })
-      .then(res => {
-        token = 'Bearer ' + res.text.replace(/['"]+/g, '')
-      })
+    token = `Bearer ${newToken(user)}`
 
     tweet = await Tweet.create({
       createdBy: mongoose.Types.ObjectId(),
