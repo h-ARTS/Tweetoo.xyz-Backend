@@ -15,6 +15,7 @@
     "test-crud": "jest /api/utils/__tests__/crud.spec.js --runInBand --detectOpenHandles",
     "test-blacklist-utils": "jest /api/resources/blacklist-token/__tests__/blacklist.util.spec.js --runInBand --detectOpenHandles",
     "test-assets": "jest -t assets-controller: --detectOpenHandles",
+    "test-notification": "jest -t emitter --runInBand --detectOpenHandles",
     "restart": "rimraf dist && yarn build && yarn start",
     "start": "node --inspect dist/index.js",
     "test": "jest"
