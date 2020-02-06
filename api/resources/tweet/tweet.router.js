@@ -24,8 +24,8 @@ router
 // /api/tweet/:tweetId
 router.route('/:tweetId/like').put(controllers.likeDoc)
 router.route('/:tweetId/unlike').put(controllers.unlikeDoc)
-router.route('/:tweetId/retweet').put(controllers.reTweet)
-router.route('/:tweetId/undoretweet').put(controllers.undoRetweet)
+router.route('/:tweetId/retweet').post(controllers.reTweet)
+router.route('/:tweetId/undoretweet').delete(controllers.undoRetweet)
 
 // /api/tweet/:tweetId/image
 router.route('/:tweetId/image').post(uploadImage, assignImagePath)

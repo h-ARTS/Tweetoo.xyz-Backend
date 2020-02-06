@@ -1,5 +1,6 @@
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
 import { User } from '../resources/user/user.model'
+import { notify } from './notificationEmitter'
 
 export const getAll = model => async (req, res) => {
   try {
@@ -44,6 +45,9 @@ export const createOne = model => async (req, res, next) => {
   let doc
   const tweetId = req.query.tweetId
   try {
+    if (tweetId) {
+      notify.emit('reply', userBody, tweetId)
+    }
     doc = await model.create({ ...req.body, ...userBody, tweetId })
     req.body.doc = doc
     next()
@@ -115,7 +119,8 @@ export const reTweet = model => async (req, res) => {
       .exec()
 
     const ref = { retweet: true }
-    if (req.query) {
+    const itIsReply = req.query.hasOwnProperty('replyId')
+    if (itIsReply) {
       ref.replyId = doc._id
       ref.tweetId = doc.tweetId
       user.replies.push(ref)
@@ -123,10 +128,12 @@ export const reTweet = model => async (req, res) => {
       ref.tweetId = doc._id
       user.tweets.push(ref)
     }
+    notify.emit('retweet', req.user, doc)
     await user.save()
 
     res.status(201).json({ user, doc })
   } catch (e) {
+    console.error(e)
     res
       .status(404)
       .send({ message: 'This doc does not exist in the database.' })

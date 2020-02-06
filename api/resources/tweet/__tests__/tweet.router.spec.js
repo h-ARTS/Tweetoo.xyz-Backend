@@ -8,7 +8,9 @@ describe('tweet router:', () => {
       { path: '/:tweetId', method: 'put' },
       { path: '/:tweetId', method: 'delete' },
       { path: '/:tweetId/like', method: 'put' },
-      { path: '/:tweetId/unlike', method: 'put' }
+      { path: '/:tweetId/unlike', method: 'put' },
+      { path: '/:tweetId/retweet', method: 'post' },
+      { path: '/:tweetId/undoretweet', method: 'delete' }
     ]
 
     routes.forEach(route => {

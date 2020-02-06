@@ -1,5 +1,6 @@
 import { Like } from './like.model'
 import { Types } from 'mongoose'
+import { notify } from '../../utils/notificationEmitter'
 
 export const likeDoc = model => async (req, res) => {
   const docId = req.query.replyId || req.params.tweetId
@@ -20,6 +21,12 @@ export const likeDoc = model => async (req, res) => {
       .lean()
       .exec()
 
+    if (!doc) {
+      return res.status(404).send({ message: 'Tweet or Reply not found!' })
+    } else {
+      notify.emit('like', req.user, doc)
+    }
+
     const like = await Like.create({
       docId: Types.ObjectId(docId),
       createdBy: req.user._id,
@@ -38,6 +45,13 @@ export const unlikeDoc = model => async (req, res) => {
 
   try {
     const doc = await model.findById(docId)
+
+    if (!doc) {
+      return res.status(404).send({
+        message: 'Tweet or Reply not found!'
+      })
+    }
+
     if (doc.likeCount === 0) {
       return res
         .status(400)

@@ -4,11 +4,13 @@ import { Like } from '../like/like.model'
 import { Reply } from '../reply/reply.model'
 
 // Watcher works only on mongodb replica sets
-const watchTweets = Tweet.watch()
+const watchTweets = Tweet.watch({
+  fullDocument: 'updateLookup'
+})
 
 watchTweets.on('change', async result => {
   if (result.operationType === 'delete') {
-    const tweet = result.documentKey
+    const tweet = result.fullDocument
 
     await Like.find()
       .where('docId')

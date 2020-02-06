@@ -3,6 +3,7 @@ import { Like } from '../like/like.model'
 import { Reply } from '../reply/reply.model'
 import { Tweet } from '../tweet/tweet.model'
 import { Types } from 'mongoose'
+import { notify } from '../../utils/notificationEmitter'
 
 const watchUsers = User.watch()
 
@@ -73,36 +74,33 @@ export const followHandler = async (req, res) => {
     const targetUser = await User.findOne({ handle: req.params.handle }).select(
       '-password'
     )
-
-    if (req.body.toFollow) {
-      targetUser.followers.push({ userId: req.user._id })
-    } else {
-      const followerToRemove = targetUser.followers.find(
-        f => f.userId.toString() === req.user._id.toString()
-      )
-      targetUser.followers.pull({ _id: followerToRemove._id })
-    }
-    await targetUser.save()
-
     if (!targetUser) {
       return res.status(400).end()
     }
 
     const me = await User.findById(req.user._id).select('-password')
+    if (!me) {
+      return res.status(400).end()
+    }
 
-    if (req.body.toFollow) {
+    const isFollowTrue = req.query.follow === 'true'
+    if (isFollowTrue) {
+      targetUser.followers.push({ userId: req.user._id })
       me.following.push({ userId: targetUser._id })
+      notify.emit('follow', me, targetUser)
     } else {
+      const followerToRemove = targetUser.followers.find(
+        f => f.userId.toString() === req.user._id.toString()
+      )
+      targetUser.followers.pull({ _id: followerToRemove._id })
+
       const followingToRemove = me.following.find(
         f => f.userId.toString() === targetUser._id.toString()
       )
       me.following.pull({ _id: followingToRemove._id })
     }
+    await targetUser.save()
     await me.save()
-
-    if (!me) {
-      return res.status(400).end()
-    }
 
     res.status(200).json({ data: { target: targetUser, updated: me } })
   } catch (e) {
