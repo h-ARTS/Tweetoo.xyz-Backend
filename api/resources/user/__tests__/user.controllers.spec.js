@@ -10,7 +10,7 @@ import {
 import { User } from '../user.model'
 import mongoose from 'mongoose'
 
-describe('user controllers:', () => {
+describe('user-controllers:', () => {
   test('has functions to display user profile and to update.', () => {
     const methods = [
       'myProfile',
@@ -180,7 +180,7 @@ describe('user controllers:', () => {
       const req = {
         params: { handle: userToFollow.handle },
         user: { _id: loggedInUser._id },
-        query: { follow: true }
+        query: { follow: 'true' }
       }
 
       const res = {
@@ -206,7 +206,7 @@ describe('user controllers:', () => {
       const req = {
         params: { handle: userToFollow.handle },
         user: { _id: loggedInUser._id },
-        query: { follow: true }
+        query: { follow: 'true' }
       }
 
       const res = {
@@ -227,7 +227,7 @@ describe('user controllers:', () => {
     })
 
     test('removes a follower from the target user and a following from the authenticated user.', async () => {
-      expect.assertions(3)
+      expect.assertions(5)
 
       const objId = mongoose.Types.ObjectId()
       const objId2 = mongoose.Types.ObjectId()
@@ -254,7 +254,7 @@ describe('user controllers:', () => {
       const req = {
         params: { handle: userToUnfollow.handle },
         user: { _id: user._id },
-        query: { follow: false }
+        query: { follow: 'false' }
       }
 
       const res = {
@@ -263,12 +263,16 @@ describe('user controllers:', () => {
           return this
         },
         json(result) {
-          expect(result.data.target.followers).not.toEqual(
-            expect.arrayContaining([{ _id: objId2, userId: user._id }])
+          expect(result.data.target.followers).toEqual(
+            expect.not.arrayContaining([{ _id: objId2, userId: user._id }])
           )
-          expect(result.data.updated.following).not.toEqual(
-            expect.arrayContaining([{ _id: objId, userId: userToUnfollow._id }])
+          expect(result.data.target.followers).not.toEqual([])
+          expect(result.data.updated.following).toEqual(
+            expect.not.arrayContaining([
+              { _id: objId, userId: userToUnfollow._id }
+            ])
           )
+          expect(result.data.updated.following).not.toEqual([])
         }
       }
 

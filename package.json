@@ -9,6 +9,7 @@
     "test-upload": "jest -t uploads: --runInBand --detectOpenHandles",
     "test-router": "jest -t router: --runInBand --detectOpenHandles",
     "test-controllers": "jest -t controllers: --runInBand --detectOpenHandles",
+    "test-user:controllers": "jest -t user-controllers --watch --runInBand --detectOpenHandles",
     "test-model": "jest -t model: --runInBand",
     "test-auth": "jest -t Authentication: --runInBand --detectOpenHandles",
     "test-crud": "jest /api/utils/__tests__/crud.spec.js --runInBand --detectOpenHandles",

@@ -83,7 +83,8 @@ export const followHandler = async (req, res) => {
       return res.status(400).end()
     }
 
-    if (req.query.follow) {
+    const isFollowTrue = req.query.follow === 'true'
+    if (isFollowTrue) {
       targetUser.followers.push({ userId: req.user._id })
       me.following.push({ userId: targetUser._id })
     } else {
