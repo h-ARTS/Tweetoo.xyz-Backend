@@ -14,6 +14,7 @@ import tweetRouter from './resources/tweet/tweet.router'
 import replyRouter from './resources/reply/reply.router'
 import userRouter from './resources/user/user.router'
 import mediaRouter from './resources/media/media.router'
+import cachedFilesRouter from './resources/cached-files/cachedFiles.router'
 import notificationRouter from './resources/notification/notification.router'
 
 export const app = express()
@@ -33,6 +34,7 @@ app.post('/logout', logout)
 
 // API
 app.use('/api', authGuard)
+app.use('/api/cached', cachedFilesRouter)
 app.use('/api/user', userRouter)
 app.use('/api/tweet', tweetRouter)
 app.use('/api/tweets', getAll(Tweet))
