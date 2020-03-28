@@ -1,7 +1,7 @@
 import router from '../media.router'
 
 describe('media router:', () => {
-  test('has getter routes for users and tweets', () => {
+  test('has getter routes for media', () => {
     const routes = [
       { path: '/user/:handle/:filename', method: 'get' },
       { path: '/tweet/:tweetId/:filename', method: 'get' }
