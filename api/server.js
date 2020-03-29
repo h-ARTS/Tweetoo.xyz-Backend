@@ -14,7 +14,6 @@ import tweetRouter from './resources/tweet/tweet.router'
 import replyRouter from './resources/reply/reply.router'
 import userRouter from './resources/user/user.router'
 import mediaRouter from './resources/media/media.router'
-import cachedMediaRouter from './resources/media/cachedMedia.router'
 import notificationRouter from './resources/notification/notification.router'
 
 export const app = express()
@@ -31,7 +30,6 @@ app.use(urlencoded({ extended: true }))
 app.post('/login', login)
 app.post('/signup', signup)
 app.post('/logout', logout)
-
 // API
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
@@ -41,8 +39,7 @@ app.use('/api/reply', replyRouter)
 app.use('/api/replies', getAll(Reply))
 app.use('/api/notifications', notificationRouter)
 // Assets route
-app.use('/media', authGuard, mediaRouter)
-app.use('/media/cached', cachedMediaRouter)
+app.use('/media', mediaRouter)
 
 export const start = async () => {
   try {

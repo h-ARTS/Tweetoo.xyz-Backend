@@ -14,4 +14,24 @@ describe('media router:', () => {
       expect(match).toBeTruthy()
     })
   })
+
+  test('has post and delete routes for cached media', () => {
+    const routes = [
+      {
+        path: '/cached/:type',
+        method: 'post'
+      },
+      {
+        path: '/cached',
+        method: 'delete'
+      }
+    ]
+
+    routes.forEach(route => {
+      const match = router.stack.find(s => {
+        return s.route.path === route.path && s.route.methods[route.method]
+      })
+      expect(match).toBeTruthy()
+    })
+  })
 })
