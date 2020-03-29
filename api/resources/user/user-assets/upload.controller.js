@@ -3,14 +3,24 @@ import { removeFile } from './assets.controller'
 
 export const assignImagePath = async (req, res) => {
   try {
-    const { originalname, mimetype, path } = req.file
     const { dimension } = req.body
+    let originalname, mimetype, path
+    if (req.file) {
+      path = req.file.path
+      originalname = req.file.originalname
+      mimetype = req.file.mimetype
+    } else {
+      path = req.body.path
+      originalname = req.body.originalname
+      mimetype = req.body.mimetype
+    }
     if (!dimension) {
       removeFile(path)
       return res.status(500).send({
         message: 'Dimension not provided!'
       })
     }
+
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
@@ -22,6 +32,7 @@ export const assignImagePath = async (req, res) => {
       },
       { new: true }
     )
+      .select('-password')
       .lean()
       .exec()
 
@@ -29,7 +40,7 @@ export const assignImagePath = async (req, res) => {
       return res.status(400).end()
     }
 
-    return res.status(201).json({ data: user })
+    return res.status(201).json(user)
   } catch (e) {
     console.error(e)
     return res.status(500).end()

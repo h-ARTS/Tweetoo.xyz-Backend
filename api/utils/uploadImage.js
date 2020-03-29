@@ -1,11 +1,13 @@
-import multer from 'multer'
 import fs from 'fs'
+import multer from 'multer'
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
     const targetPath =
       !req.params || req.params.handle !== ''
-        ? `./media/user/${req.params.handle}/`
+        ? req.params.type === 'newuser'
+          ? './media/cached/'
+          : `./media/user/${req.params.handle}/`
         : `./media/tweet/${req.params.tweetId}/`
     return fs.mkdir(targetPath, { recursive: true }, () => {
       cb(null, targetPath)
@@ -23,6 +25,7 @@ const fileFilter = (req, file, cb) => {
     file.mimetype === 'image/gif' ||
     file.mimetype === 'image/webp'
   ) {
+    console.log(file)
     return cb(null, true)
   } else {
     return cb(
