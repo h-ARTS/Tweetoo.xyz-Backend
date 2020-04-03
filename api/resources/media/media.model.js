@@ -17,6 +17,10 @@ const mediaSchema = new Schema(
     handle: {
       type: String,
       required: true
+    },
+    dimension: {
+      type: String,
+      required: true
     }
   },
   { timestamps: true }

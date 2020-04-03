@@ -1,7 +1,7 @@
 import {
   assignCachedImagePath,
   getMedia,
-  removeCachedFileFromMedia
+  removeCachedMediaDoc
 } from '../media.controllers'
 import { Media } from '../media.model'
 
@@ -143,13 +143,14 @@ describe('Media:', () => {
     })
   })
 
-  describe('removeCachedFileFromMedia:', () => {
+  describe('removeCachedMediaDoc:', () => {
     let cachedImage
     beforeEach(async () => {
       cachedImage = await Media.create({
         path: 'media/cached/1577311325591optional.png',
         mimetype: 'image/png',
         originalname: '1577311325591optional.png',
+        dimension: 'userImage',
         handle: 'paki'
       })
     })
@@ -164,7 +165,7 @@ describe('Media:', () => {
       }
       const next = () => {}
 
-      await removeCachedFileFromMedia(req, {}, next)
+      await removeCachedMediaDoc(req, {}, next)
 
       expect(req.body).not.toBe(undefined)
       expect(typeof req.body.removed).toBe('object')
@@ -189,7 +190,7 @@ describe('Media:', () => {
         }
       }
 
-      await removeCachedFileFromMedia(req, res, next)
+      await removeCachedMediaDoc(req, res, next)
     })
   })
 })

@@ -32,4 +32,12 @@ describe('Media model:', () => {
       required: true
     })
   })
+
+  test('has dimension', () => {
+    const dimension = Media.schema.obj.dimension
+    expect(dimension).toEqual({
+      type: String,
+      required: true
+    })
+  })
 })

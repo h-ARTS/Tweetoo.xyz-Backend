@@ -7,9 +7,7 @@ import { moveCachedFileToUserDir } from '../../utils/moveCachedFileToUserDir'
 
 const router = Router()
 
-router
-  .route('/cached')
-  .delete(controllers.removeCachedFileFromMedia, assignImagePath)
+router.route('/cached').put(controllers.removeCachedMediaDoc, assignImagePath)
 
 router
   .route('/cached/:type')

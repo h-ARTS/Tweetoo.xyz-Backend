@@ -28,7 +28,8 @@ export const assignCachedImagePath = async (req, res) => {
       path,
       mimetype,
       originalname,
-      handle
+      handle,
+      dimension
     })
 
     return res.status(201).json({
@@ -40,7 +41,7 @@ export const assignCachedImagePath = async (req, res) => {
   }
 }
 
-export const removeCachedFileFromMedia = async (req, res, next) => {
+export const removeCachedMediaDoc = async (req, res, next) => {
   const { path } = req.body
   try {
     const removed = await Media.findOneAndRemove({
@@ -72,4 +73,4 @@ export const removeCachedFileFromMedia = async (req, res, next) => {
   }
 }
 
-export default { assignCachedImagePath, getMedia, removeCachedFileFromMedia }
+export default { assignCachedImagePath, getMedia, removeCachedMediaDoc }
