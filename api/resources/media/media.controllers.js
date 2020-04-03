@@ -40,12 +40,14 @@ export const assignCachedImagePath = async (req, res) => {
   }
 }
 
-export const removeCachedFile = async (req, res, next) => {
+export const removeCachedFileFromMedia = async (req, res, next) => {
   const { path } = req.body
   try {
     const removed = await Media.findOneAndRemove({
       path
-    }).exec()
+    })
+      .lean()
+      .exec()
 
     if (!removed) {
       res.status(404)
@@ -54,7 +56,12 @@ export const removeCachedFile = async (req, res, next) => {
       })
     }
 
-    req.body.removed = removed
+    const { dimension, originalname, mimetype } = removed
+    req.body.dimension = dimension
+    req.body.mimetype = mimetype
+    req.body.originalname = originalname
+    req.body.path = path
+
     next()
   } catch (e) {
     console.error(e)
@@ -65,4 +72,4 @@ export const removeCachedFile = async (req, res, next) => {
   }
 }
 
-export default { assignCachedImagePath, getMedia, removeCachedFile }
+export default { assignCachedImagePath, getMedia, removeCachedFileFromMedia }
