@@ -23,7 +23,7 @@ describe('media router:', () => {
       },
       {
         path: '/cached',
-        method: 'delete'
+        method: 'put'
       }
     ]
 
