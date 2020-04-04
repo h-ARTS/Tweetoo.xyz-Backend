@@ -1,7 +1,10 @@
+import fs from 'fs'
+import mongoose from 'mongoose'
 import {
   assignCachedImagePath,
   getMedia,
-  removeCachedMediaDoc
+  removeCachedMediaDoc,
+  createUserFolder
 } from '../media.controllers'
 import { Media } from '../media.model'
 
@@ -12,8 +15,8 @@ describe('Media:', () => {
 
       const req = {
         params: {
-          handle: 'paki',
-          filename: '1579789034018favicon.png'
+          handle: 'jawo',
+          filename: '1586025776411logo_size.png'
         }
       }
       const res = {
@@ -38,7 +41,7 @@ describe('Media:', () => {
       const req = {
         params: {
           tweetId: 'example-tweetId',
-          filename: '1579789034018favicon.png'
+          filename: '1577311325591optional.png'
         }
       }
       const res = {
@@ -80,15 +83,39 @@ describe('Media:', () => {
     })
   })
 
+  describe('createUserFolder', () => {
+    test('should create a user directory for the assets', () => {
+      const req = {
+        params: {
+          handle: 'mike'
+        }
+      }
+      const res = {
+        status(code) {
+          expect(code).toBe(201)
+        },
+        send(result) {
+          expect(result).toBe('User directory for mike created.')
+        }
+      }
+
+      createUserFolder(req, res)
+    })
+
+    afterAll(() => {
+      fs.rmdirSync('media/user/mike')
+    })
+  })
+
   describe('assignCachedImagePath', () => {
     const file = {
       fieldname: 'profileImage',
-      originalname: 'example.png',
+      originalname: 'logo_size.png',
       encoding: '7bit',
       mimetype: 'image/png',
       destination: './media/',
-      filename: '1577311325591optional.png',
-      path: 'media/cached/1577311325591optional.png',
+      filename: '1586025775346logo_size2.png',
+      path: 'media/cached/1586025775346logo_size2.png',
       size: 17291
     }
 
@@ -147,9 +174,9 @@ describe('Media:', () => {
     let cachedImage
     beforeEach(async () => {
       cachedImage = await Media.create({
-        path: 'media/cached/1577311325591optional.png',
+        path: 'media/cached/1586025775346logo_size2.png',
         mimetype: 'image/png',
-        originalname: '1577311325591optional.png',
+        originalname: '1586025775346logo_size2.png',
         dimension: 'userImage',
         handle: 'paki'
       })
@@ -160,7 +187,7 @@ describe('Media:', () => {
 
       const req = {
         body: {
-          path: cachedImage.path
+          uniqueImageId: cachedImage._id
         }
       }
       const next = () => {}
@@ -168,7 +195,7 @@ describe('Media:', () => {
       await removeCachedMediaDoc(req, {}, next)
 
       expect(req.body).not.toBe(undefined)
-      expect(typeof req.body.removed).toBe('object')
+      expect(typeof req.body).toBe('object')
     })
 
     test('should respond 404 if no file found.', async () => {
@@ -176,7 +203,7 @@ describe('Media:', () => {
 
       const req = {
         body: {
-          path: 'media/cached/unknownfile.png'
+          uniqueImageId: mongoose.Types.ObjectId()
         }
       }
       const next = () => {}

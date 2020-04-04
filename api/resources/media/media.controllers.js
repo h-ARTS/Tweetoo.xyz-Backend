@@ -17,9 +17,8 @@ export const createUserFolder = (req, res) => {
   fs.mkdir(`./media/user/${req.params.handle}`, err => {
     if (err) throw err
     console.log(`User directory for ${req.params.handle} created`)
-    return res
-      .status(201)
-      .send(`User directory for ${req.params.handle} created.`)
+    res.status(201)
+    res.send(`User directory for ${req.params.handle} created.`)
   })
 }
 
