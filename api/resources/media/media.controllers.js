@@ -52,25 +52,24 @@ export const assignCachedImagePath = async (req, res) => {
 }
 
 export const removeCachedMediaDoc = async (req, res, next) => {
-  const { path } = req.body
+  const { uniqueImageId } = req.body
   try {
-    const removed = await Media.findOneAndRemove({
-      path
-    })
+    const removed = await Media.findByIdAndRemove(uniqueImageId)
       .lean()
       .exec()
 
     if (!removed) {
       res.status(404)
-      res.send({
+      return res.send({
         message: 'File not found.'
       })
     }
 
-    const { dimension, originalname, mimetype } = removed
+    const { dimension, originalname, mimetype, handle, path } = removed
     req.body.dimension = dimension
     req.body.mimetype = mimetype
     req.body.originalname = originalname
+    req.body.handle = handle
     req.body.path = path
 
     next()
@@ -83,4 +82,9 @@ export const removeCachedMediaDoc = async (req, res, next) => {
   }
 }
 
-export default { assignCachedImagePath, getMedia, removeCachedMediaDoc }
+export default {
+  getMedia,
+  createUserFolder,
+  assignCachedImagePath,
+  removeCachedMediaDoc
+}
