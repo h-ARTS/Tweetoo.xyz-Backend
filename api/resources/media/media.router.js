@@ -21,6 +21,7 @@ router
   .post(uploadImage, controllers.assignCachedImagePath)
 
 router.route('/user/:handle/:filename').get(authGuard, controllers.getMedia)
+router.route('/user/:handle').get(authGuard, controllers.createUserFolder)
 router.route('/tweet/:tweetId/:filename').get(authGuard, controllers.getMedia)
 
 export default router

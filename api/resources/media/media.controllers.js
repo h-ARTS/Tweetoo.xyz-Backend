@@ -13,6 +13,16 @@ export const getMedia = (req, res) => {
   }
 }
 
+export const createUserFolder = (req, res) => {
+  fs.mkdir(`./media/user/${req.params.handle}`, err => {
+    if (err) throw err
+    console.log(`User directory for ${req.params.handle} created`)
+    return res
+      .status(201)
+      .send(`User directory for ${req.params.handle} created.`)
+  })
+}
+
 export const assignCachedImagePath = async (req, res) => {
   try {
     const { path, mimetype, originalname } = req.file
