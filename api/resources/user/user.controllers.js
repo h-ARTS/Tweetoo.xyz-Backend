@@ -62,7 +62,7 @@ export const updateProfile = async (req, res) => {
       return res.status(404).send({ message: 'User not found.' })
     }
 
-    return res.status(200).json({ data: updatedUser })
+    return res.status(200).json(updatedUser)
   } catch (e) {
     console.error(e)
     return res.status(400).end()
@@ -102,7 +102,7 @@ export const followHandler = async (req, res) => {
     await targetUser.save()
     await me.save()
 
-    res.status(200).json({ data: { target: targetUser, updated: me } })
+    res.status(200).json({ target: targetUser, updated: me })
   } catch (e) {
     console.error(e)
     return res.status(400).end()

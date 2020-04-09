@@ -78,7 +78,7 @@ describe('user-controllers:', () => {
           return this
         },
         json(result) {
-          expect(result.data.bio).toBe(update.bio)
+          expect(result.bio).toBe(update.bio)
         }
       }
 
@@ -189,8 +189,8 @@ describe('user-controllers:', () => {
           return this
         },
         json(result) {
-          expect(result.data.target.followers).not.toHaveLength(0)
-          const follower = result.data.target.followers.find(f => {
+          expect(result.target.followers).not.toHaveLength(0)
+          const follower = result.target.followers.find(f => {
             return f.userId.toString() === loggedInUser._id.toString()
           })
           expect(follower).toBeTruthy()
@@ -215,8 +215,8 @@ describe('user-controllers:', () => {
           return this
         },
         json(result) {
-          expect(result.data.updated.following).not.toHaveLength(0)
-          const following = result.data.updated.following.find(f => {
+          expect(result.updated.following).not.toHaveLength(0)
+          const following = result.updated.following.find(f => {
             return f.userId.toString() === userToFollow._id.toString()
           })
           expect(following).toBeTruthy()
@@ -263,16 +263,16 @@ describe('user-controllers:', () => {
           return this
         },
         json(result) {
-          expect(result.data.target.followers).toEqual(
+          expect(result.target.followers).toEqual(
             expect.not.arrayContaining([{ _id: objId2, userId: user._id }])
           )
-          expect(result.data.target.followers).not.toEqual([])
-          expect(result.data.updated.following).toEqual(
+          expect(result.target.followers).not.toEqual([])
+          expect(result.updated.following).toEqual(
             expect.not.arrayContaining([
               { _id: objId, userId: userToUnfollow._id }
             ])
           )
-          expect(result.data.updated.following).not.toEqual([])
+          expect(result.updated.following).not.toEqual([])
         }
       }
 
