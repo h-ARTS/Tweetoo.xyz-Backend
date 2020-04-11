@@ -14,6 +14,9 @@ router
   .put(controllers.updateOne)
   .delete(controllers.removeOne)
 
+// /api/tweet/liked
+router.route('/liked').get(controllers.getAllLiked)
+
 // /api/tweet/:tweetId
 router
   .route('/:tweetId')

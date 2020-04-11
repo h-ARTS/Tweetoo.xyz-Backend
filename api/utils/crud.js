@@ -1,6 +1,7 @@
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
 import { User } from '../resources/user/user.model'
 import { notify } from './notificationEmitter'
+import { Like } from '../resources/like/like.model'
 
 export const getAll = model => async (req, res) => {
   try {
@@ -168,10 +169,43 @@ export const undoRetweet = model => async (req, res) => {
   }
 }
 
+export const getAllLiked = model => async (req, res) => {
+  const createdBy = req.user._id
+
+  try {
+    const likes = await Like.find()
+      .where('createdBy')
+      .equals(createdBy)
+      .select('docId')
+
+    if (!likes) {
+      return res
+        .status(404)
+        .send('No likes found associated with your account.')
+    }
+
+    const docIdOnly = likes.map(like => {
+      return like.docId
+    })
+
+    const tweets = await model.find({ _id: { $in: docIdOnly } }).lean()
+
+    if (!tweets) {
+      return res.status(404).send('No liked tweets found.')
+    }
+
+    res.status(200).json(tweets)
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 export const controllers = model => {
   return {
     getAll: getAll(model),
     getOne: getOne(model),
+    getAllLiked: getAllLiked(model),
     createOne: createOne(model),
     updateOne: updateOne(model),
     removeOne: removeOne(model),

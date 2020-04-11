@@ -5,12 +5,14 @@ import {
   updateOne,
   removeOne,
   reTweet,
-  undoRetweet
+  undoRetweet,
+  getAllLiked
 } from '../crud'
 import { Tweet } from '../../resources/tweet/tweet.model'
 import { User } from '../../resources/user/user.model'
 import mongoose from 'mongoose'
 import { Reply } from '../../resources/reply/reply.model'
+import { Like } from '../../resources/like/like.model'
 
 describe('CRUD controllers for Tweets and Replies:', () => {
   describe('getAll', () => {
@@ -109,6 +111,44 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       }
 
       await getOne(Tweet)(req, res)
+    })
+  })
+
+  describe('getAllLiked', () => {
+    const createdBy = mongoose.Types.ObjectId()
+    let tweet
+    let like
+    beforeEach(async () => {
+      tweet = await Tweet.create({
+        createdBy,
+        fullText: 'This is my new tweet.',
+        fullName: 'Dr Maxx',
+        handle: 'Drmaxx',
+        likeCount: 1
+      })
+      like = await Like.create({
+        createdBy,
+        docId: tweet._id,
+        handle: 'Drmaxx'
+      })
+    })
+
+    test('should get all liked tweets/replies.', async () => {
+      expect.assertions(3)
+
+      const req = { user: { _id: createdBy } }
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result[0].handle).toEqual(like.handle)
+          expect(result[0]._id).toEqual(tweet._id)
+        }
+      }
+
+      await getAllLiked(Tweet)(req, res)
     })
   })
 
@@ -537,35 +577,3 @@ describe('CRUD controllers for Tweets and Replies:', () => {
     })
   })
 })
-
-// PSEUDO tweet and user JSON objects
-// tweet = {
-//   fullText: 'dasfsadasd',
-//   createdBy: 'babu',
-//   createdAt: 1873894234
-// }
-
-// user = {
-//   name: 'max',
-//   bio: '',
-//   followers: 1201,
-//   following: 943,
-//   tweets: [
-//     {
-//       fullText: 'dasfsadasd',
-//       createdBy: 'max',
-//       createdAt: 1873894234,
-//       retweet: false,
-//       likeCount: 112,
-//       retweetCount: 21
-//     },
-//     {
-//       fullText: 'dasfsadasd',
-//       createdBy: 'babu',
-//       createdAt: 1873891211,
-//       retweet: true,
-//       likeCount: 222,
-//       retweetCount: 33
-//     }
-//   ]
-// }
