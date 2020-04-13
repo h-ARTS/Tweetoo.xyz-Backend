@@ -44,21 +44,22 @@ export const unlikeDoc = model => async (req, res) => {
   const docId = req.query.replyId || req.params.tweetId
 
   try {
-    const doc = await model.findById(docId)
+    const docToCheck = await model.findById(docId)
 
-    if (!doc) {
+    if (!docToCheck) {
       return res.status(404).send({
         message: 'Tweet or Reply not found!'
       })
     }
 
-    if (doc.likeCount === 0) {
+    if (docToCheck.likeCount === 0) {
       return res
         .status(400)
         .send({ message: 'Cannot unlike this tweet when likeCount 0.' })
     }
-    await doc
-      .updateOne({ $inc: { likeCount: -1 } })
+
+    const doc = await model
+      .findByIdAndUpdate(docId, { $inc: { likeCount: -1 } }, { new: true })
       .lean()
       .exec()
 
