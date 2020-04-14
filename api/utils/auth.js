@@ -116,7 +116,7 @@ export const authGuard = async (req, res, next) => {
   }
 
   const user = await User.findById(payload.id)
-    .select('-password') // We exclude password since it's not needed for the routes.
+    .select('-password')
     .lean()
     .exec()
 
