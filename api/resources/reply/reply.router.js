@@ -11,6 +11,7 @@ const router = Router()
 // /api/reply
 router
   .route('/')
+  .get(controllers.getSpecific)
   .post(controllers.createOne, appendReplyToTweet, appendToUser)
   .put(controllers.updateOne)
   .delete(controllers.removeOne, removeReplyFromTweet, removeFromUser)

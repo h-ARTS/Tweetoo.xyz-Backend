@@ -217,6 +217,7 @@ export const getAllLiked = model => async (req, res) => {
 export const controllers = model => {
   return {
     getAll: getAll(model),
+    getSpecific: getSpecific(model),
     getOne: getOne(model),
     getAllLiked: getAllLiked(model),
     createOne: createOne(model),
