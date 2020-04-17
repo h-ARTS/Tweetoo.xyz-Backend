@@ -6,7 +6,8 @@ import {
   removeOne,
   reTweet,
   undoRetweet,
-  getAllLiked
+  getAllLiked,
+  getSpecific
 } from '../crud'
 import { Tweet } from '../../resources/tweet/tweet.model'
 import { User } from '../../resources/user/user.model'
@@ -59,6 +60,91 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       }
 
       await getAll(Tweet)(req, res)
+    })
+  })
+
+  describe('getSpecific', () => {
+    const user = mongoose.Types.ObjectId()
+    let tweetOne
+    let tweetTwo
+    let tweetThree
+
+    beforeEach(async () => {
+      tweetOne = await Tweet.create({
+        createdBy: user,
+        fullText: 'My tweet 1. Yaaay!',
+        fullName: 'Dr Maxx',
+        handle: '@drmxx'
+      })
+      tweetTwo = await Tweet.create({
+        createdBy: user,
+        fullText: 'Wow this is awesome!',
+        fullName: 'Dr Maxx',
+        handle: '@drmxx'
+      })
+      tweetThree = await Tweet.create({
+        createdBy: user,
+        fullText: 'Great news here now at TV.',
+        fullName: 'Dr Maxx',
+        handle: '@drmxx'
+      })
+    })
+
+    test('should find docs specified from a given array of _id', async () => {
+      expect.assertions(5)
+
+      const req = {
+        user: {
+          _id: user
+        },
+        body: {
+          docs: [tweetOne._id, tweetTwo._id, tweetThree._id]
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result) {
+          expect(result).toHaveLength(3)
+          result.forEach((tweet, idx) => {
+            expect(tweet._id).toEqual(req.body.docs[idx])
+          })
+        }
+      }
+
+      await getSpecific(Tweet)(req, res)
+    })
+
+    test('should return 404 if no docs found', async () => {
+      expect.assertions(3)
+
+      const req = {
+        user: {
+          _id: user
+        },
+        body: {
+          docs: [
+            mongoose.Types.ObjectId(),
+            mongoose.Types.ObjectId(),
+            mongoose.Types.ObjectId()
+          ]
+        }
+      }
+
+      const res = {
+        status(code) {
+          expect(code).toBe(404)
+          return this
+        },
+        send(result) {
+          expect(result).toEqual('No docs found')
+        }
+      }
+
+      await getSpecific(Tweet)(req, res)
     })
   })
 

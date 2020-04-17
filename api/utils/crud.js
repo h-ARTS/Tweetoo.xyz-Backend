@@ -11,10 +11,23 @@ export const getAll = model => async (req, res) => {
       .lean()
       .exec()
 
-    return res.status(200).json({ data: docs })
+    return res.status(200).json(docs)
   } catch (e) {
     console.error(e)
     return res.status(404).end()
+  }
+}
+
+export const getSpecific = model => async (req, res) => {
+  try {
+    const docs = await model
+      .find({ _id: { $in: req.body.docs } })
+      .lean()
+      .exec()
+
+    return res.status(200).json(docs)
+  } catch (e) {
+    return res.status(404).send('No docs found')
   }
 }
 
@@ -151,7 +164,7 @@ export const undoRetweet = model => async (req, res) => {
       .exec()
 
     let ref
-    if (req.query) {
+    if (req.query.hasOwnProperty('replyId')) {
       ref = user.replies.find(r => r.replyId.toString() === doc._id.toString())
       user.replies.pull(ref._id)
     } else {
