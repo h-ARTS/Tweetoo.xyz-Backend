@@ -29,7 +29,7 @@ watchUsers.on('change', async result => {
 })
 
 export const myProfile = (req, res) => {
-  return res.status(200).json({ data: req.user })
+  return res.status(200).json(req.user)
 }
 
 export const getUser = async (req, res) => {

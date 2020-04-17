@@ -11,6 +11,7 @@ export const ImageFileSchema = new Schema({
   },
   url: {
     type: String,
-    required: true
+    required: true,
+    default: ''
   }
 })

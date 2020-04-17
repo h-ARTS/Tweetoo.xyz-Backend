@@ -19,7 +19,8 @@ describe('ImageFileSchema', () => {
     const url = ImageFileSchema.obj.url
     expect(url).toEqual({
       type: String,
-      required: true
+      required: true,
+      default: ''
     })
   })
 })
