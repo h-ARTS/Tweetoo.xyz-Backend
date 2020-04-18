@@ -21,7 +21,7 @@ export const getAll = model => async (req, res) => {
 export const getSpecific = model => async (req, res) => {
   try {
     const docs = await model
-      .find({ _id: { $in: req.body.docs } })
+      .find({ tweetId: req.params.tweetId })
       .lean()
       .exec()
 
@@ -53,7 +53,8 @@ export const createOne = model => async (req, res, next) => {
   const userBody = {
     createdBy: req.user._id,
     fullName: req.user.fullName,
-    handle: req.user.handle
+    handle: req.user.handle,
+    userImageUrl: req.user.userImage.url
   }
 
   let doc
