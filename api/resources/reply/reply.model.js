@@ -25,7 +25,15 @@ const replySchema = new Schema(
       required: true,
       ref: 'user'
     },
+    fullName: {
+      type: String,
+      required: true
+    },
     handle: {
+      type: String,
+      required: true
+    },
+    userImageUrl: {
       type: String,
       required: true
     }

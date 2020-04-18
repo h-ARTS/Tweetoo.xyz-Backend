@@ -31,6 +31,10 @@ export const TweetSchema = new Schema(
     handle: {
       type: String,
       required: true
+    },
+    userImageUrl: {
+      type: String,
+      required: true
     }
   },
   { timestamps: true }

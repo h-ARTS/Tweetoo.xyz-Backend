@@ -51,4 +51,11 @@ describe('Tweets model:', () => {
       required: true
     })
   })
+  test('has userImageUrl', () => {
+    const userImageUrl = Tweet.schema.obj.userImageUrl
+    expect(userImageUrl).toEqual({
+      type: String,
+      required: true
+    })
+  })
 })

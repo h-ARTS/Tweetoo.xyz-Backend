@@ -46,4 +46,18 @@ describe('Reply model:', () => {
       required: true
     })
   })
+  test('has fullName', () => {
+    const fullName = Reply.schema.obj.fullName
+    expect(fullName).toEqual({
+      type: String,
+      required: true
+    })
+  })
+  test('has userImageUrl', () => {
+    const userImageUrl = Reply.schema.obj.userImageUrl
+    expect(userImageUrl).toEqual({
+      type: String,
+      required: true
+    })
+  })
 })
