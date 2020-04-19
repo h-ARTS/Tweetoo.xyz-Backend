@@ -3,9 +3,9 @@ import { SchemaTypes } from 'mongoose'
 
 describe('Follower Schema', () => {
   test('has userId.', () => {
-    const userId = FollowerSchema.obj.userId
-    expect(userId).toEqual({
-      type: SchemaTypes.ObjectId,
+    const handle = FollowerSchema.obj.handle
+    expect(handle).toEqual({
+      type: String,
       ref: 'user',
       required: true
     })

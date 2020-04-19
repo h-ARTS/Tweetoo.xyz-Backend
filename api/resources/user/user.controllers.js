@@ -85,17 +85,17 @@ export const followHandler = async (req, res) => {
 
     const isFollowTrue = req.query.follow === 'true'
     if (isFollowTrue) {
-      targetUser.followers.push({ userId: req.user._id })
-      me.following.push({ userId: targetUser._id })
+      targetUser.followers.push({ handle: req.user.handle })
+      me.following.push({ handle: targetUser.handle })
       notify.emit('follow', me, targetUser)
     } else {
       const followerToRemove = targetUser.followers.find(
-        f => f.userId.toString() === req.user._id.toString()
+        f => f.handle === req.user.handle
       )
       targetUser.followers.pull({ _id: followerToRemove._id })
 
       const followingToRemove = me.following.find(
-        f => f.userId.toString() === targetUser._id.toString()
+        f => f.handle === targetUser.handle
       )
       me.following.pull({ _id: followingToRemove._id })
     }

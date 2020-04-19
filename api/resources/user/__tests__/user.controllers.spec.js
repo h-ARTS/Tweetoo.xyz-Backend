@@ -179,7 +179,7 @@ describe('user-controllers:', () => {
 
       const req = {
         params: { handle: userToFollow.handle },
-        user: { _id: loggedInUser._id },
+        user: loggedInUser,
         query: { follow: 'true' }
       }
 
@@ -191,7 +191,7 @@ describe('user-controllers:', () => {
         json(result) {
           expect(result.target.followers).not.toHaveLength(0)
           const follower = result.target.followers.find(f => {
-            return f.userId.toString() === loggedInUser._id.toString()
+            return f.handle.toString() === loggedInUser.handle.toString()
           })
           expect(follower).toBeTruthy()
         }
@@ -205,7 +205,7 @@ describe('user-controllers:', () => {
 
       const req = {
         params: { handle: userToFollow.handle },
-        user: { _id: loggedInUser._id },
+        user: loggedInUser,
         query: { follow: 'true' }
       }
 
@@ -217,7 +217,7 @@ describe('user-controllers:', () => {
         json(result) {
           expect(result.updated.following).not.toHaveLength(0)
           const following = result.updated.following.find(f => {
-            return f.userId.toString() === userToFollow._id.toString()
+            return f.handle.toString() === userToFollow.handle.toString()
           })
           expect(following).toBeTruthy()
         }
@@ -245,15 +245,15 @@ describe('user-controllers:', () => {
         handle: '@max_o'
       })
 
-      userToUnfollow.followers.push({ _id: objId2, userId: user._id })
+      userToUnfollow.followers.push({ _id: objId2, handle: user.handle })
       await userToUnfollow.save()
 
-      user.following.push({ _id: objId, userId: userToUnfollow._id })
+      user.following.push({ _id: objId, handle: userToUnfollow.handle })
       await user.save()
 
       const req = {
         params: { handle: userToUnfollow.handle },
-        user: { _id: user._id },
+        user,
         query: { follow: 'false' }
       }
 
@@ -264,12 +264,12 @@ describe('user-controllers:', () => {
         },
         json(result) {
           expect(result.target.followers).toEqual(
-            expect.not.arrayContaining([{ _id: objId2, userId: user._id }])
+            expect.not.arrayContaining([{ _id: objId2, handle: user.handle }])
           )
           expect(result.target.followers).not.toEqual([])
           expect(result.updated.following).toEqual(
             expect.not.arrayContaining([
-              { _id: objId, userId: userToUnfollow._id }
+              { _id: objId, handle: userToUnfollow.handle }
             ])
           )
           expect(result.updated.following).not.toEqual([])
