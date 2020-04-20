@@ -5,14 +5,16 @@ describe('ImageFileSchema', () => {
     const name = ImageFileSchema.obj.name
     expect(name).toEqual({
       type: String,
-      required: true
+      required: true,
+      default: 'no_cover.js'
     })
   })
   test('has type.', () => {
     const type = ImageFileSchema.obj.type
     expect(type).toEqual({
       type: String,
-      required: true
+      required: true,
+      default: 'image/jpeg'
     })
   })
   test('has url.', () => {
@@ -20,7 +22,7 @@ describe('ImageFileSchema', () => {
     expect(url).toEqual({
       type: String,
       required: true,
-      default: ''
+      default: 'media/standard/no_cover.js'
     })
   })
 })
