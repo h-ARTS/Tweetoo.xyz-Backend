@@ -49,6 +49,19 @@ export const getUser = async (req, res) => {
   }
 }
 
+export const getUsers = async (req, res) => {
+  const arrHandles = req.query.handles.split(',')
+  try {
+    const users = await User.find({ handle: { $in: arrHandles } }).select(
+      '-password'
+    )
+
+    return res.status(200).json(users)
+  } catch (e) {
+    return res.status(404).send('No users found.')
+  }
+}
+
 export const updateProfile = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {

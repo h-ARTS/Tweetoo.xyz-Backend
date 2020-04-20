@@ -12,9 +12,12 @@ import { checkUserAssets } from './user-assets/assets.controller'
 
 const router = Router()
 
-router.get('/', myProfile)
-router.put('/', updateProfile)
-router.delete('/', checkUserAssets, deleteProfile)
+router
+  .route('/')
+  .get(myProfile)
+  .put(updateProfile)
+  .delete(checkUserAssets, deleteProfile)
+
 router.get('/:handle', getUser)
 router.put('/:handle', followHandler)
 router.post('/:handle/image', uploadImage, assignImagePath)

@@ -7,6 +7,7 @@ import config from '../config'
 import { authGuard, login, signup, logout } from './utils/auth'
 import initNotificationEmitter from './utils/notificationEmitter'
 
+import { getUsers } from './resources/user/user.controllers'
 import { getAll } from './utils/crud'
 import { Tweet } from './resources/tweet/tweet.model'
 import { Reply } from './resources/reply/reply.model'
@@ -33,6 +34,7 @@ app.post('/logout', logout)
 // API
 app.use('/api', authGuard)
 app.use('/api/user', userRouter)
+app.use('/api/users', getUsers)
 app.use('/api/tweet', tweetRouter)
 app.use('/api/tweets', getAll(Tweet))
 app.use('/api/reply', replyRouter)

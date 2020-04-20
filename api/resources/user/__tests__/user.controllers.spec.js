@@ -15,6 +15,7 @@ describe('user-controllers:', () => {
     const methods = [
       'myProfile',
       'updateProfile',
+      'getUsers',
       'getUser',
       'followHandler',
       'appendToUser',
