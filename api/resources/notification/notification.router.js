@@ -3,6 +3,9 @@ import controllers from './notification.controllers'
 
 const router = Router()
 
-router.route('/').get(controllers.getNotifications)
+router
+  .route('/')
+  .get(controllers.getNotifications)
+  .put(controllers.updateAllNotifications)
 
 export default router

@@ -1,7 +1,10 @@
 import request from 'supertest'
 import { app } from '../../../server'
 import { User } from '../../user/user.model'
-import { getNotifications } from '../notification.controllers'
+import {
+  getNotifications,
+  updateAllNotifications
+} from '../notification.controllers'
 import { newToken } from '../../../utils/auth'
 import initNotificationEmitter, {
   removeNotifyListeners
@@ -55,6 +58,25 @@ describe('Notification-controllers:', () => {
     }
 
     await getNotifications(req, res)
+  })
+
+  test('updateAllNotifications', async () => {
+    expect.assertions(2)
+
+    const req = {
+      body: { read: true }
+    }
+    const res = {
+      status(code) {
+        expect(code).toBe(200)
+        return this
+      },
+      json(result) {
+        expect(result).toEqual({ read: true })
+      }
+    }
+
+    await updateAllNotifications(req, res)
   })
 
   afterEach(() => {
