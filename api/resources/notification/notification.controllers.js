@@ -6,7 +6,7 @@ export const getNotifications = async (req, res) => {
       recipient: req.user.handle
     })
 
-    res.status(200).json({ notifications })
+    res.status(200).json(notifications)
   } catch (e) {
     console.error(e)
     res.status(404).send(e)

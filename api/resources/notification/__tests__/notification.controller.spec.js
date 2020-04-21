@@ -46,9 +46,9 @@ describe('Notification-controllers:', () => {
         return this
       },
       json(result) {
-        expect(result.notifications).not.toHaveLength(0)
-        expect(result.notifications.length).toBeGreaterThan(0)
-        result.notifications.forEach(notification => {
+        expect(result).not.toHaveLength(0)
+        expect(result.length).toBeGreaterThan(0)
+        result.forEach(notification => {
           expect(notification.recipient).toBe(req.user.handle)
         })
       }
