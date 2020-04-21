@@ -1,4 +1,15 @@
-import { Schema, SchemaTypes, model } from 'mongoose'
+import { Schema, SchemaTypes, model, Document } from 'mongoose'
+
+export interface IReply extends Document {
+  tweetId: Schema.Types.ObjectId,
+  fullText: string,
+  likeCount: number,
+  retweetCount: number,
+  createdBy: Schema.Types.ObjectId,
+  fullName: string,
+  handle: string,
+  userImageUrl: string
+}
 
 export const replySchema = new Schema(
   {
@@ -58,4 +69,4 @@ export const UserReplySchema = new Schema({
 
 // replySchema.index({ user: 1, tweet: 1 }, { unique: true })
 
-export const Reply = model('reply', replySchema)
+export const Reply = model<IReply>('reply', replySchema)
