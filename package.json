@@ -4,7 +4,7 @@
   "description": "A Twitter Clone",
   "main": "index.js",
   "scripts": {
-    "build": "babel api --out-dir dist",
+    "build": "tsc --w",
     "dev": "nodemon --exec yarn restart",
     "test-upload": "jest -t uploads: --runInBand --detectOpenHandles",
     "test-router": "jest -t router: --runInBand --detectOpenHandles",
@@ -17,7 +17,7 @@
     "test-assets": "jest -t assets-controller: --detectOpenHandles",
     "test-notification": "jest -t emitter --runInBand --detectOpenHandles",
     "restart": "rimraf dist && yarn build && yarn start",
-    "start": "node --inspect dist/index.js",
+    "start": "tsc && ts-node build/api/index.js",
     "test": "jest"
   },
   "repository": {
@@ -56,6 +56,11 @@
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
+    "@types/body-parser": "^1.19.0",
+    "@types/express": "^4.17.6",
+    "@types/mongoose": "^5.7.12",
+    "@types/multer": "^1.4.3",
+    "@types/node": "^13.13.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^8.2.1",
     "babel-jest": "^23.4.2",
