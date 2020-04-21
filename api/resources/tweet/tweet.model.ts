@@ -4,7 +4,8 @@ export interface ITweet extends Document {
   fullText: string,
   likeCount: number,
   retweetCount: number,
-  replies: Schema.Types.ObjectId[],
+  // TODO: Replace any with exact type
+  replies: any,
   fullName: string,
   createdBy: Schema.Types.ObjectId,
   handle: string,

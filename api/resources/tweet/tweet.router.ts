@@ -4,7 +4,7 @@ import { appendToUser, removeFromUser } from '../user/user.controllers'
 import { assignImagePath } from '../user/user-assets/upload.controller'
 import uploadImage from '../../utils/uploadImage'
 
-const router = Router()
+const router: Router = Router()
 
 // /api/tweet
 router
