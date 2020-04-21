@@ -11,6 +11,12 @@ export interface IReply extends Document {
   userImageUrl: string
 }
 
+export interface IUserReply extends Document {
+  retweet: boolean,
+  replyId: Schema.Types.ObjectId,
+  tweetId: Schema.Types.ObjectId
+}
+
 export const replySchema = new Schema(
   {
     tweetId: {
