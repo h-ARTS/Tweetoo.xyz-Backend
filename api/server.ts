@@ -1,8 +1,8 @@
-import express from 'express'
-import morgan from 'morgan'
+import * as express from 'express'
+import * as morgan from 'morgan'
 import { connect } from './utils/db'
 import { json, urlencoded } from 'body-parser'
-import cors from 'cors'
+import * as cors from 'cors'
 import config from '../config'
 import { authGuard, login, signup, logout } from './utils/auth'
 import initNotificationEmitter from './utils/notificationEmitter'
@@ -18,7 +18,7 @@ import mediaRouter from './resources/media/media.router'
 import notificationRouter from './resources/notification/notification.router'
 import bookmarksRouter from './resources/bookmarks/bookmarks.router'
 
-export const app = express()
+export const app: express.Express = express()
 
 app.disable('x-powered-by')
 // Middlewares
@@ -45,21 +45,19 @@ app.use('/api/bookmarks', bookmarksRouter)
 // Assets route
 app.use('/media', mediaRouter)
 
-export const start = async () => {
+export const start = async (): Promise<any> => {
   try {
     initNotificationEmitter()
     await connect()
-    app.listen(config.port, () =>
-      console.log(
-        `REST API Server running on http://localhost:${config.port}/api`
-      )
+    app.listen(config.port, (): void =>
+      console.log(`REST API Server running on http://localhost:${config.port}/api`)
     )
   } catch (e) {
     console.error(e)
   }
 }
 
-app.use(function(err, req, res, next) {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction): void => {
   console.log('This is the invalid field -> ', err.field)
   next(err)
 })
