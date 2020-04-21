@@ -1,9 +1,9 @@
 require('dotenv').config()
-const fs = require('fs')
-const path = require('path')
+import * as fs from 'fs'
+import * as path from 'path'
 
-const privateKeyPath = path.resolve('.ssh', process.env.PRIVATE_KEY_FILE)
-const publicKeyPath = path.resolve('.ssh', process.env.PUBLIC_KEY_FILE)
+const privateKeyPath: string = path.resolve('.ssh', process.env.PRIVATE_KEY_FILE)
+const publicKeyPath: string = path.resolve('.ssh', process.env.PUBLIC_KEY_FILE)
 
 const config = {
   port: 6500,
@@ -16,4 +16,4 @@ const config = {
     'mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/api?=replicaSet=tweetoo'
 }
 
-module.exports = config
+export default config
