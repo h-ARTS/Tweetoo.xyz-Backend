@@ -4,7 +4,10 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "allowJs": true,
-    "target": "es6"
+    "target": "es6",
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true
   },
   "include": ["./api/**/*", "./config/*"]
 }
