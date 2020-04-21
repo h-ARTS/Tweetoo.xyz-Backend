@@ -1,14 +1,16 @@
 import { EventEmitter } from 'events'
 import { Notification } from '../resources/notification/notification.model'
-import { Tweet } from '../resources/tweet/tweet.model'
+import { Tweet, ITweet } from '../resources/tweet/tweet.model'
+import { IUser } from '../resources/user/user.model'
+import { IReply } from '../resources/reply/reply.model'
 
-export let notify
+export let notify: EventEmitter
 
-const initNotificationEmitter = () => {
+const initNotificationEmitter = (): void => {
   notify = new EventEmitter()
 
-  notify.on('reply', async (user, tweetId) => {
-    const tweet = await Tweet.findById(tweetId).lean()
+  notify.on('reply', async (user: IUser, tweetId: string): Promise<void> => {
+    const tweet: ITweet = await Tweet.findById(tweetId).lean()
     if (user.handle !== tweet.handle) {
       await Notification.create({
         type: 'reply',
@@ -19,8 +21,8 @@ const initNotificationEmitter = () => {
     }
   })
 
-  notify.on('like', async (user, doc) => {
-    const docType = doc.hasOwnProperty('replies') ? 'tweetId' : 'replyId'
+  notify.on('like', async (user: IUser, doc: ITweet | IReply): Promise<void> => {
+    const docType: string = doc.hasOwnProperty('replies') ? 'tweetId' : 'replyId'
     if (user.handle !== doc.handle) {
       await Notification.create({
         type: 'like',
@@ -31,8 +33,8 @@ const initNotificationEmitter = () => {
     }
   })
 
-  notify.on('retweet', async (user, doc) => {
-    const docType = doc.hasOwnProperty('tweetId') ? 'replyId' : 'tweetId'
+  notify.on('retweet', async (user: IUser, doc: ITweet | IReply): Promise<void> => {
+    const docType: string = doc.hasOwnProperty('tweetId') ? 'replyId' : 'tweetId'
     if (user.handle !== doc.handle) {
       await Notification.create({
         type: 'retweet',
@@ -43,7 +45,7 @@ const initNotificationEmitter = () => {
     }
   })
 
-  notify.on('follow', async (me, targetUser) => {
+  notify.on('follow', async (me: IUser, targetUser: IUser): Promise<void> => {
     if (me.handle !== targetUser.handle) {
       await Notification.create({
         type: 'follow',
@@ -54,7 +56,7 @@ const initNotificationEmitter = () => {
   })
 }
 
-export const removeNotifyListeners = () => {
+export const removeNotifyListeners = (): void => {
   notify.removeAllListeners()
 }
 

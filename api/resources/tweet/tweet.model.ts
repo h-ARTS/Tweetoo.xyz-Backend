@@ -1,4 +1,15 @@
-import { Schema, SchemaTypes, model } from 'mongoose'
+import { Schema, SchemaTypes, model, Document } from 'mongoose'
+
+export interface ITweet extends Document {
+  fullText: string,
+  likeCount: number,
+  retweetCount: number,
+  replies: Schema.Types.ObjectId[],
+  fullName: string,
+  createdBy: Schema.Types.ObjectId,
+  handle: string,
+  userImageUrl: string
+}
 
 export const TweetSchema = new Schema(
   {
@@ -53,4 +64,4 @@ export const UserTweetSchema = new Schema({
 
 // TweetSchema.index({ user: 1, handle: 1 }, { unique: true })
 
-export const Tweet = model('tweet', TweetSchema)
+export const Tweet = model<ITweet>('tweet', TweetSchema)

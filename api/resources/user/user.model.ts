@@ -1,10 +1,29 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, Document, HookNextFunction } from 'mongoose'
 // Safer than md5 hash which can be cracked faster by a super computer.
 import bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
-import { UserTweetSchema } from '../tweet/tweet.model'
+import { UserTweetSchema, ITweet } from '../tweet/tweet.model'
 import { ImageFileSchema } from './user-assets/imagefile.schema'
 import { UserReplySchema } from '../reply/reply.model'
+
+export interface IUser extends Document {
+  email: string,
+  handle: string,
+  fullName: string,
+  password: string,
+  bio?: string,
+  location?: string,
+  website?: string,
+  birthday?: Date,
+  userImage: any,
+  coverImage: any,
+  following: any[],
+  followers: any[],
+  tweets: ITweet[],
+  replies: any[],
+  isBanned: boolean,
+  isVerified: boolean
+}
 
 const userSchema = new Schema(
   {
@@ -60,16 +79,14 @@ const userSchema = new Schema(
       default: false
     }
   },
-  {
-    timestamps: true
-  }
+  { timestamps: true }
 )
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', (next: HookNextFunction): void => {
   if (!this.isModified('password')) {
     return next()
   } else {
-    bcrypt.hash(this.password, 10, (err, hash) => {
+    bcrypt.hash(this.password, 10, (err: Error|null, hash: string): void => {
       if (err) {
         return next(err)
       }
@@ -80,10 +97,10 @@ userSchema.pre('save', function(next) {
   }
 })
 
-userSchema.methods.verifyPassword = function entered(password) {
+userSchema.methods.verifyPassword = function entered(password: string): Promise<boolean> {
   const hashedPassword = this.password
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, hashedPassword, (err, theyAreSame) => {
+  return new Promise((resolve, reject): void => {
+    bcrypt.compare(password, hashedPassword, (err: Error|null, theyAreSame: boolean) => {
       if (err) {
         return reject(err)
       }
@@ -93,4 +110,4 @@ userSchema.methods.verifyPassword = function entered(password) {
   })
 }
 
-export const User = model('user', userSchema)
+export const User = model<IUser>('user', userSchema)
