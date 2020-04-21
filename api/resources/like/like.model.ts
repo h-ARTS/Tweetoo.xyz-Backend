@@ -1,4 +1,10 @@
-import { Schema, SchemaTypes, model } from 'mongoose'
+import { Schema, SchemaTypes, model, Document } from 'mongoose'
+
+export interface ILike extends Document {
+  docId: Schema.Types.ObjectId,
+  createdBy: Schema.Types.ObjectId,
+  handle: string
+}
 
 const likeSchema = new Schema(
   {
@@ -20,4 +26,4 @@ const likeSchema = new Schema(
   { timestamps: true }
 )
 
-export const Like = model('like', likeSchema)
+export const Like = model<ILike>('like', likeSchema)
