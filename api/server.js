@@ -16,6 +16,7 @@ import replyRouter from './resources/reply/reply.router'
 import userRouter from './resources/user/user.router'
 import mediaRouter from './resources/media/media.router'
 import notificationRouter from './resources/notification/notification.router'
+import bookmarksRouter from './resources/bookmarks/bookmarks.router'
 
 export const app = express()
 
@@ -40,6 +41,7 @@ app.use('/api/tweets', getAll(Tweet))
 app.use('/api/reply', replyRouter)
 app.use('/api/replies', getAll(Reply))
 app.use('/api/notifications', notificationRouter)
+app.use('/api/bookmarks', bookmarksRouter)
 // Assets route
 app.use('/media', mediaRouter)
 

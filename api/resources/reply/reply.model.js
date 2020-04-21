@@ -1,6 +1,6 @@
 import { Schema, SchemaTypes, model } from 'mongoose'
 
-const replySchema = new Schema(
+export const replySchema = new Schema(
   {
     tweetId: {
       type: SchemaTypes.ObjectId,
