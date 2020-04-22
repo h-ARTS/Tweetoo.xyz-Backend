@@ -211,6 +211,7 @@ describe('Media:', () => {
       const res = {
         status(code) {
           expect(code).toBe(404)
+          return this
         },
         send(result) {
           expect(result.message).toEqual('File not found.')
