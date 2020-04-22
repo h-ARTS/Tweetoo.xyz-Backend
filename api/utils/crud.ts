@@ -2,8 +2,17 @@ import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
 import { User } from '../resources/user/user.model'
 import { notify } from './notificationEmitter'
 import { Like } from '../resources/like/like.model'
+import { Model } from 'mongoose'
+import { ITweet } from '../resources/tweet/tweet.model'
+import { IReply } from '../resources/reply/reply.model'
+import { Request, Response, NextFunction } from 'express'
+import { IRequestUser } from './auth'
 
-export const getAll = model => async (req, res) => {
+type ICrudType<RequestT> = (model: Model<ITweet|IReply>) 
+  => (req: RequestT, res: Response, next?: NextFunction)
+  => Promise<Response<any>|void> | NextFunction
+
+export const getAll: ICrudType<Request> = model => async (req, res) => {
   try {
     const docs = await model
       .find()
@@ -18,7 +27,7 @@ export const getAll = model => async (req, res) => {
   }
 }
 
-export const getSpecific = model => async (req, res) => {
+export const getSpecific: ICrudType<Request> = model => async (req, res) => {
   try {
     const docs = await model
       .find({ tweetId: req.params.tweetId })
@@ -31,7 +40,7 @@ export const getSpecific = model => async (req, res) => {
   }
 }
 
-export const getOne = model => async (req, res) => {
+export const getOne: ICrudType<Request> = model => async (req, res) => {
   try {
     const doc = await model
       .findOne(req.body)
@@ -49,7 +58,7 @@ export const getOne = model => async (req, res) => {
   }
 }
 
-export const createOne = model => async (req, res, next) => {
+export const createOne: ICrudType<IRequestUser> = model => async (req, res, next) => {
   const userBody = {
     createdBy: req.user._id,
     fullName: req.user.fullName,
@@ -57,7 +66,7 @@ export const createOne = model => async (req, res, next) => {
     userImageUrl: req.user.userImage.url
   }
 
-  let doc
+  let doc: ITweet|IReply
   const tweetId = req.query.tweetId
   try {
     if (tweetId) {
@@ -65,14 +74,14 @@ export const createOne = model => async (req, res, next) => {
     }
     doc = await model.create({ ...req.body, ...userBody, tweetId })
     req.body.doc = doc
-    next()
+    return next()
   } catch (e) {
     console.error(e)
     return res.status(400).end()
   }
 }
 
-export const updateOne = model => async (req, res) => {
+export const updateOne: ICrudType<IRequestUser> = model => async (req, res) => {
   try {
     const docId = req.params.tweetId || req.query.replyId
     const updatedDoc = await model
@@ -98,7 +107,7 @@ export const updateOne = model => async (req, res) => {
   }
 }
 
-export const removeOne = model => async (req, res, next) => {
+export const removeOne: ICrudType<IRequestUser> = model => async (req, res, next) => {
   try {
     const docId = req.params.tweetId || req.query.replyId
     const removedDoc = await model.findOneAndRemove({
@@ -111,18 +120,18 @@ export const removeOne = model => async (req, res, next) => {
     }
 
     req.body.removed = removedDoc
-    next()
+    return next()
   } catch (e) {
     console.error(e)
     return res.status(404).send({ message: 'Not found for removal' })
   }
 }
 
-export const reTweet = model => async (req, res) => {
+export const reTweet: ICrudType<IRequestUser> = model => async (req, res) => {
   const docId = req.params.tweetId || req.query.replyId
   try {
     const user = await User.findById(req.user._id).select('-password')
-    const doc = await model
+    const doc: ITweet|IReply|null = await model
       .findByIdAndUpdate(
         docId,
         {
@@ -131,9 +140,9 @@ export const reTweet = model => async (req, res) => {
         { new: true }
       )
       .lean()
-      .exec()
 
-    const ref = { retweet: true }
+    // TODO: Define the exact type of ref constant
+    const ref: any = { retweet: true, tweetId: null, replyId: null }
     const itIsReply = req.query.hasOwnProperty('replyId')
     if (itIsReply) {
       ref.replyId = doc._id
@@ -146,16 +155,16 @@ export const reTweet = model => async (req, res) => {
     notify.emit('retweet', req.user, doc)
     await user.save()
 
-    res.status(201).json({ user, doc })
+    return res.status(201).json({ user, doc })
   } catch (e) {
     console.error(e)
-    res
+    return res
       .status(404)
       .send({ message: 'This doc does not exist in the database.' })
   }
 }
 
-export const undoRetweet = model => async (req, res) => {
+export const undoRetweet: ICrudType<IRequestUser> = model => async (req, res) => {
   const docId = req.params.tweetId || req.query.replyId
   try {
     const user = await User.findById(req.user._id).select('-password')
@@ -164,7 +173,8 @@ export const undoRetweet = model => async (req, res) => {
       .lean()
       .exec()
 
-    let ref
+    // TODO: Define exact type of ref
+    let ref: any
     if (req.query.hasOwnProperty('replyId')) {
       ref = user.replies.find(r => r.replyId.toString() === doc._id.toString())
       user.replies.pull(ref._id)
@@ -174,16 +184,16 @@ export const undoRetweet = model => async (req, res) => {
     }
     await user.save()
 
-    res.status(201).json({ user, doc })
+    return res.status(201).json({ user, doc })
   } catch (e) {
     console.error(e)
-    res
+    return res
       .status(404)
       .send({ message: 'This doc does not exist in the database.' })
   }
 }
 
-export const getAllLiked = model => async (req, res) => {
+export const getAllLiked: ICrudType<IRequestUser> = model => async (req, res) => {
   const createdBy = req.user._id
 
   try {
@@ -208,14 +218,19 @@ export const getAllLiked = model => async (req, res) => {
       return res.status(404).send('No liked tweets found.')
     }
 
-    res.status(200).json(tweets)
+    return res.status(200).json(tweets)
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    return res.status(400).end()
   }
 }
 
-export const controllers = model => {
+interface IControllers {
+  // TODO: Define exact type
+  [x: string]: any
+}
+
+export const controllers = (model: Model<ITweet|IReply>): IControllers => {
   return {
     getAll: getAll(model),
     getSpecific: getSpecific(model),
