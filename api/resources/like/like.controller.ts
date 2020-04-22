@@ -1,8 +1,13 @@
-import { Like } from './like.model'
-import { Types } from 'mongoose'
+import { Types, Model } from 'mongoose'
+import { IRequestUser } from '../../utils/auth'
 import { notify } from '../../utils/notificationEmitter'
+import { Like } from './like.model'
+import { ITweet } from '../tweet/tweet.model'
+import { IReply } from '../reply/reply.model'
+import { Response } from 'express'
 
-export const likeDoc = model => async (req, res) => {
+export const likeDoc = (model: Model<ITweet|IReply>) => 
+  async (req: IRequestUser, res: Response): Promise<Response<any>|void> => {
   const docId = req.query.replyId || req.params.tweetId
 
   try {
@@ -33,14 +38,15 @@ export const likeDoc = model => async (req, res) => {
       handle: req.user.handle
     })
 
-    res.status(201).json({ doc, like })
+    return res.status(201).json({ doc, like })
   } catch (e) {
     console.error(e)
-    res.status(400).end(e)
+    return res.status(400).end(e)
   }
 }
 
-export const unlikeDoc = model => async (req, res) => {
+export const unlikeDoc = (model: Model<ITweet|IReply>) => 
+  async (req: IRequestUser, res: Response): Promise<Response<any>|void> => {
   const docId = req.query.replyId || req.params.tweetId
 
   try {
