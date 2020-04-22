@@ -56,7 +56,7 @@ export const signup = async (req: Request, res: Response): Promise<object|void> 
   }
 }
 
-export const login = async (req: Request, res: Response): Promise<object> => {
+export const login = async (req: Request, res: Response): Promise<object|void> => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send({ message: 'Email and password required!' })
   }
