@@ -1,4 +1,10 @@
-import { Schema } from 'mongoose'
+import { Schema, Document } from 'mongoose'
+
+export interface IImageFile extends Document {
+  name: String,
+  type: string,
+  url: string
+}
 
 export const ImageFileSchema = new Schema({
   name: {
