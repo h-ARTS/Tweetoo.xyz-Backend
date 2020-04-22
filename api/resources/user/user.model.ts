@@ -1,10 +1,11 @@
-import { Schema, model, Document, HookNextFunction } from 'mongoose'
+import { Schema, model, Document, HookNextFunction, Model } from 'mongoose'
 // Safer than md5 hash which can be cracked faster by a super computer.
 import bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
 import { UserTweetSchema, ITweet } from '../tweet/tweet.model'
 import { ImageFileSchema } from './user-assets/imagefile.schema'
 import { UserReplySchema } from '../reply/reply.model'
+import { ResolveType, RejectType } from '../../utils/auth'
 
 export interface IUser extends Document {
   email: string,
@@ -22,10 +23,11 @@ export interface IUser extends Document {
   tweets: ITweet[],
   replies: any[],
   isBanned: boolean,
-  isVerified: boolean
+  isVerified: boolean,
+  verifyPassword: (password: string) => Promise<boolean>
 }
 
-const userSchema = new Schema(
+const userSchema: Schema = new Schema(
   {
     email: {
       type: String,
@@ -99,7 +101,7 @@ userSchema.pre('save', (next: HookNextFunction): void => {
 
 userSchema.methods.verifyPassword = function entered(password: string): Promise<boolean> {
   const hashedPassword = this.password
-  return new Promise((resolve, reject): void => {
+  return new Promise((resolve: ResolveType<boolean>, reject: RejectType): void => {
     bcrypt.compare(password, hashedPassword, (err: Error|null, theyAreSame: boolean) => {
       if (err) {
         return reject(err)
