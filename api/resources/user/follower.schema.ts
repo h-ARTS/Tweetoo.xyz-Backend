@@ -1,4 +1,8 @@
-import { Schema } from 'mongoose'
+import { Schema, Document } from 'mongoose'
+
+export interface IFollower extends Document {
+  handle: string
+}
 
 export const FollowerSchema = new Schema({
   //
@@ -7,6 +11,7 @@ export const FollowerSchema = new Schema({
   handle: {
     type: String,
     ref: 'user',
+    unique: true,
     required: true
   }
 })

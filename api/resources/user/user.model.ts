@@ -1,29 +1,29 @@
 import { Schema, model, Document, HookNextFunction, Types } from 'mongoose'
 // Safer than md5 hash which can be cracked faster by a super computer.
 import * as bcrypt from 'bcrypt'
-import { FollowerSchema } from './follower.schema'
+import { FollowerSchema, IFollower } from './follower.schema'
 import { UserTweetSchema, ITweet } from '../tweet/tweet.model'
 import { ImageFileSchema } from './user-assets/imagefile.schema'
 import { UserReplySchema, IUserReply } from '../reply/reply.model'
 import { ResolveType, RejectType } from '../../utils/auth'
 
 export interface IUser extends Document {
-  email: string,
-  handle: string,
-  fullName: string,
-  password: string,
-  bio?: string,
-  location?: string,
-  website?: string,
-  birthday?: Date,
-  userImage: any,
-  coverImage: any,
-  following: any[],
-  followers: any[],
-  tweets: Types.Array<ITweet>,
-  replies: Types.Array<IUserReply>,
-  isBanned: boolean,
-  isVerified: boolean,
+  email: string
+  handle: string
+  fullName: string
+  password: string
+  bio?: string
+  location?: string
+  website?: string
+  birthday?: Date
+  userImage: any
+  coverImage: any
+  following: Types.Array<IFollower>
+  followers: Types.Array<IFollower>
+  tweets: Types.Array<ITweet>
+  replies: Types.Array<IUserReply>
+  isBanned: boolean
+  isVerified: boolean
   verifyPassword: (password: string) => Promise<boolean>
 }
 
