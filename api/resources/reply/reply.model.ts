@@ -13,11 +13,11 @@ export interface IReply extends Document {
 
 export interface IUserReply extends Document {
   retweet: boolean,
-  replyId: Schema.Types.ObjectId,
-  tweetId: Schema.Types.ObjectId
+  replyId?: Schema.Types.ObjectId,
+  tweetId?: Schema.Types.ObjectId
 }
 
-export const replySchema = new Schema(
+export const replySchema: Schema = new Schema(
   {
     tweetId: {
       type: SchemaTypes.ObjectId,
@@ -58,7 +58,7 @@ export const replySchema = new Schema(
   { timestamps: true }
 )
 
-export const UserReplySchema = new Schema({
+export const UserReplySchema: Schema = new Schema({
   retweet: {
     type: Boolean,
     default: false

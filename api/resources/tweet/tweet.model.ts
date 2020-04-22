@@ -1,6 +1,8 @@
 import { Schema, SchemaTypes, model, Document } from 'mongoose'
 
 export interface ITweet extends Document {
+  // TODO: Remove tweetId when exact type defined in crud.ts (reTweet)
+  tweetId?: any,
   fullText: string,
   likeCount: number,
   retweetCount: number,
@@ -12,7 +14,12 @@ export interface ITweet extends Document {
   userImageUrl: string
 }
 
-export const TweetSchema = new Schema(
+export interface IUserTweet extends Document {
+  retweet: boolean,
+  tweetId?: Schema.Types.ObjectId
+}
+
+export const TweetSchema: Schema = new Schema(
   {
     fullText: {
       type: String,
@@ -52,7 +59,7 @@ export const TweetSchema = new Schema(
   { timestamps: true }
 )
 
-export const UserTweetSchema = new Schema({
+export const UserTweetSchema: Schema = new Schema({
   retweet: {
     type: Boolean,
     default: false
