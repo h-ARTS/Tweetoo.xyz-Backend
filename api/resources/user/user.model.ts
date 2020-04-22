@@ -84,7 +84,7 @@ const userSchema: Schema = new Schema(
   { timestamps: true }
 )
 
-userSchema.pre('save', (next: HookNextFunction): void => {
+userSchema.pre<IUser>('save', (next: HookNextFunction): void => {
   if (!this.isModified('password')) {
     return next()
   } else {
