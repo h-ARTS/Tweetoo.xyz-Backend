@@ -1,24 +1,32 @@
 import config from '../../config'
-import { User } from '../resources/user/user.model'
-import jwt from 'jsonwebtoken'
-import { Blacklist } from '../resources/blacklist-token/blacklist.model'
+import { User, IUser } from '../resources/user/user.model'
+import * as jwt from 'jsonwebtoken'
+import { Blacklist, IBlacklist } from '../resources/blacklist-token/blacklist.model'
 import { checkBlacklisted } from '../resources/blacklist-token/blacklist.util'
+import { Request, Response, NextFunction } from 'express'
 
-export const newToken = user => {
-  const options = {
+export type ResolveType<T> = (value?: T | PromiseLike<T>) => void
+export type RejectType = (reason?: any) => void
+
+export interface IRequestUser extends Request {
+  user: Omit<IUser, 'password'>
+}
+
+export const newToken = (user: IUser): string => {
+  const options: jwt.SignOptions = {
     algorithm: 'RS256',
     expiresIn: config.secrets.jwtExp
   }
   return jwt.sign({ id: user.id }, config.secrets.privateKey, options)
 }
 
-export const verifyToken = token => {
-  return new Promise((resolve, reject) => {
+export const verifyToken = (token: string): Promise<IUser> => {
+  return new Promise((resolve: ResolveType<IUser>, reject: RejectType): void => {
     jwt.verify(
       token,
       config.secrets.publicKey,
       { algorithms: ['RS256'] },
-      (err, payload) => {
+      (err: Error|null, payload: IUser): void|IUser => {
         if (err) return reject(err)
         return resolve(payload)
       }
@@ -26,7 +34,7 @@ export const verifyToken = token => {
   })
 }
 
-export const signup = async (req, res) => {
+export const signup = async (req: Request, res: Response): Promise<object|void> => {
   if (
     !req.body.email ||
     !req.body.password ||
@@ -39,8 +47,8 @@ export const signup = async (req, res) => {
   }
 
   try {
-    const user = await User.create(req.body)
-    const token = newToken(user)
+    const user: IUser = await User.create(req.body)
+    const token: string = newToken(user)
     return res.status(201).json(token)
   } catch (e) {
     console.error(e)
@@ -48,7 +56,7 @@ export const signup = async (req, res) => {
   }
 }
 
-export const login = async (req, res) => {
+export const login = async (req: Request, res: Response): Promise<object> => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send({ message: 'Email and password required!' })
   }
@@ -56,7 +64,7 @@ export const login = async (req, res) => {
   const invalid = { message: 'Wrong email and password combination.' }
 
   try {
-    const user = await User.findOne({ email: req.body.email })
+    const user: IUser = await User.findOne({ email: req.body.email })
       .select('email password') // We only include email and password and exclude the rest
       .exec()
 
@@ -64,13 +72,13 @@ export const login = async (req, res) => {
       return res.status(401).send(invalid)
     }
 
-    const match = await user.verifyPassword(req.body.password)
+    const match: boolean = await user.verifyPassword(req.body.password)
 
     if (!match) {
       return res.status(401).send(invalid)
     }
 
-    const token = newToken(user)
+    const token: string = newToken(user)
     return res.status(201).json(token)
   } catch (e) {
     console.error(e)
@@ -78,11 +86,11 @@ export const login = async (req, res) => {
   }
 }
 
-export const logout = async (req, res) => {
-  const token = req.headers.authorization.split('Bearer ')[1]
-  const { exp, iat } = jwt.decode(token)
+export const logout = async (req: IRequestUser, res: Response): Promise<void> => {
+  const token: string = req.headers.authorization.split('Bearer ')[1]
+  const { exp, iat }: any = jwt.decode(token)
   try {
-    const blacklisted = await Blacklist.create({ token, exp, iat })
+    const blacklisted: IBlacklist = await Blacklist.create({ token, exp, iat })
     delete req.user
     delete req.headers.authorization
     res.status(200).send({ blacklisted })
@@ -92,7 +100,8 @@ export const logout = async (req, res) => {
   }
 }
 
-export const authGuard = async (req, res, next) => {
+export const authGuard = async (req: IRequestUser, res: Response, 
+  next: NextFunction): Promise<object|void> => {
   const bearer = req.headers.authorization
 
   if (!bearer || !bearer.startsWith('Bearer ')) {
@@ -101,8 +110,8 @@ export const authGuard = async (req, res, next) => {
 
   const token = bearer.split('Bearer ')[1].trim()
 
-  let payload
-  const isBlacklistedToken = await checkBlacklisted(token)
+  let payload: IUser
+  const isBlacklistedToken: boolean = await checkBlacklisted(token)
 
   try {
     if (!isBlacklistedToken) {
@@ -115,10 +124,9 @@ export const authGuard = async (req, res, next) => {
     return res.status(401).end()
   }
 
-  const user = await User.findById(payload.id)
+  const user: Omit<IUser, 'password'> = await User.findById(payload.id)
     .select('-password')
     .lean()
-    .exec()
 
   if (!user) {
     return res.status(401).end()
