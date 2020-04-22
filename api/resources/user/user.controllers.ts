@@ -1,38 +1,42 @@
-import { User } from './user.model'
-import { Like } from '../like/like.model'
-import { Reply } from '../reply/reply.model'
-import { Tweet } from '../tweet/tweet.model'
+import { Response, Request } from 'express'
+import { ChangeStream, ChangeEventDelete } from 'mongodb'
 import { Types } from 'mongoose'
+import { User, IUser } from './user.model'
+import { Like } from '../like/like.model'
+import { Reply, IReply } from '../reply/reply.model'
+import { Tweet, ITweet } from '../tweet/tweet.model'
 import { notify } from '../../utils/notificationEmitter'
+import { IRequestUser } from '../../utils/auth'
 
-const watchUsers = User.watch()
+const watchUsers: ChangeStream = User.watch()
 
-watchUsers.on('change', async result => {
+watchUsers.on('change', async (result: ChangeEventDelete): Promise<void> => {
   if (result.operationType === 'delete') {
     const user = result.documentKey
 
     await Tweet.find()
       .where('createdBy')
-      .all([user._id])
+      .and([user._id])
       .remove()
 
     await Like.find()
       .where('createdBy')
-      .all([user._id])
+      .and([user._id])
       .remove()
 
     await Reply.find()
       .where('createdBy')
-      .all([user._id])
+      .and([user._id])
       .remove()
   }
 })
 
-export const myProfile = (req, res) => {
+export const myProfile = (req: IRequestUser, res: Response): Response<any> => {
   return res.status(200).json(req.user)
 }
 
-export const getUser = async (req, res) => {
+export const getUser = async (req: Request, res: Response): 
+  Promise<Response<any>|void> => {
   try {
     const user = await User.findOne({ handle: req.params.handle }).select(
       '-password'
@@ -49,8 +53,9 @@ export const getUser = async (req, res) => {
   }
 }
 
-export const getUsers = async (req, res) => {
-  const arrHandles = req.query.handles.split(',')
+export const getUsers = async (req: IRequestUser, res: Response): 
+  Promise<Response<any>> => {
+  const arrHandles: string[] = req.query.handles.split(',')
   try {
     const users = await User.find({ handle: { $in: arrHandles } }).select(
       '-password'
@@ -62,7 +67,8 @@ export const getUsers = async (req, res) => {
   }
 }
 
-export const updateProfile = async (req, res) => {
+export const updateProfile = async (req: IRequestUser, res: Response): 
+  Promise<Response<any>|void> => {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true
@@ -82,7 +88,8 @@ export const updateProfile = async (req, res) => {
   }
 }
 
-export const followHandler = async (req, res) => {
+export const followHandler = async (req: IRequestUser, res: Response): 
+  Promise<Response<any>|void> => {
   try {
     const targetUser = await User.findOne({ handle: req.params.handle }).select(
       '-password'
@@ -122,11 +129,12 @@ export const followHandler = async (req, res) => {
   }
 }
 
-export const appendToUser = async (req, res) => {
+export const appendToUser = async (req: IRequestUser, res: Response): 
+  Promise<Response<any>|void> => {
   try {
     const user = await User.findById(req.user._id).select('-password')
 
-    let result
+    let result: {reply?: IReply, tweet: ITweet, user: IUser}
     if (req.body.doc.tweetId) {
       user.replies.push({
         replyId: req.body.doc._id,
@@ -154,7 +162,8 @@ export const appendToUser = async (req, res) => {
   }
 }
 
-export const removeFromUser = async (req, res) => {
+export const removeFromUser = async (req: IRequestUser, res: Response):
+  Promise<Response<any>|void> => {
   const doc = req.body.removed
   const itHasRepliesArray = doc.replies
   try {
@@ -185,7 +194,8 @@ export const removeFromUser = async (req, res) => {
   }
 }
 
-export const deleteProfile = async (req, res) => {
+export const deleteProfile = async (req: IRequestUser, res: Response):
+  Promise<Response<any>|void> => {
   try {
     const removedProfile = await User.findByIdAndRemove(req.user._id).exec()
 
