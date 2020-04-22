@@ -1,6 +1,9 @@
+import { Response } from 'express'
+import { IRequestUser } from '../../utils/auth'
 import { Bookmarks } from './bookmarks.model'
 
-export const getBookmarks = async (req, res) => {
+export const getBookmarks = async (req: IRequestUser, res: Response):
+  Promise<Response<any>|void> => {
   try {
     const bookmarks = await Bookmarks.find({ userId: req.user._id })
 
@@ -10,7 +13,8 @@ export const getBookmarks = async (req, res) => {
   }
 }
 
-export const createBookmark = async (req, res) => {
+export const createBookmark = async (req: IRequestUser, res: Response):
+  Promise<Response<any>|void> => {
   const { tweet, tweetId } = req.body
   try {
     const bookmark = await Bookmarks.create({

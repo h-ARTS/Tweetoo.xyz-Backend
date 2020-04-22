@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import controller from './bookmarks.controller'
 
-const router = Router()
+const router: Router = Router()
 
 router
   .route('/')
