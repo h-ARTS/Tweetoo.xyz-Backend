@@ -1,10 +1,10 @@
-import { Schema, model, Document, HookNextFunction, Model } from 'mongoose'
+import { Schema, model, Document, HookNextFunction, Types } from 'mongoose'
 // Safer than md5 hash which can be cracked faster by a super computer.
-import bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt'
 import { FollowerSchema } from './follower.schema'
 import { UserTweetSchema, ITweet } from '../tweet/tweet.model'
 import { ImageFileSchema } from './user-assets/imagefile.schema'
-import { UserReplySchema } from '../reply/reply.model'
+import { UserReplySchema, IUserReply } from '../reply/reply.model'
 import { ResolveType, RejectType } from '../../utils/auth'
 
 export interface IUser extends Document {
@@ -20,8 +20,8 @@ export interface IUser extends Document {
   coverImage: any,
   following: any[],
   followers: any[],
-  tweets: ITweet[],
-  replies: any[],
+  tweets: Types.Array<ITweet>,
+  replies: Types.Array<IUserReply>,
   isBanned: boolean,
   isVerified: boolean,
   verifyPassword: (password: string) => Promise<boolean>
