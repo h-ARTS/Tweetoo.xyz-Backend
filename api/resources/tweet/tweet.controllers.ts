@@ -11,7 +11,7 @@ interface IChangeEventDelete extends ChangeEventDelete {
 }
 
 // Watcher works only on mongodb replica sets
-const watchTweets: ChangeStream = Tweet.watch(null, {
+const watchTweets: ChangeStream = Tweet.watch(undefined, {
   fullDocument: 'updateLookup'
 })
 
@@ -35,6 +35,12 @@ export const appendReplyToTweet = async (req: Request, res: Response,
   next: NextFunction): Promise<void> => {
   try {
     const tweet: ITweet = await Tweet.findById(req.body.doc.tweetId)
+
+    if (!tweet) {
+      res.status(404).end()
+      return
+    }
+
     tweet.replies.push(req.body.doc._id)
     await tweet.save()
 
@@ -51,6 +57,12 @@ export const removeReplyFromTweet = async (req: Request, res: Response,
   const doc: IReply = req.body.removed
   try {
     const tweet: ITweet = await Tweet.findById(doc.tweetId)
+
+    if (!tweet) {
+      res.status(400).end()
+      return
+    }
+
     tweet.replies.pull(doc._id)
     await tweet.save()
 
