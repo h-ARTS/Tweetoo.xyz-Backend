@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import controllers from './notification.controllers'
 
-const router = Router()
+const router: Router = Router()
 
 router
   .route('/')

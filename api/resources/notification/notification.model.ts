@@ -1,4 +1,13 @@
-import { Schema, model, SchemaTypes } from 'mongoose'
+import { Schema, model, SchemaTypes, Document } from 'mongoose'
+
+export interface INotification extends Document {
+  type: string,
+  snder: string,
+  recipient: string,
+  read: boolean,
+  tweetId?: Schema.Types.ObjectId,
+  replyId?: Schema.Types.ObjectId
+}
 
 export const notificationSchema = new Schema(
   {
@@ -24,4 +33,4 @@ export const notificationSchema = new Schema(
   { timestamps: true }
 )
 
-export const Notification = model('notification', notificationSchema)
+export const Notification = model<INotification>('notification', notificationSchema)
