@@ -6,7 +6,7 @@ import {
   removeReplyFromTweet
 } from '../tweet/tweet.controllers'
 
-const router = Router()
+const router: Router = Router()
 
 // /api/reply
 router
