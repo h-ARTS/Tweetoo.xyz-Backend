@@ -9,7 +9,10 @@ export type ResolveType<T> = (value?: T | PromiseLike<T>) => void
 export type RejectType = (reason?: any) => void
 
 export interface IRequestUser extends Request {
-  user: Omit<IUser, 'password'>
+  user: Omit<IUser, 'password'>,
+  query: {
+    [x: string]: any
+  }
 }
 
 export const newToken = (user: IUser): string => {

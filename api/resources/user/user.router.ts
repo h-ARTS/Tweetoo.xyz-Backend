@@ -10,7 +10,7 @@ import uploadImage from '../../utils/uploadImage'
 import { assignImagePath } from './user-assets/upload.controller'
 import { checkUserAssets } from './user-assets/assets.controller'
 
-const router = Router()
+const router: Router = Router()
 
 router
   .route('/')
