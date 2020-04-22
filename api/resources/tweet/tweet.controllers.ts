@@ -5,8 +5,7 @@ import { Reply, IReply } from '../reply/reply.model'
 import { ChangeStream, ChangeEventDelete } from 'mongodb'
 import { Request, Response, NextFunction } from 'express'
 
-
-interface IChangeEventDelete extends ChangeEventDelete {
+export interface IChangeEventDelete extends ChangeEventDelete {
   fullDocument: ITweet
 }
 
