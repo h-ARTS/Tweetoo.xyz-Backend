@@ -3,7 +3,7 @@ import { Schema, model, Document, HookNextFunction, Types } from 'mongoose'
 import * as bcrypt from 'bcrypt'
 import { FollowerSchema, IFollower } from './follower.schema'
 import { UserTweetSchema, ITweet } from '../tweet/tweet.model'
-import { ImageFileSchema } from './user-assets/imagefile.schema'
+import { ImageFileSchema, IImageFile } from './user-assets/imagefile.schema'
 import { UserReplySchema, IUserReply } from '../reply/reply.model'
 import { ResolveType, RejectType } from '../../utils/auth'
 
@@ -16,8 +16,8 @@ export interface IUser extends Document {
   location?: string
   website?: string
   birthday?: Date
-  userImage: any
-  coverImage: any
+  userImage: IImageFile
+  coverImage: IImageFile
   following: Types.Array<IFollower>
   followers: Types.Array<IFollower>
   tweets: Types.Array<ITweet>
