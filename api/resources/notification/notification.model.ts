@@ -2,7 +2,7 @@ import { Schema, model, SchemaTypes, Document } from 'mongoose'
 
 export interface INotification extends Document {
   type: string,
-  snder: string,
+  sender: string,
   recipient: string,
   read: boolean,
   tweetId?: Schema.Types.ObjectId,
