@@ -15,7 +15,7 @@ export interface IRequestUser extends Request {
   }
 }
 
-export const newToken = (user: IUser): string => {
+export const newToken = (user: Pick<IUser, 'id'>): string => {
   const options: jwt.SignOptions = {
     algorithm: 'RS256',
     expiresIn: config.secrets.jwtExp
@@ -91,6 +91,7 @@ export const login = async (req: Request, res: Response): Promise<object|void> =
 
 export const logout = async (req: IRequestUser, res: Response): Promise<void> => {
   const token: string = req.headers.authorization.split('Bearer ')[1]
+  // TODO: Define exact types
   const { exp, iat }: any = jwt.decode(token)
   try {
     const blacklisted: IBlacklist = await Blacklist.create({ token, exp, iat })
@@ -104,7 +105,7 @@ export const logout = async (req: IRequestUser, res: Response): Promise<void> =>
 }
 
 export const authGuard = async (req: IRequestUser, res: Response, 
-  next: NextFunction): Promise<object|void> => {
+  next?: NextFunction): Promise<object|void> => {
   const bearer = req.headers.authorization
 
   if (!bearer || !bearer.startsWith('Bearer ')) {
