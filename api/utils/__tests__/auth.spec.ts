@@ -4,20 +4,21 @@ import {
   signup,
   login,
   authGuard,
-  logout
+  IRequestUser
 } from '../auth'
-import jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
-import { User } from '../../resources/user/user.model'
+import { User, IUser } from '../../resources/user/user.model'
 import config from '../../../config'
 import { Blacklist } from '../../resources/blacklist-token/blacklist.model'
+import { Request, Response } from 'express'
 
 describe('Authentication:', () => {
   describe('newToken', () => {
     test('creates a new json web token from user id.', () => {
       const id = 493
       const token = newToken({ id })
-      jwt.verify(token, config.secrets.publicKey, (err, payload) => {
+      jwt.verify(token, config.secrets.publicKey, (err: null|Error, payload: IUser) => {
         if (err) {
           return err
         }
@@ -41,16 +42,16 @@ describe('Authentication:', () => {
     test('requires email and password.', async () => {
       expect.assertions(2)
 
-      const req = { body: {} }
+      const req = { body: {} } as Request
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(400)
           return this
         },
-        send(result) {
+        send(result: { message: string }) {
           expect(typeof result.message).toBe('string')
         }
-      }
+      } as Response
 
       await login(req, res)
     })
@@ -58,16 +59,21 @@ describe('Authentication:', () => {
     test('user must exist.', async () => {
       expect.assertions(2)
 
-      const req = { body: { email: 'wrong@me.com', password: '1234' } }
+      const req = { 
+        body: { 
+          email: 'wrong@me.com', 
+          password: '1234' 
+        } 
+      } as Request
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(401)
           return this
         },
-        send(result) {
+        send(result: { message: string }) {
           expect(typeof result.message).toBe('string')
         }
-      }
+      } as Response
 
       await login(req, res)
     })
@@ -87,16 +93,16 @@ describe('Authentication:', () => {
           email: 'william@wallace.com',
           password: 'thecompletewrongpw'
         }
-      }
+      } as Request
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(401)
           return this
         },
-        send(result) {
+        send(result: { message: string }) {
           expect(typeof result.message).toBe('string')
         }
-      }
+      } as Response
 
       await login(req, res)
     })
@@ -116,20 +122,19 @@ describe('Authentication:', () => {
           email: fields.email,
           password: fields.password
         }
-      }
+      } as Request
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        async json(token) {
-          let user = await verifyToken(token)
+        async json(token: string) {
+          let user: IUser = await verifyToken(token)
           user = await User.findById(user.id)
             .lean()
-            .exec()
           expect(user._id.toString()).toBe(savedUser._id.toString())
         }
-      }
+      } as any // TODO: Define exact type
 
       await login(req, res)
     })
@@ -139,16 +144,16 @@ describe('Authentication:', () => {
     test('requires email and password, full name and user handle.', async () => {
       expect.assertions(2)
 
-      const req = { body: {} }
+      const req = { body: {} } as Request
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(400)
           return this
         },
-        send(result) {
+        send(result: { message: string }) {
           expect(typeof result.message).toBe('string')
         }
-      }
+      } as Response
 
       await signup(req, res)
     })
@@ -163,20 +168,20 @@ describe('Authentication:', () => {
           fullName: 'Dr. Max Mustard',
           handle: '@DrMustard'
         }
-      }
+      } as Request
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        async json(token) {
-          let user = await verifyToken(token)
+        async json(token: string) {
+          let user: IUser = await verifyToken(token)
           user = await User.findById(user.id)
             .lean()
-            .exec()
+
           expect(user.email).toBe(req.body.email)
         }
-      }
+      } as any // TODO: Define exact type
 
       await signup(req, res)
     })
@@ -186,16 +191,16 @@ describe('Authentication:', () => {
     test('looks for Bearer token in headers.', async () => {
       expect.assertions(2)
 
-      const req = { headers: {} }
+      const req = { headers: {} } as IRequestUser
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(401)
           return this
         },
-        end() {
+        end(): void {
           expect(true).toBe(true)
         }
-      }
+      } as Response
 
       await authGuard(req, res)
     })
@@ -203,16 +208,16 @@ describe('Authentication:', () => {
     test('looks for the token and must have correct prefix.', async () => {
       expect.assertions(2)
 
-      const req = { headers: { authorization: newToken({ id: '32758gf' }) } }
+      const req = { headers: { authorization: newToken({ id: '32758gf' }) } } as IRequestUser
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(401)
           return this
         },
-        end() {
+        end(): void {
           expect(true).toBe(true)
         }
-      }
+      } as Response
 
       await authGuard(req, res)
     })
@@ -221,17 +226,17 @@ describe('Authentication:', () => {
       expect.assertions(2)
 
       const token = `Bearer ${newToken({ id: Types.ObjectId() })}`
-      const req = { headers: { authorization: token } }
+      const req = { headers: { authorization: token } } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(401)
           return this
         },
-        end() {
+        end(): void {
           expect(true).toBe(true)
         }
-      }
+      } as Response
 
       await authGuard(req, res)
     })
@@ -247,10 +252,10 @@ describe('Authentication:', () => {
       })
 
       const token = `Bearer ${newToken(user)}`
-      const req = { headers: { authorization: token } }
+      const req = { headers: { authorization: token } } as IRequestUser
       const next = () => {}
 
-      await authGuard(req, {}, next)
+      await authGuard(req, {} as Response, next)
 
       expect(req.user._id.toString()).toBe(user._id.toString())
       expect(req.user).not.toHaveProperty('password')
@@ -268,20 +273,21 @@ describe('Authentication:', () => {
 
       const bearer = `Bearer ${newToken(user)}`
       const token = bearer.split('Bearer ')[1]
-      const { exp, iat } = jwt.decode(token)
+      // TODO: Define exact type
+      const { exp, iat }: any = jwt.decode(token)
 
-      const req = { headers: { authorization: bearer } }
+      const req = { headers: { authorization: bearer } } as IRequestUser
       await Blacklist.create({ token, exp, iat })
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(401)
           return this
         },
-        end() {
+        end(): void {
           expect(true).toBe(true)
         }
-      }
+      } as Response
 
       await authGuard(req, res)
     })
@@ -299,7 +305,7 @@ describe('Authentication:', () => {
       const bearer = `Bearer ${newToken(user)}`
       const token = bearer.split('Bearer ')[1]
 
-      const req = { headers: { authorization: bearer } }
+      const req = { headers: { authorization: bearer } } as IRequestUser
       await Blacklist.create({
         token,
         exp: 1578683384,
@@ -307,16 +313,18 @@ describe('Authentication:', () => {
       })
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(401)
           return this
         },
-        end() {
+        end(): void {
           expect(true).toBe(true)
         }
-      }
+      } as Response
 
       await authGuard(req, res)
     })
   })
+
+  // TODO: Create logout tests
 })
