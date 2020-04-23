@@ -1,19 +1,19 @@
-import mongoose from 'mongoose'
-import request from 'supertest'
+import * as mongoose from 'mongoose'
+import * as request from 'supertest'
 import { app } from '../../server'
 import { newToken } from '../auth'
 import initNotificationEmitter, {
   notify,
   removeNotifyListeners
 } from '../notificationEmitter'
-import { Tweet } from '../../resources/tweet/tweet.model'
-import { User } from '../../resources/user/user.model'
+import { Tweet, ITweet } from '../../resources/tweet/tweet.model'
+import { User, IUser } from '../../resources/user/user.model'
 import { Notification } from '../../resources/notification/notification.model'
 
 describe('Notification event emitter', () => {
-  let user
-  let token
-  let tweet
+  let user: IUser
+  let token: string
+  let tweet: ITweet
 
   beforeEach(async () => {
     user = await User.create({
