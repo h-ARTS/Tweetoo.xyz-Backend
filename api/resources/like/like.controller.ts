@@ -41,7 +41,7 @@ export const likeDoc = (model: Model<ITweet|IReply>) =>
     return res.status(201).json({ doc, like })
   } catch (e) {
     console.error(e)
-    return res.status(400).end(e)
+    return res.status(400).end()
   }
 }
 
