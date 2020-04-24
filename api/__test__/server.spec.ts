@@ -1,11 +1,11 @@
-import request from 'supertest'
+import * as mongoose from 'mongoose'
+import * as request from 'supertest'
 import { app } from '../server'
 import { User } from '../resources/user/user.model'
 import { newToken } from '../utils/auth'
-import mongoose from 'mongoose'
 
 describe('API Authentication:', () => {
-  let token
+  let token: string
   beforeEach(async () => {
     const user = await User.create({
       email: 'max@mustard.com',
@@ -21,16 +21,16 @@ describe('API Authentication:', () => {
       expect.assertions(4)
 
       let response = await request(app).get('/api/user')
-      expect(response.statusCode).toBe(401)
+      expect(response.status).toBe(401)
 
       response = await request(app).get('/api/tweet')
-      expect(response.statusCode).toBe(401)
+      expect(response.status).toBe(401)
 
       response = await request(app).get('/api/tweets')
-      expect(response.statusCode).toBe(401)
+      expect(response.status).toBe(401)
 
       response = await request(app).get('/api/notifications')
-      expect(response.statusCode).toBe(401)
+      expect(response.status).toBe(401)
     })
 
     test('passes with JWT', async () => {
@@ -55,7 +55,7 @@ describe('API Authentication:', () => {
       ])
 
       return results.forEach(res => {
-        expect(res.statusCode).not.toBe(401)
+        expect(res.status).not.toBe(401)
       })
     })
   })

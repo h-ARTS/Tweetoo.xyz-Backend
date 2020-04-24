@@ -1,4 +1,4 @@
-import request from 'supertest'
+import * as request from 'supertest'
 import { Response } from 'express'
 import { app } from '../../../server'
 import { User, IUser } from '../../user/user.model'
