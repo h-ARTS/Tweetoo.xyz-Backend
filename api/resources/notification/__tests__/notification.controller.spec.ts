@@ -1,19 +1,22 @@
 import request from 'supertest'
+import { Response } from 'express'
 import { app } from '../../../server'
-import { User } from '../../user/user.model'
+import { User, IUser } from '../../user/user.model'
 import {
   getNotifications,
   updateAllNotifications
 } from '../notification.controllers'
-import { newToken } from '../../../utils/auth'
+import { newToken, IRequestUser } from '../../../utils/auth'
 import initNotificationEmitter, {
   removeNotifyListeners
 } from '../../../utils/notificationEmitter'
+import { IFollower } from '../../user/follower.schema'
+import { INotification } from '../notification.model'
 
 describe('Notification-controllers:', () => {
   initNotificationEmitter()
 
-  let user, following
+  let user: IUser, following: IFollower
   beforeEach(async () => {
     user = await User.create({
       email: 'johndoe@gmail.com',
@@ -42,20 +45,20 @@ describe('Notification-controllers:', () => {
 
     const req = {
       user: following
-    }
+    } as IRequestUser
     const res = {
-      status(code) {
+      status(code: number) {
         expect(code).toBe(200)
         return this
       },
-      json(result) {
+      json(result: INotification[]) {
         expect(result).not.toHaveLength(0)
         expect(result.length).toBeGreaterThan(0)
         result.forEach(notification => {
           expect(notification.recipient).toBe(req.user.handle)
         })
       }
-    }
+    } as Response
 
     await getNotifications(req, res)
   })
@@ -65,16 +68,17 @@ describe('Notification-controllers:', () => {
 
     const req = {
       body: { read: true }
-    }
+    } as IRequestUser
+    
     const res = {
-      status(code) {
+      status(code: number) {
         expect(code).toBe(200)
         return this
       },
-      json(result) {
+      json(result: INotification) {
         expect(result).toEqual({ read: true })
       }
-    }
+    } as Response
 
     await updateAllNotifications(req, res)
   })
