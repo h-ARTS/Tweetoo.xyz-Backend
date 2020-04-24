@@ -1,5 +1,4 @@
 import { FollowerSchema } from '../follower.schema'
-import { SchemaTypes } from 'mongoose'
 
 describe('Follower Schema', () => {
   test('has userId.', () => {
