@@ -1,10 +1,12 @@
+import * as mongoose from 'mongoose'
 import { getBookmarks, createBookmark } from '../bookmarks.controller'
-import { Bookmarks } from '../bookmarks.model'
-import mongoose from 'mongoose'
-import { User } from '../../user/user.model'
+import { Bookmarks, IBookmark } from '../bookmarks.model'
+import { User, IUser } from '../../user/user.model'
+import { IRequestUser } from '../../../utils/auth'
+import { Response } from 'express'
 
 describe('Bookmarks-controller:', () => {
-  let user
+  let user: IUser
   beforeEach(async () => {
     user = await User.create({
       email: 'max@mustard.com',
@@ -29,17 +31,17 @@ describe('Bookmarks-controller:', () => {
   test('getBookmarks', async () => {
     expect.assertions(2)
 
-    const req = { user }
+    const req = { user: { _id: user._id } } as IRequestUser
 
     const res = {
-      status(code) {
+      status(code: number) {
         expect(code).toBe(200)
         return this
       },
-      json(result) {
+      json(result: IBookmark[]) {
         expect(result).toHaveLength(1)
       }
-    }
+    } as Response
 
     await getBookmarks(req, res)
   })
@@ -49,7 +51,7 @@ describe('Bookmarks-controller:', () => {
 
     const tweetId = mongoose.Types.ObjectId()
     const req = {
-      user,
+      user: { _id: user._id },
       body: {
         tweet: {
           handle: 'julian',
@@ -62,17 +64,17 @@ describe('Bookmarks-controller:', () => {
         },
         tweetId
       }
-    }
+    } as IRequestUser
     const res = {
-      status(code) {
+      status(code: number) {
         expect(code).toBe(201)
         return this
       },
-      json(result) {
+      json(result: IBookmark) {
         expect(result.userId).toEqual(user._id)
         expect(result.tweet.tweetId).toEqual(tweetId)
       }
-    }
+    } as Response
 
     await createBookmark(req, res)
   })
