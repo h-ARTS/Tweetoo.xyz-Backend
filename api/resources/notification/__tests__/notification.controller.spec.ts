@@ -10,13 +10,12 @@ import { newToken, IRequestUser } from '../../../utils/auth'
 import initNotificationEmitter, {
   removeNotifyListeners
 } from '../../../utils/notificationEmitter'
-import { IFollower } from '../../user/follower.schema'
 import { INotification } from '../notification.model'
 
 describe('Notification-controllers:', () => {
   initNotificationEmitter()
 
-  let user: IUser, following: IFollower
+  let user: IUser, following: IUser
   beforeEach(async () => {
     user = await User.create({
       email: 'johndoe@gmail.com',
@@ -29,7 +28,7 @@ describe('Notification-controllers:', () => {
       email: 'chris@brian.org',
       password: 'fdfwecs',
       fullName: 'Chris J. Brian',
-      handle: 'chris_b'
+      handle: 'chris_a'
     })
 
     const token = newToken(user)
@@ -44,7 +43,7 @@ describe('Notification-controllers:', () => {
     expect.assertions(4)
 
     const req = {
-      user: following
+      user: { _id: following._id, handle: following.handle }
     } as IRequestUser
     const res = {
       status(code: number) {
@@ -67,7 +66,8 @@ describe('Notification-controllers:', () => {
     expect.assertions(2)
 
     const req = {
-      body: { read: true }
+      body: { read: true },
+      user: { handle: user.handle }
     } as IRequestUser
     
     const res = {
