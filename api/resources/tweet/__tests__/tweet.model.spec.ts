@@ -55,7 +55,7 @@ describe('Tweets model:', () => {
     const userImageUrl = Tweet.schema.obj.userImageUrl
     expect(userImageUrl).toEqual({
       type: String,
-      required: true
+      default: ''
     })
   })
 })
