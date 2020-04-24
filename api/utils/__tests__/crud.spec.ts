@@ -1,3 +1,4 @@
+import * as mongoose from 'mongoose'
 import {
   getAll,
   getOne,
@@ -9,11 +10,12 @@ import {
   getAllLiked,
   getSpecific
 } from '../crud'
-import { Tweet } from '../../resources/tweet/tweet.model'
-import { User } from '../../resources/user/user.model'
-import mongoose from 'mongoose'
-import { Reply } from '../../resources/reply/reply.model'
-import { Like } from '../../resources/like/like.model'
+import { Tweet, ITweet, IUserTweet } from '../../resources/tweet/tweet.model'
+import { User, IUser } from '../../resources/user/user.model'
+import { Reply, IReply, IUserReply } from '../../resources/reply/reply.model'
+import { Like, ILike } from '../../resources/like/like.model'
+import { IRequestUser } from '../auth'
+import { Response } from 'express'
 
 describe('CRUD controllers for Tweets and Replies:', () => {
   describe('getAll', () => {
@@ -47,17 +49,17 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         user: {
           _id: user
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: any) {
           expect(result.data).toHaveLength(3)
         }
-      }
+      } as Response
 
       await getAll(Tweet)(req, res)
     })
@@ -65,9 +67,9 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 
   describe('getSpecific', () => {
     const user = mongoose.Types.ObjectId()
-    let tweetOne
-    let tweetTwo
-    let tweetThree
+    let tweetOne: ITweet
+    let tweetTwo: ITweet
+    let tweetThree: ITweet
 
     beforeEach(async () => {
       tweetOne = await Tweet.create({
@@ -100,20 +102,20 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         body: {
           docs: [tweetOne._id, tweetTwo._id, tweetThree._id]
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: any) {
           expect(result).toHaveLength(3)
-          result.forEach((tweet, idx) => {
+          result.forEach((tweet: ITweet, idx: number) => {
             expect(tweet._id).toEqual(req.body.docs[idx])
           })
         }
-      }
+      } as Response
 
       await getSpecific(Tweet)(req, res)
     })
@@ -132,17 +134,17 @@ describe('CRUD controllers for Tweets and Replies:', () => {
             mongoose.Types.ObjectId()
           ]
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        send(result) {
+        send(result: string) {
           expect(result).toEqual('No docs found')
         }
-      }
+      } as Response
 
       await getSpecific(Tweet)(req, res)
     })
@@ -163,17 +165,17 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         params: {
           tweetId: tweet._id
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: any) {
           expect(result.data._id.toString()).toBe(tweet._id.toString())
         }
-      }
+      } as Response
 
       await getOne(Tweet)(req, res)
     })
@@ -183,18 +185,19 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 
       const req = {
         params: {
-          tweetId: mongoose.Types.ObjectId()
+          tweetId: mongoose.Types.ObjectId().toHexString()
         }
-      }
+      } as IRequestUser
+
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        end() {
+        end(): void {
           expect(true).toBe(true)
         }
-      }
+      } as Response
 
       await getOne(Tweet)(req, res)
     })
@@ -202,8 +205,9 @@ describe('CRUD controllers for Tweets and Replies:', () => {
 
   describe('getAllLiked', () => {
     const createdBy = mongoose.Types.ObjectId()
-    let tweet
-    let like
+    let tweet: ITweet
+    let like: ILike
+
     beforeEach(async () => {
       tweet = await Tweet.create({
         createdBy,
@@ -222,17 +226,17 @@ describe('CRUD controllers for Tweets and Replies:', () => {
     test('should get all liked tweets/replies.', async () => {
       expect.assertions(3)
 
-      const req = { user: { _id: createdBy } }
+      const req = { user: { _id: createdBy } } as IRequestUser
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: any) {
           expect(result[0].handle).toEqual(like.handle)
           expect(result[0]._id).toEqual(tweet._id)
         }
-      }
+      } as Response
 
       await getAllLiked(Tweet)(req, res)
     })
@@ -250,10 +254,10 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         user: { _id: createdBy, fullName: 'Max', handle: '@max' },
         query: {},
         body
-      }
+      } as IRequestUser
       const next = () => {}
 
-      await createOne(Tweet)(req, {}, next)
+      await createOne(Tweet)(req, {} as Response, next)
 
       expect(req.body.hasOwnProperty('doc')).toBe(true)
     })
@@ -267,10 +271,10 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         user: { _id: createdBy, fullName: 'Max Fritz', handle: '@maxFritz' },
         query: {},
         body
-      }
+      } as IRequestUser
       const next = () => {}
 
-      await createOne(Tweet)(req, {}, next)
+      await createOne(Tweet)(req, {} as Response, next)
 
       expect(req.body.doc).toEqual(
         expect.objectContaining({
@@ -298,18 +302,18 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         params: { tweetId: tweet._id },
         user: { _id: user },
         body: update
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: any) {
           expect(result.data._id.toString()).toBe(tweet._id.toString())
           expect(result.data.fullText).toBe(update.fullText)
         }
-      }
+      } as Response
 
       await updateOne(Tweet)(req, res)
     })
@@ -321,20 +325,20 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       const update = { fullText: 'hello' }
 
       const req = {
-        params: { tweetId: mongoose.Types.ObjectId() },
+        params: { tweetId: mongoose.Types.ObjectId().toHexString() },
         user: { _id: user },
         body: update
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        end() {
+        end(): void {
           expect(true).toBe(true)
         }
-      }
+      } as Response
 
       await updateOne(Tweet)(req, res)
     })
@@ -356,10 +360,10 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         params: { tweetId: tweet._id },
         user: { _id: user },
         body: {}
-      }
+      } as IRequestUser
       const next = () => {}
 
-      await removeOne(Tweet)(req, {}, next)
+      await removeOne(Tweet)(req, {} as Response, next)
 
       expect(req.body.removed).not.toBe({})
       expect(req.body.removed).toEqual(
@@ -376,29 +380,29 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       const user = mongoose.Types.ObjectId()
 
       const req = {
-        params: { tweetId: mongoose.Types.ObjectId() },
+        params: { tweetId: mongoose.Types.ObjectId().toHexString() },
         user: { _id: user }
-      }
+      } as IRequestUser
       const next = () => {}
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        send(result) {
-          expect(typeof result.message).toBe('string')
+        send(result: { message: string }) {
+          expect(result.message).not.toBe('')
         }
-      }
+      } as Response
 
       await removeOne(Tweet)(req, res, next)
     })
   })
 
   describe('reTweet', () => {
-    let user
-    let tweet
-    let reply
+    let user: IUser
+    let tweet: ITweet
+    let reply: IReply
     beforeEach(async () => {
       user = await User.create({
         email: 'max2@aol.com',
@@ -425,25 +429,25 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(3)
 
       const req = {
-        user,
+        user: { _id: user._id },
         params: {},
         query: { replyId: reply._id }
-      }
+      } as IRequestUser // TODO: Define exact type
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
-          result.user.replies.forEach(reply => {
+        json(result: any) {
+          result.user.replies.forEach((reply: IUserReply) => {
             expect(reply.replyId.toString()).toEqual(
               req.query.replyId.toString()
             )
           })
           expect(result.user.replies).toHaveLength(1)
         }
-      }
+      } as Response
 
       await reTweet(Reply)(req, res)
     })
@@ -452,24 +456,24 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(3)
 
       const req = {
-        user,
+        user: { _id: user._id },
         params: { tweetId: tweet._id }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
-          result.user.tweets.forEach(tweet => {
+        json(result: any) {
+          result.user.tweets.forEach((tweet: IUserTweet) => {
             expect(tweet.tweetId.toString()).toEqual(
               req.params.tweetId.toString()
             )
           })
           expect(result.user.tweets).toHaveLength(1)
         }
-      }
+      } as Response
 
       await reTweet(Tweet)(req, res)
     })
@@ -478,20 +482,20 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(3)
 
       const req = {
-        user,
+        user: { _id: user._id },
         params: { tweetId: tweet._id }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
+        json(result: { user: IUser, doc: ITweet|IReply }) {
           expect(result.user.tweets).toHaveLength(1)
           expect(result.doc.retweetCount).toBe(1)
         }
-      }
+      } as Response
 
       await reTweet(Tweet)(req, res)
     })
@@ -500,22 +504,22 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
+        user: { _id: user._id },
         params: { tweetId: tweet._id }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
+        json(result: any) {
           const doc = result.user.tweets.find(
-            t => t.tweetId.toString() === req.params.tweetId.toString()
+            (t: IUserTweet) => t.tweetId.toString() === req.params.tweetId.toString()
           )
           expect(doc.retweet).toBe(true)
         }
-      }
+      } as Response
 
       await reTweet(Tweet)(req, res)
     })
@@ -524,28 +528,28 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
-        params: { tweetId: mongoose.Types.ObjectId() }
-      }
+        user: { _id: user._id },
+        params: { tweetId: mongoose.Types.ObjectId().toHexString() }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        send(result) {
-          expect(typeof result.message).toBe('string')
+        send(result: { message: string }) {
+          expect(result.message).not.toBe('')
         }
-      }
+      } as Response
 
       await reTweet(Tweet)(req, res)
     })
   })
 
   describe('undoRetweet', () => {
-    let user
-    let tweet
-    let reply
+    let user: IUser
+    let tweet: ITweet
+    let reply: IReply
     beforeEach(async () => {
       user = await User.create({
         email: 'max2@aol.com',
@@ -581,19 +585,19 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
+        user: { _id: user._id },
         params: { tweetId: tweet._id }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
+        json(result: { user: IUser }) {
           expect(result.user.tweets).toHaveLength(0)
         }
-      }
+      } as Response
 
       await undoRetweet(Tweet)(req, res)
     })
@@ -602,20 +606,20 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
+        user: { _id: user._id },
         params: {},
         query: { replyId: reply._id }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
+        json(result: { user: IUser }) {
           expect(result.user.replies).toHaveLength(0)
         }
-      }
+      } as Response
 
       await undoRetweet(Reply)(req, res)
     })
@@ -624,19 +628,19 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
+        user: { _id: user._id },
         params: { tweetId: tweet._id }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
+        json(result: { doc: ITweet|IReply }) {
           expect(result.doc.retweetCount).toBe(0)
         }
-      }
+      } as Response
 
       await undoRetweet(Tweet)(req, res)
     })
@@ -645,19 +649,19 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
-        params: { tweetId: mongoose.Types.ObjectId() }
-      }
+        user: { _id: user._id },
+        params: { tweetId: mongoose.Types.ObjectId().toHexString() }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        send(result) {
-          expect(typeof result.message).toBe('string')
+        send(result: { message: string }) {
+          expect(result.message).not.toBe('')
         }
-      }
+      } as Response
 
       await undoRetweet(Tweet)(req, res)
     })
