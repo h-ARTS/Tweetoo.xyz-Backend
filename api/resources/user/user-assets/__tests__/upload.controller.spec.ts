@@ -1,10 +1,12 @@
 import { assignImagePath } from '../upload.controller'
-import { User } from '../../user.model'
-import fs from 'fs'
+import { User, IUser } from '../../user.model'
+import * as fs from 'fs'
+import { IRequestUser } from '../../../../utils/auth'
+import { Response } from 'express'
 
 describe('uploads:', () => {
   describe('assignImagePath', () => {
-    let user
+    let user: IUser
     beforeEach(async () => {
       user = await User.create({
         email: 'max@mustard.com',
@@ -17,7 +19,7 @@ describe('uploads:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
+        user: { _id: user._id },
         file: {
           fieldname: 'profileImage',
           originalname: 'example.png',
@@ -31,17 +33,17 @@ describe('uploads:', () => {
         body: {
           dimension: 'coverImage'
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
+        json(result: { data: IUser }) {
           expect(result.data.hasOwnProperty(req.body.dimension)).toBe(true)
         }
-      }
+      } as Response
 
       await assignImagePath(req, res)
     })
@@ -50,7 +52,7 @@ describe('uploads:', () => {
       expect.assertions(3)
 
       const req = {
-        user,
+        user: { _id: user._id },
         file: {
           fieldname: 'image',
           originalname: 'example.png',
@@ -62,7 +64,7 @@ describe('uploads:', () => {
           size: 17291
         },
         body: { dimension: '' }
-      }
+      } as IRequestUser
 
       fs.copyFileSync(
         `media/user/maxmustard/_${req.file.filename}`,
@@ -70,14 +72,14 @@ describe('uploads:', () => {
       )
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(500)
           return this
         },
-        send(result) {
+        send(result: { message: string }) {
           expect(result.message).toEqual('Dimension not provided!')
         }
-      }
+      } as Response
 
       await assignImagePath(req, res)
 
