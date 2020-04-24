@@ -1,8 +1,9 @@
+import { ObjectId } from 'mongodb'
 import { Schema, SchemaTypes, model, Document } from 'mongoose'
 
 export interface ILike extends Document {
-  docId: Schema.Types.ObjectId,
-  createdBy: Schema.Types.ObjectId,
+  docId: ObjectId,
+  createdBy: ObjectId,
   handle: string
 }
 

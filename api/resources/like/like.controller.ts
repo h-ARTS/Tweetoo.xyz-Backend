@@ -1,10 +1,10 @@
-import { Types, Model } from 'mongoose'
+import { Response } from 'express'
+import { Model } from 'mongoose'
 import { IRequestUser } from '../../utils/auth'
 import { notify } from '../../utils/notificationEmitter'
 import { Like } from './like.model'
 import { ITweet } from '../tweet/tweet.model'
 import { IReply } from '../reply/reply.model'
-import { Response } from 'express'
 
 export const likeDoc = (model: Model<ITweet|IReply>) => 
   async (req: IRequestUser, res: Response): Promise<Response<any>|void> => {
@@ -33,7 +33,7 @@ export const likeDoc = (model: Model<ITweet|IReply>) =>
     }
 
     const like = await Like.create({
-      docId: Types.ObjectId(docId),
+      docId: docId,
       createdBy: req.user._id,
       handle: req.user.handle
     })
