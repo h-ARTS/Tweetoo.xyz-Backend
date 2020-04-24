@@ -2,8 +2,10 @@ import controllers, {
   appendReplyToTweet,
   removeReplyFromTweet
 } from '../tweet.controllers'
-import mongoose from 'mongoose'
-import { Tweet } from '../tweet.model'
+import * as mongoose from 'mongoose'
+import { Tweet, ITweet } from '../tweet.model'
+import { Request, Response } from 'express'
+import { ObjectId } from 'mongodb'
 
 describe('tweet controllers:', () => {
   test('has crud and like/unlike controllers', () => {
@@ -17,12 +19,12 @@ describe('tweet controllers:', () => {
       'unlikeDoc'
     ]
 
-    crudMethods.forEach(method => {
+    crudMethods.forEach((method: string) => {
       expect(typeof controllers[method]).toBe('function')
     })
   })
 
-  let tweet
+  let tweet: ITweet
   beforeEach(async () => {
     tweet = await Tweet.create({
       createdBy: mongoose.Types.ObjectId(),
@@ -41,12 +43,12 @@ describe('tweet controllers:', () => {
             tweetId: tweet._id
           }
         }
-      }
+      } as Request
       const next = () => {}
 
-      await appendReplyToTweet(req, {}, next)
+      await appendReplyToTweet(req, {} as Response, next)
 
-      req.body.tweet.replies.forEach(replyId => {
+      req.body.tweet.replies.forEach((replyId: ObjectId) => {
         expect(replyId.toString()).toEqual(req.body.doc._id.toString())
       })
     })
@@ -62,10 +64,10 @@ describe('tweet controllers:', () => {
         body: {
           removed: { _id: replyId, tweetId: tweet._id }
         }
-      }
+      } as Request
       const next = () => {}
 
-      await removeReplyFromTweet(req, {}, next)
+      await removeReplyFromTweet(req, {} as Response, next)
 
       const expectedTweet = await Tweet.findById(tweet._id)
       expect(expectedTweet.replies).toHaveLength(0)
