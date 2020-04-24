@@ -8,5 +8,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
   },
-  "include": ["./api/**/*", "./config/*"]
+  "include": ["./api/**/*", "./config/*"],
+  "exclude": ["node_modules"]
 }
