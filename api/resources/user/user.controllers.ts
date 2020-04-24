@@ -214,6 +214,7 @@ export const controllers = {
   myProfile: myProfile,
   updateProfile: updateProfile,
   getUser: getUser,
+  getUsers: getUsers,
   followHandler: followHandler,
   appendToUser: appendToUser,
   removeFromUser: removeFromUser,

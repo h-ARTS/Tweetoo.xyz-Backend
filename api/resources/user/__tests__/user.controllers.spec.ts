@@ -7,8 +7,12 @@ import {
   removeFromUser,
   deleteProfile
 } from '../user.controllers'
-import { User } from '../user.model'
-import mongoose from 'mongoose'
+import { User, IUser } from '../user.model'
+import * as mongoose from 'mongoose'
+import { IRequestUser } from '../../../utils/auth'
+import { Response } from 'express'
+import { ITweet } from '../../tweet/tweet.model'
+import { IUserReply, IReply } from '../../reply/reply.model'
 
 describe('user-controllers:', () => {
   test('has functions to display user profile and to update.', () => {
@@ -19,10 +23,11 @@ describe('user-controllers:', () => {
       'getUser',
       'followHandler',
       'appendToUser',
-      'removeFromUser'
+      'removeFromUser',
+      'deleteProfile'
     ]
 
-    methods.forEach(method => {
+    methods.forEach((method: string) => {
       expect(typeof controllers[method]).toBe('function')
     })
   })
@@ -39,19 +44,20 @@ describe('user-controllers:', () => {
       })
 
       const req = {
-        user
-      }
+        user: { _id: user._id }
+      } as IRequestUser
+
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
-          expect(result.data._id.toString()).toEqual(user._id.toString())
+        json(result: IUser) {
+          expect(result._id.toString()).toEqual(user._id.toString())
         }
-      }
+      } as Response
 
-      await myProfile(req, res)
+      myProfile(req, res)
     })
   })
 
@@ -71,17 +77,17 @@ describe('user-controllers:', () => {
       const req = {
         user: { _id: user._id },
         body: update
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: { bio: string }) {
           expect(result.bio).toBe(update.bio)
         }
-      }
+      } as Response
 
       await updateProfile(req, res)
     })
@@ -90,26 +96,29 @@ describe('user-controllers:', () => {
       expect.assertions(4)
 
       const update = { location: 'Seattle, WA' }
-      const req = { user: { _id: mongoose.Types.ObjectId() }, body: update }
+      const req = { 
+        user: { _id: mongoose.Types.ObjectId().toHexString() }, 
+        body: update 
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        send(result) {
+        send(result: { message: string }) {
           expect(result).not.toBeFalsy()
           expect(result.hasOwnProperty('message')).toBe(true)
           expect(result.message).toBe('User not found.')
         }
-      }
+      } as Response
 
       await updateProfile(req, res)
     })
   })
 
   describe('deleteProfile', () => {
-    let user
+    let user: IUser
 
     beforeEach(async () => {
       user = await User.create({
@@ -123,43 +132,49 @@ describe('user-controllers:', () => {
     test('removes the user from the database.', async () => {
       expect.assertions(3)
 
-      const req = { user }
+      const req = { user: { _id: user._id } } as IRequestUser
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: { removed: IUser }) {
           expect(result.removed).not.toBeFalsy()
           expect(result.removed._id.toString()).toBe(req.user._id.toString())
         }
-      }
+      } as Response
+
       await deleteProfile(req, res)
     })
 
     test('returns 404 if no user found.', async () => {
       expect.assertions(4)
 
-      const req = { user: { _id: mongoose.Types.ObjectId() } }
+      const req = { 
+        user: { 
+          _id: mongoose.Types.ObjectId().toHexString() 
+        } 
+      } as IRequestUser
+
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(404)
           return this
         },
-        send(result) {
+        send(result: { message: string }) {
           expect(result).not.toEqual({})
           expect(result.hasOwnProperty('message')).toBe(true)
           expect(result.message).toBe('User not found.')
         }
-      }
+      } as Response
 
       await deleteProfile(req, res)
     })
   })
 
   describe('followHandler', () => {
-    let userToFollow
-    let loggedInUser
+    let userToFollow: IUser
+    let loggedInUser: IUser
     beforeEach(async () => {
       userToFollow = await User.create({
         email: 'mike@gmail.com',
@@ -180,23 +195,23 @@ describe('user-controllers:', () => {
 
       const req = {
         params: { handle: userToFollow.handle },
-        user: loggedInUser,
+        user: { _id: loggedInUser._id, handle: loggedInUser.handle },
         query: { follow: 'true' }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: { target: IUser, updated: IUser }) {
           expect(result.target.followers).not.toHaveLength(0)
           const follower = result.target.followers.find(f => {
             return f.handle.toString() === loggedInUser.handle.toString()
           })
           expect(follower).toBeTruthy()
         }
-      }
+      } as Response
 
       await followHandler(req, res)
     })
@@ -206,23 +221,23 @@ describe('user-controllers:', () => {
 
       const req = {
         params: { handle: userToFollow.handle },
-        user: loggedInUser,
+        user: { _id: loggedInUser._id, handle: loggedInUser.handle },
         query: { follow: 'true' }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: { target: IUser, updated: IUser }) {
           expect(result.updated.following).not.toHaveLength(0)
           const following = result.updated.following.find(f => {
             return f.handle.toString() === userToFollow.handle.toString()
           })
           expect(following).toBeTruthy()
         }
-      }
+      } as Response
 
       await followHandler(req, res)
     })
@@ -254,16 +269,16 @@ describe('user-controllers:', () => {
 
       const req = {
         params: { handle: userToUnfollow.handle },
-        user,
+        user: { _id: user._id, handle: user.handle },
         query: { follow: 'false' }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: { target: IUser, updated: IUser }) {
           expect(result.target.followers).toEqual(
             expect.not.arrayContaining([{ _id: objId2, handle: user.handle }])
           )
@@ -275,14 +290,14 @@ describe('user-controllers:', () => {
           )
           expect(result.updated.following).not.toEqual([])
         }
-      }
+      } as Response
 
       await followHandler(req, res)
     })
   })
 
   describe('appendToUser', () => {
-    let user
+    let user: IUser
 
     beforeEach(async () => {
       user = await User.create({
@@ -297,25 +312,25 @@ describe('user-controllers:', () => {
       expect.assertions(2)
 
       const req = {
-        user,
+        user: { _id: user._id },
         body: {
           doc: { _id: mongoose.Types.ObjectId() }
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
-          result.user.tweets.forEach(tweet => {
+        json(result: { user: IUser }) {
+          result.user.tweets.forEach((tweet: ITweet) => {
             expect(tweet.tweetId.toString()).toEqual(
               req.body.doc._id.toString()
             )
           })
         }
-      }
+      } as Response
 
       await appendToUser(req, res)
     })
@@ -325,33 +340,33 @@ describe('user-controllers:', () => {
 
       const tweetId = mongoose.Types.ObjectId()
       const req = {
-        user,
+        user: { _id: user._id },
         body: {
           doc: { _id: mongoose.Types.ObjectId(), tweetId },
           tweet: { _id: tweetId }
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(201)
           return this
         },
-        json(result) {
-          result.user.replies.forEach(reply => {
+        json(result: { user: IUser }) {
+          result.user.replies.forEach((reply: IUserReply) => {
             expect(reply.replyId.toString()).toEqual(
               req.body.doc._id.toString()
             )
           })
         }
-      }
+      } as Response
 
       await appendToUser(req, res)
     })
   })
 
   describe('removeFromUser', () => {
-    let user
+    let user: IUser
     const tweetId = mongoose.Types.ObjectId()
     const replyId = mongoose.Types.ObjectId()
     beforeEach(async () => {
@@ -361,8 +376,8 @@ describe('user-controllers:', () => {
         fullName: 'Max Ol',
         handle: '@max_o'
       })
-      await user.replies.push({ replyId, tweetId })
-      await user.tweets.push({ tweetId })
+      user.replies.push({ replyId, tweetId })
+      user.tweets.push({ tweetId })
       await user.save()
     })
 
@@ -370,27 +385,27 @@ describe('user-controllers:', () => {
       expect.assertions(3)
 
       const req = {
-        user,
+        user: { _id: user._id },
         body: {
           removed: {
             _id: replyId,
             tweetId
           }
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: { removed: IReply, user: IUser }) {
           expect(result.removed._id.toString()).toEqual(
             req.body.removed._id.toString()
           )
           expect(result.user.replies).toHaveLength(0)
         }
-      }
+      } as Response
 
       await removeFromUser(req, res)
     })
@@ -399,21 +414,21 @@ describe('user-controllers:', () => {
       expect.assertions(4)
 
       const req = {
-        user,
+        user: { _id: user._id },
         body: {
           removed: {
             _id: tweetId,
             replies: []
           }
         }
-      }
+      } as IRequestUser
 
       const res = {
-        status(code) {
+        status(code: number) {
           expect(code).toBe(200)
           return this
         },
-        json(result) {
+        json(result: { removed: ITweet, user: IUser }) {
           expect(result.removed._id.toString()).toEqual(
             req.body.removed._id.toString()
           )
@@ -422,10 +437,10 @@ describe('user-controllers:', () => {
             r => r.tweetId.toString() === req.body.removed._id.toString()
           )
           expect(result.user.replies).toEqual(
-            expect.not.objectContaining(...replyDocs)
+            expect.not.objectContaining(replyDocs)
           )
         }
-      }
+      } as Response
 
       await removeFromUser(req, res)
     })
