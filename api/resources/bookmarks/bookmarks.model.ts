@@ -10,7 +10,8 @@ export const BookmarksSchema = new Schema(
   {
     userId: {
       type: SchemaTypes.ObjectId,
-      required: true
+      required: true,
+      ref: 'user'
     },
     tweet: tweetSchema
   },

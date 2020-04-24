@@ -9,7 +9,7 @@ describe('Bookmarks router:', () => {
 
     routes.forEach(route => {
       const match = router.stack.find(r => {
-        return r.route.path === route.path && r.route.method[route.method]
+        return r.route.path === route.path && r.route.methods[route.method]
       })
       expect(match).toBeTruthy()
     })
