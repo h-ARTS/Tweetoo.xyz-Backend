@@ -10,8 +10,16 @@ export type RejectType = (reason?: any) => void
 
 export interface IRequestUser extends Request {
   user: Omit<IUser, 'password'>,
+  params: {
+    tweetId?: string,
+    filename?: string,
+    handle?: string
+  },
   query: {
-    [x: string]: any
+    tweetId?: string
+    replyId?: string,
+    handles?: string,
+    follow?: string
   }
 }
 
