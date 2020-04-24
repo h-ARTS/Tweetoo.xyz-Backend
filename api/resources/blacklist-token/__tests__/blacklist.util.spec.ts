@@ -4,7 +4,7 @@ import { checkBlacklisted } from '../blacklist.util'
 import { newToken } from '../../../utils/auth'
 import { Blacklist } from '../blacklist.model'
 
-describe('Blacklist utility functions', () => {
+describe('Blacklist-utility:', () => {
   describe('checkBlacklisted: ', () => {
     test('it returns false if no blacklisted token found.', async () => {
       expect.assertions(2)

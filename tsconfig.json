@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
+    "outDir": "./dist",
     "moduleResolution": "node",
     "module": "commonjs",
     "allowJs": true,
