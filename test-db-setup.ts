@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import * as mongoose from 'mongoose'
 mongoose.set('useFindAndModify', false)
 mongoose.set('useUnifiedTopology', true)
 mongoose.set('useCreateIndex', true)

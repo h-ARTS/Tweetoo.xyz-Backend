@@ -87,19 +87,20 @@
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
     "supertest": "^4.0.2",
-    "ts-jest": "^25.4.0"
+    "ts-jest": "^25.4.0",
+    "typescript": "^3.8.3"
   },
   "jest": {
+    "preset": "ts-jest",
     "verbose": true,
     "testURL": "http://localhost/",
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
-      "./test-db-setup.js"
+      "./test-db-setup.ts"
     ],
     "testPathIgnorePatterns": [
-      "dist/"
+      "dist/", "build/"
     ],
-    "restoreMocks": true,
-    "preset": "ts-jest"
+    "restoreMocks": true
   }
 }
