@@ -69,7 +69,7 @@ describe('Notification-controllers:', () => {
       body: { read: true },
       user: { handle: user.handle }
     } as IRequestUser
-    
+
     const res = {
       status(code: number) {
         expect(code).toBe(200)
