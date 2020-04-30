@@ -11,8 +11,11 @@ describe('Bookmark model:', () => {
       ref: 'user'
     })
   })
-  test('has tweet', () => {
-    const tweet = Bookmarks.schema.obj.tweet
-    expect(tweet).toEqual(tweetSchema)
+  test('has tweetId', () => {
+    const tweetId = Bookmarks.schema.obj.tweetId
+    expect(tweetId).toEqual({
+      type: String,
+      required: true
+    })
   })
 })

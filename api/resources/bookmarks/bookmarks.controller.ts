@@ -15,10 +15,10 @@ export const getBookmarks = async (req: IRequestUser, res: Response):
 
 export const createBookmark = async (req: IRequestUser, res: Response):
   Promise<Response<any>|void> => {
-  const { tweet, tweetId } = req.body
+  const { tweetId } = req.body
   try {
     const bookmark = await Bookmarks.create({
-      tweet: { ...tweet, tweetId },
+      tweetId,
       userId: req.user._id
     })
 

@@ -3,7 +3,7 @@ import { replySchema as tweetSchema, IReply } from '../reply/reply.model'
 
 export interface IBookmark extends Document {
   userId: Schema.Types.ObjectId,
-  tweet: IReply
+  tweetId: string
 }
 
 export const BookmarksSchema = new Schema(
@@ -13,7 +13,10 @@ export const BookmarksSchema = new Schema(
       required: true,
       ref: 'user'
     },
-    tweet: tweetSchema
+    tweetId: {
+      type: String,
+      required: true
+    }
   },
   {
     timestamps: true

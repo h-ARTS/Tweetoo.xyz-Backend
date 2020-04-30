@@ -16,16 +16,7 @@ describe('Bookmarks-controller:', () => {
     })
     await Bookmarks.create({
       userId: user._id,
-      tweet: {
-        tweetId: mongoose.Types.ObjectId(),
-        fullText: 'Bla bla',
-        fullName: 'Pakster',
-        handle: 'paki',
-        createdBy: mongoose.Types.ObjectId(),
-        likeCount: 1,
-        retweetCount: 0,
-        userImageUrl: 'media/standard/no_cover.jpg'
-      }
+      tweetId: mongoose.Types.ObjectId()
     })
   })
   test('getBookmarks', async () => {
@@ -53,15 +44,6 @@ describe('Bookmarks-controller:', () => {
     const req = {
       user: { _id: user._id },
       body: {
-        tweet: {
-          handle: 'julian',
-          fullText: 'Bla bla',
-          fullName: 'Julian Manfred',
-          likeCount: 1,
-          retweetCount: 0,
-          createdBy: mongoose.Types.ObjectId(),
-          userImageUrl: 'media/standard/no_cover.jpg'
-        },
         tweetId
       }
     } as IRequestUser
@@ -72,7 +54,7 @@ describe('Bookmarks-controller:', () => {
       },
       json(result: IBookmark) {
         expect(result.userId).toEqual(user._id)
-        expect(result.tweet.tweetId).toEqual(tweetId)
+        expect(result.tweetId).toEqual(tweetId)
       }
     } as Response
 
