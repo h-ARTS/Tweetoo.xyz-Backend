@@ -2,7 +2,7 @@
   "name": "tweetoo.xyz",
   "version": "1.0.0",
   "description": "A Twitter Clone",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "build": "tsc --w",
     "dev": "nodemon --exec yarn restart",
@@ -12,12 +12,12 @@
     "test-user:controllers": "jest -t user-controllers --watch --runInBand --detectOpenHandles",
     "test-model": "jest -t model: --runInBand",
     "test-auth": "jest -t Authentication: --runInBand --detectOpenHandles",
-    "test-crud": "jest /api/utils/__tests__/crud.spec.js --runInBand --detectOpenHandles",
+    "test-crud": "jest /api/utils/__tests__/crud.spec.ts --runInBand --detectOpenHandles",
     "test-blacklist-utils": "jest -t Blacklist-utility --runInBand --detectOpenHandles",
     "test-assets": "jest -t assets-controller: --detectOpenHandles",
     "test-notification": "jest -t emitter --runInBand --detectOpenHandles",
     "restart": "rimraf dist && yarn build && yarn start",
-    "start": "tsc && ts-node build/api/index.js",
+    "start": "tsc && ts-node dist/api/index.js",
     "test": "ts-jest"
   },
   "repository": {
@@ -68,6 +68,7 @@
     "@types/morgan": "^1.9.0",
     "@types/multer": "^1.4.3",
     "@types/node": "^13.13.1",
+    "@types/supertest": "^2.0.8",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^8.2.1",
     "babel-jest": "^23.4.2",
@@ -99,7 +100,8 @@
       "./test-db-setup.ts"
     ],
     "testPathIgnorePatterns": [
-      "dist/", "build/"
+      "dist/",
+      "build/"
     ],
     "restoreMocks": true
   }
