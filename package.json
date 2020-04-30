@@ -2,9 +2,9 @@
   "name": "tweetoo.xyz",
   "version": "1.0.0",
   "description": "A Twitter Clone",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "build": "babel api --out-dir dist",
+    "build": "tsc --w",
     "dev": "nodemon --exec yarn restart",
     "test-upload": "jest -t uploads: --runInBand --detectOpenHandles",
     "test-router": "jest -t router: --runInBand --detectOpenHandles",
@@ -12,13 +12,13 @@
     "test-user:controllers": "jest -t user-controllers --watch --runInBand --detectOpenHandles",
     "test-model": "jest -t model: --runInBand",
     "test-auth": "jest -t Authentication: --runInBand --detectOpenHandles",
-    "test-crud": "jest /api/utils/__tests__/crud.spec.js --runInBand --detectOpenHandles",
-    "test-blacklist-utils": "jest /api/resources/blacklist-token/__tests__/blacklist.util.spec.js --runInBand --detectOpenHandles",
+    "test-crud": "jest /api/utils/__tests__/crud.spec.ts --runInBand --detectOpenHandles",
+    "test-blacklist-utils": "jest -t Blacklist-utility --runInBand --detectOpenHandles",
     "test-assets": "jest -t assets-controller: --detectOpenHandles",
     "test-notification": "jest -t emitter --runInBand --detectOpenHandles",
     "restart": "rimraf dist && yarn build && yarn start",
-    "start": "node --inspect dist/index.js",
-    "test": "jest"
+    "start": "tsc && ts-node dist/api/index.js",
+    "test": "ts-jest"
   },
   "repository": {
     "type": "git",
@@ -56,6 +56,19 @@
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
+    "@babel/preset-typescript": "^7.9.0",
+    "@types/bcrypt": "^3.0.0",
+    "@types/body-parser": "^1.19.0",
+    "@types/cors": "^2.8.6",
+    "@types/express": "^4.17.6",
+    "@types/jest": "^25.2.1",
+    "@types/jsonwebtoken": "^8.3.9",
+    "@types/mongodb": "^3.5.8",
+    "@types/mongoose": "^5.7.12",
+    "@types/morgan": "^1.9.0",
+    "@types/multer": "^1.4.3",
+    "@types/node": "^13.13.1",
+    "@types/supertest": "^2.0.8",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^8.2.1",
     "babel-jest": "^23.4.2",
@@ -74,17 +87,21 @@
     "nodemon": "^2.0.1",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "ts-jest": "^25.4.0",
+    "typescript": "^3.8.3"
   },
   "jest": {
+    "preset": "ts-jest",
     "verbose": true,
     "testURL": "http://localhost/",
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
-      "./test-db-setup.js"
+      "./test-db-setup.ts"
     ],
     "testPathIgnorePatterns": [
-      "dist/"
+      "dist/",
+      "build/"
     ],
     "restoreMocks": true
   }

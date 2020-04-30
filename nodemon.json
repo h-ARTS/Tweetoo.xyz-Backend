@@ -9,15 +9,15 @@
   "execMap": {
     "js": "node"
   },
-
   "runOnChangeOnly": false,
   "watch": [
-    "src/**/*.js",
-    "src/**/*.graphql",
-    "src/**/*.gql"
+    "api/**/*.ts",
+    "api/**/*.graphql",
+    "api/**/*.gql"
   ],
   "env": {
     "NODE_ENV": "development"
   },
-  "ext": "js,json,graphql"
+  "ext": "ts,json,graphql",
+  "exec": "ts-node api/index.ts"
 }
