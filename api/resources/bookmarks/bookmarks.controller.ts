@@ -2,8 +2,10 @@ import { Response } from 'express'
 import { IRequestUser } from '../../utils/auth'
 import { Bookmarks } from './bookmarks.model'
 
-export const getBookmarks = async (req: IRequestUser, res: Response):
-  Promise<Response<any>|void> => {
+export const getBookmarks = async (
+  req: IRequestUser,
+  res: Response
+): Promise<Response<any> | void> => {
   try {
     const bookmarks = await Bookmarks.find({ userId: req.user._id })
 
@@ -13,8 +15,10 @@ export const getBookmarks = async (req: IRequestUser, res: Response):
   }
 }
 
-export const createBookmark = async (req: IRequestUser, res: Response):
-  Promise<Response<any>|void> => {
+export const createBookmark = async (
+  req: IRequestUser,
+  res: Response
+): Promise<Response<any> | void> => {
   const { tweetId } = req.body
   try {
     const bookmark = await Bookmarks.create({
@@ -23,9 +27,27 @@ export const createBookmark = async (req: IRequestUser, res: Response):
     })
 
     res.status(201).json(bookmark)
-  } catch (e) {
-    res.status(400).end(e)
+  } catch (error) {
+    console.error(error)
+    res.status(400).end()
   }
 }
 
-export default { getBookmarks, createBookmark }
+export const removeBookmark = async (
+  req: IRequestUser,
+  res: Response
+): Promise<Response<any> | void> => {
+  const { tweetId } = req.body
+  try {
+    const bookmark = await Bookmarks.findOneAndRemove({ tweetId })
+      .lean()
+      .exec()
+
+    res.status(200).json(bookmark)
+  } catch (error) {
+    console.error(error)
+    res.status(400).end()
+  }
+}
+
+export default { getBookmarks, createBookmark, removeBookmark }

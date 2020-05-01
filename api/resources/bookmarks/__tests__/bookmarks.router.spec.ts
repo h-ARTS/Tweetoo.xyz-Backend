@@ -4,7 +4,8 @@ describe('Bookmarks router:', () => {
   test('has get and post router', () => {
     const routes = [
       { path: '/', method: 'get' },
-      { path: '/', method: 'post' }
+      { path: '/', method: 'post' },
+      { path: '/', method: 'delete' }
     ]
 
     routes.forEach(route => {

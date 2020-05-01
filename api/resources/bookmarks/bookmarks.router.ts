@@ -7,5 +7,6 @@ router
   .route('/')
   .get(controller.getBookmarks)
   .post(controller.createBookmark)
+  .delete(controller.removeBookmark)
 
 export default router
