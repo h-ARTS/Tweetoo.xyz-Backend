@@ -6,8 +6,10 @@ import { Like } from './like.model'
 import { ITweet } from '../tweet/tweet.model'
 import { IReply } from '../reply/reply.model'
 
-export const likeDoc = (model: Model<ITweet|IReply>) => 
-  async (req: IRequestUser, res: Response): Promise<Response<any>|void> => {
+export const likeDoc = (model: Model<ITweet | IReply>) => async (
+  req: IRequestUser,
+  res: Response
+): Promise<Response<any> | void> => {
   const docId = req.query.replyId || req.params.tweetId
 
   try {
@@ -45,8 +47,10 @@ export const likeDoc = (model: Model<ITweet|IReply>) =>
   }
 }
 
-export const unlikeDoc = (model: Model<ITweet|IReply>) => 
-  async (req: IRequestUser, res: Response): Promise<Response<any>|void> => {
+export const unlikeDoc = (model: Model<ITweet | IReply>) => async (
+  req: IRequestUser,
+  res: Response
+): Promise<Response<any> | void> => {
   const docId = req.query.replyId || req.params.tweetId
 
   try {
