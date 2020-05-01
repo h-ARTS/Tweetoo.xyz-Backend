@@ -76,8 +76,8 @@ describe('Bookmarks-controller:', () => {
 
       const req = {
         user: { _id: user._id },
-        body: {
-          tweetId
+        query: {
+          tweetId: tweetId.toHexString()
         }
       } as IRequestUser
 

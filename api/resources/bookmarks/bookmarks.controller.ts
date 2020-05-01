@@ -37,7 +37,7 @@ export const removeBookmark = async (
   req: IRequestUser,
   res: Response
 ): Promise<Response<any> | void> => {
-  const { tweetId } = req.body
+  const { tweetId } = req.query
   try {
     const bookmark = await Bookmarks.findOneAndRemove({ tweetId })
       .lean()
