@@ -25,7 +25,6 @@ export const getEntries = async (
     if (!userEntries && !tweetEntries)
       return res.status(404).send('No entries found.')
 
-    console.log(tweetEntries, userEntries)
     res.status(200).json({ users: userEntries, tweets: tweetEntries })
   } catch (error) {
     console.error(error)
