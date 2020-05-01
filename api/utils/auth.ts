@@ -1,7 +1,10 @@
 import config from '../../config'
 import { User, IUser } from '../resources/user/user.model'
 import * as jwt from 'jsonwebtoken'
-import { Blacklist, IBlacklist } from '../resources/blacklist-token/blacklist.model'
+import {
+  Blacklist,
+  IBlacklist
+} from '../resources/blacklist-token/blacklist.model'
 import { checkBlacklisted } from '../resources/blacklist-token/blacklist.util'
 import { Request, Response, NextFunction } from 'express'
 
@@ -9,17 +12,18 @@ export type ResolveType<T> = (value?: T | PromiseLike<T>) => void
 export type RejectType = (reason?: any) => void
 
 export interface IRequestUser extends Request {
-  user: Omit<IUser, 'password'>,
+  user: Omit<IUser, 'password'>
   params: {
-    tweetId?: string,
-    filename?: string,
+    tweetId?: string
+    filename?: string
     handle?: string
-  },
+  }
   query: {
     tweetId?: string
-    replyId?: string,
-    handles?: string,
+    replyId?: string
+    handles?: string
     follow?: string
+    entry?: string
   }
 }
 
@@ -32,20 +36,25 @@ export const newToken = (user: Pick<IUser, 'id'>): string => {
 }
 
 export const verifyToken = (token: string): Promise<IUser> => {
-  return new Promise((resolve: ResolveType<IUser>, reject: RejectType): void => {
-    jwt.verify(
-      token,
-      config.secrets.publicKey,
-      { algorithms: ['RS256'] },
-      (err: Error|null, payload: IUser): void|IUser => {
-        if (err) return reject(err)
-        return resolve(payload)
-      }
-    )
-  })
+  return new Promise(
+    (resolve: ResolveType<IUser>, reject: RejectType): void => {
+      jwt.verify(
+        token,
+        config.secrets.publicKey,
+        { algorithms: ['RS256'] },
+        (err: Error | null, payload: IUser): void | IUser => {
+          if (err) return reject(err)
+          return resolve(payload)
+        }
+      )
+    }
+  )
 }
 
-export const signup = async (req: Request, res: Response): Promise<object|void> => {
+export const signup = async (
+  req: Request,
+  res: Response
+): Promise<object | void> => {
   if (
     !req.body.email ||
     !req.body.password ||
@@ -67,7 +76,10 @@ export const signup = async (req: Request, res: Response): Promise<object|void> 
   }
 }
 
-export const login = async (req: Request, res: Response): Promise<object|void> => {
+export const login = async (
+  req: Request,
+  res: Response
+): Promise<object | void> => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send({ message: 'Email and password required!' })
   }
@@ -97,7 +109,10 @@ export const login = async (req: Request, res: Response): Promise<object|void> =
   }
 }
 
-export const logout = async (req: IRequestUser, res: Response): Promise<void> => {
+export const logout = async (
+  req: IRequestUser,
+  res: Response
+): Promise<void> => {
   const token: string = req.headers.authorization.split('Bearer ')[1]
   // TODO: Define exact types
   const { exp, iat }: any = jwt.decode(token)
@@ -112,8 +127,11 @@ export const logout = async (req: IRequestUser, res: Response): Promise<void> =>
   }
 }
 
-export const authGuard = async (req: IRequestUser, res: Response, 
-  next?: NextFunction): Promise<object|void> => {
+export const authGuard = async (
+  req: IRequestUser,
+  res: Response,
+  next?: NextFunction
+): Promise<object | void> => {
   const bearer = req.headers.authorization
 
   if (!bearer || !bearer.startsWith('Bearer ')) {

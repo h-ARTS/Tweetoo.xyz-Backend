@@ -17,6 +17,7 @@ import userRouter from './resources/user/user.router'
 import mediaRouter from './resources/media/media.router'
 import notificationRouter from './resources/notification/notification.router'
 import bookmarksRouter from './resources/bookmarks/bookmarks.router'
+import searchRouter from './resources/search/search.router'
 
 export const app: express.Express = express()
 
@@ -42,6 +43,7 @@ app.use('/api/reply', replyRouter)
 app.use('/api/replies', getAll(Reply))
 app.use('/api/notifications', notificationRouter)
 app.use('/api/bookmarks', bookmarksRouter)
+app.use('/api/search', searchRouter)
 // Assets route
 app.use('/media', mediaRouter)
 
