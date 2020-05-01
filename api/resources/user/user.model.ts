@@ -84,11 +84,12 @@ const userSchema: Schema = new Schema(
   { timestamps: true }
 )
 
-userSchema.pre<IUser>('save', function(next: HookNextFunction): void {
+// tslint:disable-next-line: prettier
+userSchema.pre<IUser>('save', function (next: HookNextFunction): void {
   if (!this.isModified('password')) {
     return next()
   } else {
-    bcrypt.hash(this.password, 10, (err: Error|null, hash: string): void => {
+    bcrypt.hash(this.password, 10, (err: Error | null, hash: string): void => {
       if (err) {
         return next(err)
       }
@@ -99,17 +100,26 @@ userSchema.pre<IUser>('save', function(next: HookNextFunction): void {
   }
 })
 
-userSchema.methods.verifyPassword = function entered(password: string): Promise<boolean> {
+userSchema.methods.verifyPassword = function entered(
+  password: string
+): Promise<boolean> {
   const hashedPassword = this.password
-  return new Promise((resolve: ResolveType<boolean>, reject: RejectType): void => {
-    bcrypt.compare(password, hashedPassword, (err: Error|null, theyAreSame: boolean) => {
-      if (err) {
-        return reject(err)
-      }
+  return new Promise(
+    (resolve: ResolveType<boolean>, reject: RejectType): void => {
+      // tslint:disable-next-line: prettier
+      bcrypt.compare(password, hashedPassword,
+        (err: Error | null, theyAreSame: boolean) => {
+          if (err) {
+            return reject(err)
+          }
 
-      resolve(theyAreSame)
-    })
-  })
+          resolve(theyAreSame)
+        }
+      )
+    }
+  )
 }
+
+userSchema.index({ fullName: 'text', handle: 'text' })
 
 export const User = model<IUser>('user', userSchema)
