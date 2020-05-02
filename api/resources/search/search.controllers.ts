@@ -13,6 +13,7 @@ export const getEntries = async (
       { $text: { $search: entry } },
       { score: { $meta: 'textScore' } }
     )
+      .select('-password')
       .sort({ score: { $meta: 'textScore' } })
       .lean()
     const tweetEntries = await Tweet.find(
