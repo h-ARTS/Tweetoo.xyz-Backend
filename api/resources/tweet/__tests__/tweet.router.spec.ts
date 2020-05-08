@@ -4,7 +4,6 @@ describe('tweet router:', () => {
   test('has crud and like/unlike routes', () => {
     const routes = [
       { path: '/', method: 'get' },
-      { path: '/:tweetId', method: 'get' },
       { path: '/:tweetId', method: 'put' },
       { path: '/:tweetId', method: 'delete' },
       { path: '/:tweetId/like', method: 'put' },

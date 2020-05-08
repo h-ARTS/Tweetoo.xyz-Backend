@@ -1,28 +1,53 @@
+import { Request, Response, NextFunction } from 'express'
+import { Model } from 'mongoose'
+import { IRequestUser } from './auth'
 import { likeDoc, unlikeDoc } from '../resources/like/like.controller'
 import { User } from '../resources/user/user.model'
 import { notify } from './notificationEmitter'
 import { Like } from '../resources/like/like.model'
-import { Model } from 'mongoose'
 import { ITweet } from '../resources/tweet/tweet.model'
 import { IReply } from '../resources/reply/reply.model'
-import { Request, Response, NextFunction } from 'express'
-import { IRequestUser } from './auth'
 
-type ICrudType<RequestT> = (model: Model<ITweet|IReply>) 
+type ICrudType<RequestT> = (model: Model<ITweet | IReply>)
   => (req: RequestT, res: Response, next?: NextFunction)
-  => Promise<Response<any>|void> | NextFunction
+    => Promise<Response<any> | void> | NextFunction
 
 export const getAll: ICrudType<Request> = model => async (req, res) => {
   try {
     const docs = await model
       .find()
-      .limit(10)
       .lean()
       .exec()
 
     return res.status(200).json(docs)
   } catch (e) {
     console.error(e)
+    return res.status(404).end()
+  }
+}
+
+export const getPaginated: ICrudType<IRequestUser> = model => async (req, res) => {
+  let last_id: String
+  try {
+    last_id = req.query.tweetId
+    const docs = last_id !== ''
+      ? await model
+        .find({ '_id': { $lt: last_id } })
+        .sort('-createdAt')
+        .limit(10)
+        .lean()
+        .exec()
+      : await model
+        .find()
+        .sort('-createdAt')
+        .limit(10)
+        .lean()
+        .exec()
+
+    const lastId = docs[docs.length - 1]._id
+    return res.status(200).json({ docs, lastId })
+  } catch (error) {
+    console.error(error)
     return res.status(404).end()
   }
 }
@@ -59,14 +84,15 @@ export const getOne: ICrudType<Request> = model => async (req, res) => {
 }
 
 export const createOne: ICrudType<IRequestUser> = model => async (req, res, next) => {
+  const { _id, fullName, handle, userImage } = req.user
   const userBody = {
-    createdBy: req.user._id,
-    fullName: req.user.fullName,
-    handle: req.user.handle,
-    userImageUrl: req.user.userImage.url
+    createdBy: _id,
+    fullName: fullName,
+    handle: handle,
+    userImageUrl: userImage ? userImage.url : ''
   }
 
-  let doc: ITweet|IReply
+  let doc: ITweet | IReply
   const tweetId = req.query.tweetId
   try {
     if (tweetId) {
@@ -131,7 +157,7 @@ export const reTweet: ICrudType<IRequestUser> = model => async (req, res) => {
   const docId = req.params.tweetId || req.query.replyId
   try {
     const user = await User.findById(req.user._id).select('-password')
-    const doc: ITweet|IReply|null = await model
+    const doc: ITweet | IReply | null = await model
       .findByIdAndUpdate(
         docId,
         {
@@ -230,9 +256,10 @@ interface IControllers {
   [x: string]: any
 }
 
-export const controllers = (model: Model<ITweet|IReply>): IControllers => {
+export const controllers = (model: Model<ITweet | IReply>): IControllers => {
   return {
     getAll: getAll(model),
+    getPaginated: getPaginated(model),
     getSpecific: getSpecific(model),
     getOne: getOne(model),
     getAllLiked: getAllLiked(model),

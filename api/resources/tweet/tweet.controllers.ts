@@ -1,9 +1,9 @@
+import { Request, Response, NextFunction } from 'express'
+import { ChangeStream, ChangeEventDelete } from 'mongodb'
 import { controllers } from '../../utils/crud'
 import { Tweet, ITweet } from './tweet.model'
 import { Like } from '../like/like.model'
 import { Reply, IReply } from '../reply/reply.model'
-import { ChangeStream, ChangeEventDelete } from 'mongodb'
-import { Request, Response, NextFunction } from 'express'
 
 export interface IChangeEventDelete extends ChangeEventDelete {
   fullDocument: ITweet
@@ -30,7 +30,7 @@ watchTweets.on('change', async (result: IChangeEventDelete): Promise<void> => {
   }
 })
 
-export const appendReplyToTweet = async (req: Request, res: Response, 
+export const appendReplyToTweet = async (req: Request, res: Response,
   next: NextFunction): Promise<void> => {
   try {
     const tweet: ITweet = await Tweet.findById(req.body.doc.tweetId)
@@ -51,7 +51,7 @@ export const appendReplyToTweet = async (req: Request, res: Response,
   }
 }
 
-export const removeReplyFromTweet = async (req: Request, res: Response, 
+export const removeReplyFromTweet = async (req: Request, res: Response,
   next: NextFunction): Promise<void> => {
   const doc: IReply = req.body.removed
   try {

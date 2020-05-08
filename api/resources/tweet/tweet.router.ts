@@ -20,9 +20,12 @@ router.route('/liked').get(controllers.getAllLiked)
 // /api/tweet/:tweetId
 router
   .route('/:tweetId')
-  .get(controllers.getOne)
   .put(controllers.updateOne)
   .delete(controllers.removeOne, removeFromUser)
+
+router
+  .route('/next')
+  .get(controllers.getPaginated)
 
 // /api/tweet/:tweetId
 router.route('/:tweetId/like').put(controllers.likeDoc)
