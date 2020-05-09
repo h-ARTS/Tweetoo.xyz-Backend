@@ -8,7 +8,8 @@ import {
   reTweet,
   undoRetweet,
   getAllLiked,
-  getSpecific
+  getSpecific,
+  getPaginated
 } from '../crud'
 import { Tweet, ITweet, IUserTweet } from '../../resources/tweet/tweet.model'
 import { User, IUser } from '../../resources/user/user.model'
@@ -64,6 +65,133 @@ describe('CRUD controllers for Tweets and Replies:', () => {
       await getAll(Tweet)(req, res)
     })
   })
+
+  describe('getPaginated', () => {
+    const userId = mongoose.Types.ObjectId()
+    let tweet: ITweet
+    beforeEach(async () => {
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 1. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 2. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 3. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 4. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 5. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 6. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 7. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 8. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 9. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      tweet = await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 10. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+      await Tweet.create({
+        createdBy: userId,
+        fullText: `My tweet 11. Yaaay!`,
+        fullName: 'Test user',
+        handle: '@testuser'
+      })
+    })
+
+    test('should get 10 tweets and last tweet id even if no last tweetId specified.',
+      async () => {
+        expect.assertions(3)
+
+        const req = {
+          user: {
+            _id: userId
+          },
+          query: {
+            tweetId: ''
+          }
+        } as IRequestUser
+
+        const res = {
+          status(code: number) {
+            expect(code).toBe(200)
+            return this
+          },
+          json(result: { docs: ITweet[], lastId: string }) {
+            expect(result.docs).toHaveLength(10)
+            expect(result.lastId).toEqual(result.docs[result.docs.length - 1]._id)
+          }
+        } as Response
+
+        await getPaginated(Tweet)(req, res)
+      })
+
+    test('should get the next 10 tweets if last tweetId specified', async () => {
+      expect.assertions(3)
+
+      const req = {
+        user: {
+          _id: userId
+        },
+        query: {
+          tweetId: tweet._id
+        }
+      } as IRequestUser
+
+      const res = {
+        status(code: number) {
+          expect(code).toBe(200)
+          return this
+        },
+        json(result: { docs: ITweet[], lastId: string }) {
+          expect(result.docs).not.toBe([])
+          expect(result.lastId).toEqual(result.docs[result.docs.length - 1]._id)
+        }
+      } as Response
+
+      await getPaginated(Tweet)(req, res)
+    })
+  })
+
 
   describe('getSpecific', () => {
     const user = mongoose.Types.ObjectId()
@@ -255,7 +383,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         query: {},
         body
       } as IRequestUser
-      const next = () => {}
+      const next = () => { }
 
       await createOne(Tweet)(req, {} as Response, next)
 
@@ -272,7 +400,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         query: {},
         body
       } as IRequestUser
-      const next = () => {}
+      const next = () => { }
 
       await createOne(Tweet)(req, {} as Response, next)
 
@@ -361,7 +489,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         user: { _id: user },
         body: {}
       } as IRequestUser
-      const next = () => {}
+      const next = () => { }
 
       await removeOne(Tweet)(req, {} as Response, next)
 
@@ -383,7 +511,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
         params: { tweetId: mongoose.Types.ObjectId().toHexString() },
         user: { _id: user }
       } as IRequestUser
-      const next = () => {}
+      const next = () => { }
 
       const res = {
         status(code: number) {
@@ -491,7 +619,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
           expect(code).toBe(201)
           return this
         },
-        json(result: { user: IUser, doc: ITweet|IReply }) {
+        json(result: { user: IUser, doc: ITweet | IReply }) {
           expect(result.user.tweets).toHaveLength(1)
           expect(result.doc.retweetCount).toBe(1)
         }
@@ -637,7 +765,7 @@ describe('CRUD controllers for Tweets and Replies:', () => {
           expect(code).toBe(201)
           return this
         },
-        json(result: { doc: ITweet|IReply }) {
+        json(result: { doc: ITweet | IReply }) {
           expect(result.doc.retweetCount).toBe(0)
         }
       } as Response
