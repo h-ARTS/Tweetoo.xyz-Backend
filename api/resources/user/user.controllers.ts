@@ -41,10 +41,7 @@ export const getUser = async (req: Request, res: Response):
     const user = await User.findOne({ handle: req.params.handle }).select(
       '-password'
     )
-
-    if (!user) {
-      return res.status(404).end()
-    }
+    if (!user) return res.status(404).end()
 
     return res.status(200).json(user)
   } catch (e) {
@@ -76,10 +73,7 @@ export const updateProfile = async (req: IRequestUser, res: Response):
       .select('-password')
       .lean()
       .exec()
-
-    if (!updatedUser) {
-      return res.status(404).send({ message: 'User not found.' })
-    }
+    if (!updatedUser) return res.status(404).send({ message: 'User not found.' })
 
     return res.status(200).json(updatedUser)
   } catch (e) {
@@ -198,10 +192,7 @@ export const deleteProfile = async (req: IRequestUser, res: Response):
   Promise<Response<any> | void> => {
   try {
     const removedProfile = await User.findByIdAndRemove(req.user._id).exec()
-
-    if (!removedProfile) {
-      return res.status(404).send({ message: 'User not found.' })
-    }
+    if (!removedProfile) return res.status(404).send({ message: 'User not found.' })
 
     res.status(200).json({ removed: removedProfile })
   } catch (e) {
