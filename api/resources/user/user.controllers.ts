@@ -35,8 +35,8 @@ export const myProfile = (req: IRequestUser, res: Response): Response<any> => {
   return res.status(200).json(req.user)
 }
 
-export const getUser = async (req: Request, res: Response): 
-  Promise<Response<any>|void> => {
+export const getUser = async (req: Request, res: Response):
+  Promise<Response<any> | void> => {
   try {
     const user = await User.findOne({ handle: req.params.handle }).select(
       '-password'
@@ -53,7 +53,7 @@ export const getUser = async (req: Request, res: Response):
   }
 }
 
-export const getUsers = async (req: IRequestUser, res: Response): 
+export const getUsers = async (req: IRequestUser, res: Response):
   Promise<Response<any>> => {
   const arrHandles: string[] = req.query.handles.split(',')
   try {
@@ -67,8 +67,8 @@ export const getUsers = async (req: IRequestUser, res: Response):
   }
 }
 
-export const updateProfile = async (req: IRequestUser, res: Response): 
-  Promise<Response<any>|void> => {
+export const updateProfile = async (req: IRequestUser, res: Response):
+  Promise<Response<any> | void> => {
   try {
     const updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {
       new: true
@@ -88,23 +88,23 @@ export const updateProfile = async (req: IRequestUser, res: Response):
   }
 }
 
-export const followHandler = async (req: IRequestUser, res: Response): 
-  Promise<Response<any>|void> => {
+export const followHandler = async (req: IRequestUser, res: Response):
+  Promise<Response<any> | void> => {
   try {
     const targetUser = await User.findOne({ handle: req.params.handle }).select(
       '-password'
     )
-    if (!targetUser) {
-      return res.status(400).end()
-    }
+    if (!targetUser) return res.status(400).end()
+
+    const isAlreadyFollower =
+      targetUser.followers.find(user => user.handle == req.user.handle)
+    if (isAlreadyFollower) return res.status(400).end('Already follower')
 
     const me = await User.findById(req.user._id).select('-password')
-    if (!me) {
-      return res.status(400).end()
-    }
+    if (!me) return res.status(400).end()
 
-    const isFollowTrue = req.query.follow === 'true'
-    if (isFollowTrue) {
+    const isFollow = req.query.follow === 'true'
+    if (isFollow) {
       targetUser.followers.push({ handle: req.user.handle })
       me.following.push({ handle: targetUser.handle })
       notify.emit('follow', me, targetUser)
@@ -129,12 +129,12 @@ export const followHandler = async (req: IRequestUser, res: Response):
   }
 }
 
-export const appendToUser = async (req: IRequestUser, res: Response): 
-  Promise<Response<any>|void> => {
+export const appendToUser = async (req: IRequestUser, res: Response):
+  Promise<Response<any> | void> => {
   try {
     const user = await User.findById(req.user._id).select('-password')
 
-    let result: {reply?: IReply, tweet: ITweet, user: IUser}
+    let result: { reply?: IReply, tweet: ITweet, user: IUser }
     if (req.body.doc.tweetId) {
       user.replies.push({
         replyId: req.body.doc._id,
@@ -163,7 +163,7 @@ export const appendToUser = async (req: IRequestUser, res: Response):
 }
 
 export const removeFromUser = async (req: IRequestUser, res: Response):
-  Promise<Response<any>|void> => {
+  Promise<Response<any> | void> => {
   const doc = req.body.removed
   const itHasRepliesArray = doc.replies
   try {
@@ -195,7 +195,7 @@ export const removeFromUser = async (req: IRequestUser, res: Response):
 }
 
 export const deleteProfile = async (req: IRequestUser, res: Response):
-  Promise<Response<any>|void> => {
+  Promise<Response<any> | void> => {
   try {
     const removedProfile = await User.findByIdAndRemove(req.user._id).exec()
 
