@@ -29,14 +29,14 @@ export const assignCachedImagePath = async (req: Request, res: Response):
   const { path, mimetype, originalname } = req.file
   const { dimension, handle } = req.body
 
-  try {
-    if (!dimension || !handle) {
-      removeFile(path)
-      return res.status(500).send({
-        message: `${!dimension ? 'Dimension' : 'User name'} not provided!`
-      })
-    }
+  if (!dimension || !handle) {
+    removeFile(path)
+    return res.status(400).send({
+      message: `${!dimension ? 'Dimension' : 'User name'} not provided!`
+    })
+  }
 
+  try {
     const cached = await Media.create({
       path,
       mimetype,
