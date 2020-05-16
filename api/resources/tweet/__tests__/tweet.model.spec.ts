@@ -1,5 +1,6 @@
-import { Tweet } from '../tweet.model'
 import { SchemaTypes } from 'mongoose'
+import { Tweet } from '../tweet.model'
+import { ImageFileSchema } from '../../user/user-assets/imagefile.schema'
 
 describe('Tweets model:', () => {
   test('has fullText', () => {
@@ -51,10 +52,19 @@ describe('Tweets model:', () => {
       required: true
     })
   })
+
   test('has userImageUrl', () => {
     const userImageUrl = Tweet.schema.obj.userImageUrl
     expect(userImageUrl).toEqual({
       type: String,
+      default: ''
+    })
+  })
+
+  test('has tweetImages', () => {
+    const tweetImages = Tweet.schema.obj.tweetImages
+    expect(tweetImages).toEqual({
+      type: [ImageFileSchema],
       default: ''
     })
   })
