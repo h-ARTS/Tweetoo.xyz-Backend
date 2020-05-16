@@ -3,7 +3,7 @@ import * as multer from 'multer'
 import { Request } from 'express'
 
 const storage: multer.StorageEngine = multer.diskStorage({
-  destination: (req: Request, file: Express.Multer.File, 
+  destination: (req: Request, file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void): void => {
     const targetPath: string =
       !req.params || req.params.handle !== ''
@@ -16,13 +16,13 @@ const storage: multer.StorageEngine = multer.diskStorage({
       cb(null, targetPath)
     })
   },
-  filename: (req: Request, file: Express.Multer.File, 
+  filename: (req: Request, file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void): void => {
-      cb(null, Date.now() + file.originalname)
+    cb(null, Date.now() + file.originalname)
   }
 })
 
-const fileFilter = (req: Request, file: Express.Multer.File, 
+const fileFilter = (req: Request, file: Express.Multer.File,
   cb: multer.FileFilterCallback): void => {
   if (
     file.mimetype === 'image/jpeg' ||
@@ -36,7 +36,7 @@ const fileFilter = (req: Request, file: Express.Multer.File,
   }
 }
 
-export default multer({
+export const userImageUpload = multer({
   storage: storage,
   limits: {
     fileSize: 1024 * 1024 * 7
@@ -44,3 +44,12 @@ export default multer({
   preservePath: true,
   fileFilter: fileFilter
 }).single('image')
+
+export const tweetImageUpload = multer({
+  storage: null,
+  limits: {
+    fileSize: 1024 * 1024 * 7
+  },
+  preservePath: true,
+  fileFilter
+}).array('tweet-images', 6)

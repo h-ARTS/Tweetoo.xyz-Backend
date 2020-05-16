@@ -2,7 +2,7 @@ import { Router } from 'express'
 import controllers from './tweet.controllers'
 import { appendToUser, removeFromUser } from '../user/user.controllers'
 import { assignImagePath } from '../user/user-assets/upload.controller'
-import uploadImage from '../../utils/uploadImage'
+import { tweetImageUpload } from '../../utils/uploadImage'
 
 const router: Router = Router()
 
@@ -34,6 +34,6 @@ router.route('/:tweetId/retweet').post(controllers.reTweet)
 router.route('/:tweetId/undoretweet').delete(controllers.undoRetweet)
 
 // /api/tweet/:tweetId/image
-router.route('/:tweetId/image').post(uploadImage, assignImagePath)
+router.route('/:tweetId/image').post(tweetImageUpload, assignImagePath)
 
 export default router
