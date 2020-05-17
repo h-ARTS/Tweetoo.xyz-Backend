@@ -51,6 +51,18 @@ export const appendReplyToTweet = async (req: Request, res: Response,
   }
 }
 
+export const getCachedTweetImages = (req: Request, res: Response) => {
+  // req.files is an ArrayLike Object which has apperantly no .length property
+  // This is why we turn it into an actual array
+  let files = [].concat(req.files)
+
+  files = files.map((file: Express.Multer.File) => {
+    return { mimetype: file.mimetype, filename: file.filename, path: file.path }
+  })
+
+  res.status(200).json(files)
+}
+
 export const removeReplyFromTweet = async (req: Request, res: Response,
   next: NextFunction): Promise<void> => {
   const doc: IReply = req.body.removed
