@@ -68,4 +68,4 @@ export const tweetImageUpload = multer({
   },
   preservePath: true,
   fileFilter
-}).array('tweet-images', 6)
+}).any()

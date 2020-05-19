@@ -1,12 +1,13 @@
 import config from '../../config'
-import { User, IUser } from '../resources/user/user.model'
 import * as jwt from 'jsonwebtoken'
+import { Request, Response, NextFunction } from 'express'
+import { User, IUser } from '../resources/user/user.model'
 import {
   Blacklist,
   IBlacklist
 } from '../resources/blacklist-token/blacklist.model'
 import { checkBlacklisted } from '../resources/blacklist-token/blacklist.util'
-import { Request, Response, NextFunction } from 'express'
+import { IMedia } from '../resources/media/media.model'
 
 export type ResolveType<T> = (value?: T | PromiseLike<T>) => void
 export type RejectType = (reason?: any) => void
@@ -24,7 +25,8 @@ export interface IRequestUser extends Request {
     handles?: string
     follow?: string
     entry?: string
-  }
+  },
+  medias?: IMedia[]
 }
 
 export const newToken = (user: Pick<IUser, 'id'>): string => {
