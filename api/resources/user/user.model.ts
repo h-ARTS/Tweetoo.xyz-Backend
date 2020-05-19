@@ -7,6 +7,7 @@ import { ImageFileSchema, IImageFile } from './user-assets/imagefile.schema'
 import { UserReplySchema, IUserReply } from '../reply/reply.model'
 import { ResolveType, RejectType } from '../../utils/auth'
 
+const SALT_ROUNDS = 10
 export interface IUser extends Document {
   email: string
   handle: string
@@ -89,7 +90,7 @@ userSchema.pre<IUser>('save', function (next: HookNextFunction): void {
   if (!this.isModified('password')) {
     return next()
   } else {
-    bcrypt.hash(this.password, 10, (err: Error | null, hash: string): void => {
+    bcrypt.hash(this.password, SALT_ROUNDS, (err: Error | null, hash: string): void => {
       if (err) {
         return next(err)
       }
