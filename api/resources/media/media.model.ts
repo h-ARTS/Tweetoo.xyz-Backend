@@ -10,7 +10,7 @@ export interface IMedia extends Document {
   mimetype: string,
   originalname: string,
   handle: string,
-  dimension: Dimension
+  dimension?: Dimension
 }
 
 const mediaSchema = new Schema(
@@ -32,8 +32,7 @@ const mediaSchema = new Schema(
       required: true
     },
     dimension: {
-      type: String,
-      required: true
+      type: String
     }
   },
   { timestamps: true }
