@@ -4,6 +4,8 @@ import { controllers } from '../../utils/crud'
 import { Tweet, ITweet } from './tweet.model'
 import { Like } from '../like/like.model'
 import { Reply, IReply } from '../reply/reply.model'
+import { IRequestUser } from '../../utils/auth'
+import { Media, IMedia } from '../media/media.model'
 
 export interface IChangeEventDelete extends ChangeEventDelete {
   fullDocument: ITweet
@@ -51,16 +53,30 @@ export const appendReplyToTweet = async (req: Request, res: Response,
   }
 }
 
-export const getCachedTweetImages = (req: Request, res: Response) => {
-  // req.files is an ArrayLike Object which has apperantly no .length property
-  // This is why we turn it into an actual array
-  let files = [].concat(req.files)
+export const getCachedTweetImages = async (req: IRequestUser, res: Response) => {
+  const images = req.medias
+  return res.status(200).json(images)
+}
 
-  files = files.map((file: Express.Multer.File) => {
-    return { mimetype: file.mimetype, filename: file.filename, path: file.path }
-  })
+export const saveCachedTweetMedias = async (req: IRequestUser, res: Response,
+  next: NextFunction) => {
+  const files = [].concat(req.files).map(file => ({
+    path: file.path,
+    originalname: file.filename,
+    mimetype: file.mimetype,
+    handle: req.user.handle
+  }))
 
-  res.status(200).json(files)
+  try {
+    const medias = await Media.create(files)
+
+    if (!medias) return res.status(400).send('Cached tweet images cant be created');
+
+    req.medias = medias
+    return next()
+  } catch (reason) {
+    throw Error(reason)
+  }
 }
 
 export const removeReplyFromTweet = async (req: Request, res: Response,

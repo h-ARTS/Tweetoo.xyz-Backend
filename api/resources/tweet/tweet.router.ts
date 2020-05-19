@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import controllers, { getCachedTweetImages } from './tweet.controllers'
+import controllers, { getCachedTweetImages, saveCachedTweetMedias } from './tweet.controllers'
 import { appendToUser, removeFromUser } from '../user/user.controllers'
 import { assignImagePath } from '../user/user-assets/upload.controller'
 import { tweetImageUpload } from '../../utils/uploadImage'
@@ -37,6 +37,7 @@ router.route('/:tweetId/undoretweet').delete(controllers.undoRetweet)
 router.route('/:tweetId/image').post(tweetImageUpload, assignImagePath)
 
 // /api/tweet/cache-tweet-image
-router.route('/cache-tweet-image').post(tweetImageUpload, getCachedTweetImages)
+router.route('/cache-tweet-image')
+  .post(tweetImageUpload, saveCachedTweetMedias, getCachedTweetImages)
 
 export default router
