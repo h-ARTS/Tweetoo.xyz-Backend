@@ -84,20 +84,22 @@ export const updateProfile = async (req: IRequestUser, res: Response):
 
 export const followHandler = async (req: IRequestUser, res: Response):
   Promise<Response<any> | void> => {
+  const isFollow = req.query.follow === 'true'
+
   try {
     const targetUser = await User.findOne({ handle: req.params.handle }).select(
       '-password'
     )
     if (!targetUser) return res.status(400).end()
 
-    const isAlreadyFollower =
+    const hasBeenFollowedAlready =
       targetUser.followers.find(user => user.handle == req.user.handle)
-    if (isAlreadyFollower) return res.status(400).end('Already follower')
+    if (hasBeenFollowedAlready && isFollow)
+      return res.status(400).end('Has been already followed!')
 
     const me = await User.findById(req.user._id).select('-password')
     if (!me) return res.status(400).end()
 
-    const isFollow = req.query.follow === 'true'
     if (isFollow) {
       targetUser.followers.push({ handle: req.user.handle })
       me.following.push({ handle: targetUser.handle })
