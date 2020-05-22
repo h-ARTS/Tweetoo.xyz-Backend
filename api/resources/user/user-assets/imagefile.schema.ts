@@ -3,7 +3,8 @@ import { Schema, Document } from 'mongoose'
 export interface IImageFile extends Document {
   name: String,
   type: string,
-  url: string
+  url: string,
+  mediaId?: string
 }
 
 export const ImageFileSchema = new Schema({
@@ -21,5 +22,9 @@ export const ImageFileSchema = new Schema({
     type: String,
     required: true,
     default: 'media/standard/no_cover.js'
+  },
+  mediaId: {
+    type: String,
+    required: false
   }
 })

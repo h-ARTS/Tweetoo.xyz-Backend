@@ -25,4 +25,11 @@ describe('ImageFileSchema', () => {
       default: 'media/standard/no_cover.js'
     })
   })
+  test('has mediaId.', () => {
+    const mediaId = ImageFileSchema.obj.mediaId
+    expect(mediaId).toEqual({
+      type: String,
+      required: false
+    })
+  })
 })
