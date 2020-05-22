@@ -1,10 +1,12 @@
 import { Router } from 'express'
+// Controllers
 import { authGuard } from '../../utils/auth'
 import { assignImagePath } from '../user/user-assets/upload.controller'
 import controllers from './media.controllers'
-import getBody from '../../utils/getBody'
-import { userImageUpload } from '../../utils/uploadImage'
+// Utils
+import { removeFileAndReturnBody } from '../../utils/filesystem.utils'
 import { moveCachedFileToUserDir } from '../../utils/moveCachedFileToUserDir'
+import { userImageUpload } from '../../utils/uploadImage'
 
 const router: Router = Router()
 
@@ -16,7 +18,9 @@ router
     moveCachedFileToUserDir,
     assignImagePath
   )
-  .post(authGuard, controllers.removeCachedMediaDoc, getBody)
+  // This is actually a DELETE request but due to middleware code structure
+  // I used post to pass the uniqueImageId (ObjectId) in the body
+  .post(authGuard, controllers.removeCachedMediaDoc, removeFileAndReturnBody)
 
 router
   .route('/cached/:type')
