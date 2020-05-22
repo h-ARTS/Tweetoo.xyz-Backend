@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { authGuard } from '../../utils/auth'
 import { assignImagePath } from '../user/user-assets/upload.controller'
 import controllers from './media.controllers'
+import getBody from '../../utils/getBody'
 import { userImageUpload } from '../../utils/uploadImage'
 import { moveCachedFileToUserDir } from '../../utils/moveCachedFileToUserDir'
 
@@ -15,6 +16,7 @@ router
     moveCachedFileToUserDir,
     assignImagePath
   )
+  .post(authGuard, controllers.removeCachedMediaDoc, getBody)
 
 router
   .route('/cached/:type')

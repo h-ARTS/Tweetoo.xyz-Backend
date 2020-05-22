@@ -65,7 +65,8 @@ export const removeCachedMediaDoc = async (req: Request, res: Response, next: Ne
       return res.status(404).send({ message: 'File not found.' })
     }
 
-    const { dimension, originalname, mimetype, handle, path } = removed
+    const { _id, dimension, originalname, mimetype, handle, path } = removed
+    req.body._id = _id
     req.body.dimension = dimension
     req.body.mimetype = mimetype
     req.body.originalname = originalname
