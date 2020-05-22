@@ -86,6 +86,9 @@ export const followHandler = async (req: IRequestUser, res: Response):
   Promise<Response<any> | void> => {
   const isFollow = req.query.follow === 'true'
 
+  if (req.user.handle == req.params.handle)
+    return res.status(400).send('You cant follow yourself!')
+
   try {
     const targetUser = await User.findOne({ handle: req.params.handle }).select(
       '-password'
