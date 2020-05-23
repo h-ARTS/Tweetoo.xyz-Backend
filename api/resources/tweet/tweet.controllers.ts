@@ -5,7 +5,8 @@ import { Tweet, ITweet } from './tweet.model'
 import { Like } from '../like/like.model'
 import { Reply, IReply } from '../reply/reply.model'
 import { IRequestUser } from '../../utils/auth'
-import { Media, IMedia } from '../media/media.model'
+import { Media } from '../media/media.model'
+import { removeFileRecursive } from '../../utils/filesystem.utils'
 
 export interface IChangeEventDelete extends ChangeEventDelete {
   fullDocument: ITweet
@@ -19,6 +20,7 @@ const watchTweets: ChangeStream = Tweet.watch(undefined, {
 watchTweets.on('change', async (result: IChangeEventDelete): Promise<void> => {
   if (result.operationType === 'delete') {
     const tweet = result.fullDocument
+    console.log(tweet)
 
     await Like.find()
       .where('docId')
@@ -29,6 +31,9 @@ watchTweets.on('change', async (result: IChangeEventDelete): Promise<void> => {
       .where('tweetId')
       .and([tweet._id])
       .remove()
+
+    removeFileRecursive(`./media/tweets/${tweet._id}`,
+      () => console.log(`Tweet ${tweet._id} deleted`))
   }
 })
 
@@ -47,9 +52,9 @@ export const appendReplyToTweet = async (req: Request, res: Response,
 
     req.body.tweet = tweet
     next()
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  } catch (reason) {
+    console.error(reason)
+    res.status(400).send('Error querying Tweet doc.')
   }
 }
 
@@ -75,9 +80,43 @@ export const saveCachedTweetMedias = async (req: IRequestUser, res: Response,
     req.medias = medias
     return next()
   } catch (reason) {
-    throw Error(reason)
+    console.error(reason)
+    res.status(500).send('Error querying Media doc.')
   }
 }
+
+export const renameImagePaths =
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { _id } = req.body.doc
+    const tweetImages = req.body.tweetImages
+    if (!tweetImages.length) return next()
+
+    let tweet: any
+    try {
+      tweet = await Tweet.findById(_id)
+      if (!tweet) return next()
+      tweet.tweetImages = []
+      await tweet.save()
+    }
+    catch (reason) {
+      console.error(reason)
+      res.status(400).send('Tweet not found.')
+    }
+    finally {
+      tweetImages.forEach(image => {
+        tweet.tweetImages.push({
+          name: image.originalname,
+          type: image.mimetype,
+          url: image.path,
+          mediaId: image._id
+        })
+      })
+      await tweet.save()
+
+      req.body.doc = tweet
+      next()
+    }
+  }
 
 export const removeReplyFromTweet = async (req: Request, res: Response,
   next: NextFunction): Promise<void> => {
@@ -95,9 +134,9 @@ export const removeReplyFromTweet = async (req: Request, res: Response,
 
     req.body.removed = doc
     next()
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  } catch (reason) {
+    console.error(reason)
+    res.status(400).send('Cant remove reply from tweet!')
   }
 }
 
