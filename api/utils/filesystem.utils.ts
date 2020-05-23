@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import { Request, Response, NextFunction } from 'express'
+import { Media } from '../resources/media/media.model'
 
 export const moveCachedFileToUserDir = (req: Request, res: Response, next: NextFunction) => {
   const { path, originalname, handle } = req.body
@@ -13,6 +14,44 @@ export const moveCachedFileToUserDir = (req: Request, res: Response, next: NextF
     })
   })
 }
+
+export const moveCachedImagesToTweetDir =
+  (req: Request, res: Response, next: NextFunction) => {
+    const { _id } = req.body.doc
+    const tweetImages = req.body.tweetImages
+    if (!tweetImages) return next()
+
+    let imagesBody = new Set()
+
+    fs.mkdir(`./media/tweets/${_id}`, (err: Error | null) => {
+      if (err) throw err
+
+      tweetImages.forEach(async image => {
+        let media = await Media.findById(image.mediaId)
+        if (!media) res.status(400).send('No Media doc found!')
+
+        let targetPath: string = `media/tweets/${_id}/${media.originalname}`
+        imagesBody.add({
+          originalname: image.name,
+          mimetype: image.type,
+          path: targetPath,
+          mediaId: media._id
+        })
+
+        fs.copyFile(`./${media.path}`, `./${targetPath}`,
+          async (err: Error | null): Promise<void> => {
+            if (err) throw err
+            removeFile(media.path)
+
+            media.path = targetPath
+            await media.save()
+
+            req.body.tweetImages = Array.from(imagesBody)
+            next()
+          })
+      })
+    })
+  }
 
 export const removeFileRecursive =
   (path: string, callback: () => void): void => {
@@ -36,7 +75,6 @@ export const removeFile = (path: string): void => {
     console.log(`${path} is deleted!`)
   })
 }
-
 
 export const removeFileAndReturnBody = (req: Request, res: Response) => {
   removeFile(req.body.path)

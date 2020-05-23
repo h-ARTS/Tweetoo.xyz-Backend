@@ -53,31 +53,32 @@ export const assignCachedImagePath = async (req: Request, res: Response):
   }
 }
 
-export const removeCachedMediaDoc = async (req: Request, res: Response, next: NextFunction):
-  Promise<Response<{ message: string }> | void> => {
-  const { uniqueImageId } = req.body
-  try {
-    const removed = await Media.findByIdAndRemove(uniqueImageId)
-      .lean()
-      .exec()
+export const removeCachedMediaDoc =
+  async (req: Request, res: Response, next: NextFunction):
+    Promise<Response<{ message: string }> | void> => {
+    const { uniqueImageId } = req.body
+    try {
+      const removed = await Media.findByIdAndRemove(uniqueImageId)
+        .lean()
+        .exec()
 
-    if (!removed) {
+      if (!removed) {
+        return res.status(404).send({ message: 'File not found.' })
+      }
+
+      const { dimension, originalname, mimetype, handle, path } = removed
+      req.body.dimension = dimension
+      req.body.mimetype = mimetype
+      req.body.originalname = originalname
+      req.body.handle = handle
+      req.body.path = path
+
+      next()
+    } catch (e) {
+      console.error(e)
       return res.status(404).send({ message: 'File not found.' })
     }
-
-    const { dimension, originalname, mimetype, handle, path } = removed
-    req.body.dimension = dimension
-    req.body.mimetype = mimetype
-    req.body.originalname = originalname
-    req.body.handle = handle
-    req.body.path = path
-
-    next()
-  } catch (e) {
-    console.error(e)
-    return res.status(404).send({ message: 'File not found.' })
   }
-}
 
 export default {
   getMedia,
