@@ -4,8 +4,7 @@ import { authGuard } from '../../utils/auth'
 import { assignImagePath } from '../user/user-assets/upload.controller'
 import controllers from './media.controllers'
 // Utils
-import { removeFileAndReturnBody } from '../../utils/filesystem.utils'
-import { moveCachedFileToUserDir } from '../../utils/moveCachedFileToUserDir'
+import { moveCachedFileToUserDir, removeFileAndReturnBody } from '../../utils/filesystem.utils'
 import { userImageUpload } from '../../utils/uploadImage'
 
 const router: Router = Router()
