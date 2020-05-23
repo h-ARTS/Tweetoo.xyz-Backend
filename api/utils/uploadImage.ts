@@ -34,7 +34,7 @@ const tweetStorage: multer.StorageEngine = multer.diskStorage({
   },
   filename: (req: IRequestUser, file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void): void => {
-    cb(null, req.user.handle + new Date().toISOString() + file.originalname)
+    cb(null, req.user.handle + Date.now() + file.originalname)
   }
 })
 
