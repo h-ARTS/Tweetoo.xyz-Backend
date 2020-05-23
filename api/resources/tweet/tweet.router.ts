@@ -1,8 +1,9 @@
 import { Router } from 'express'
-import controllers, { getCachedTweetImages, saveCachedTweetMedias } from './tweet.controllers'
+import controllers, { getCachedTweetImages, saveCachedTweetMedias, renameImagePaths } from './tweet.controllers'
 import { appendToUser, removeFromUser } from '../user/user.controllers'
 import { assignImagePath } from '../user/user-assets/upload.controller'
 import { tweetImageUpload } from '../../utils/uploadImage'
+import { moveCachedImagesToTweetDir } from '../../utils/filesystem.utils'
 
 const router: Router = Router()
 
@@ -10,7 +11,7 @@ const router: Router = Router()
 router
   .route('/')
   .get(controllers.getOne)
-  .post(controllers.createOne, appendToUser)
+  .post(controllers.createOne, moveCachedImagesToTweetDir, renameImagePaths, appendToUser)
   .put(controllers.updateOne)
   .delete(controllers.removeOne)
 
