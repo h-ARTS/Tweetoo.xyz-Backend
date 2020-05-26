@@ -1,11 +1,13 @@
 import controllers, {
   appendReplyToTweet,
-  removeReplyFromTweet
+  removeReplyFromTweet,
+  saveCachedTweetMedias
 } from '../tweet.controllers'
 import * as mongoose from 'mongoose'
 import { Tweet, ITweet } from '../tweet.model'
 import { Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
+import { IRequestUser } from '../../../utils/auth'
 
 describe('tweet controllers:', () => {
   test('has crud and like/unlike controllers', () => {
@@ -44,7 +46,7 @@ describe('tweet controllers:', () => {
           }
         }
       } as Request
-      const next = () => {}
+      const next = () => { }
 
       await appendReplyToTweet(req, {} as Response, next)
 
@@ -53,6 +55,61 @@ describe('tweet controllers:', () => {
       })
     })
   })
+
+  describe('saveCachedTweetMedias:', () => {
+    test('should create Media docs from request.files object', async () => {
+      expect.assertions(5)
+
+      const req = {
+        files: [{
+          path: 'media/_cached/something.jpg',
+          filename: 'something.jpg',
+          mimetype: 'image/jpeg'
+        }],
+        user: {
+          handle: 'paki'
+        }
+      } as IRequestUser
+      const next = () => { }
+
+      await saveCachedTweetMedias(req, {} as Response, next)
+
+      expect(req.medias).not.toHaveLength(0)
+      req.medias.forEach(media => {
+        expect(media.path).toBe(req.files[0].path)
+        expect(media.originalname).toBe(req.files[0].filename)
+        expect(media.mimetype).toBe(req.files[0].mimetype)
+        expect(media.handle).toBe(req.user.handle)
+      })
+    })
+
+    test('should not create media doc and return 400 if insufficient props provided', async () => {
+      expect.assertions(2)
+
+      const req = {
+        files: [{
+          path: 'media/_cached/something.jpg'
+        }],
+        user: {
+          handle: 'paki'
+        }
+      } as IRequestUser
+      const next = () => { }
+
+      const res = {
+        status(code: number) {
+          expect(code).toBe(400)
+          return this
+        },
+        send(message: string) {
+          expect(message).toBe('Cached tweet images cant be created')
+        }
+      } as Response
+
+      await saveCachedTweetMedias(req, res, next)
+    })
+  })
+
 
   describe('removeReplyFromTweet', () => {
     test('removes a reply id from tweet document.', async () => {
@@ -65,7 +122,7 @@ describe('tweet controllers:', () => {
           removed: { _id: replyId, tweetId: tweet._id }
         }
       } as Request
-      const next = () => {}
+      const next = () => { }
 
       await removeReplyFromTweet(req, {} as Response, next)
 

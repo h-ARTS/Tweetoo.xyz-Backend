@@ -75,13 +75,11 @@ export const saveCachedTweetMedias = async (req: IRequestUser, res: Response,
   try {
     const medias = await Media.create(files)
 
-    if (!medias) return res.status(400).send('Cached tweet images cant be created');
-
     req.medias = medias
     return next()
   } catch (reason) {
     console.error(reason)
-    res.status(500).send('Error querying Media doc.')
+    return res.status(400).send('Cached tweet images cant be created');
   }
 }
 
