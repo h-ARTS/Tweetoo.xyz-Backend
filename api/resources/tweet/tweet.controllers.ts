@@ -86,34 +86,33 @@ export const saveCachedTweetMedias = async (req: IRequestUser, res: Response,
 export const renameImagePaths =
   async (req: Request, res: Response, next: NextFunction) => {
     const { _id } = req.body.doc
-    const tweetImages = req.body.tweetImages
-    if (!tweetImages.length) return next()
+    const userDirTweetImages = req.body.tweetImages
+    if (!req.body.tweetImages) return next()
 
-    let tweet: any
+    let tweet: ITweet | any
     try {
       tweet = await Tweet.findById(_id)
-      if (!tweet) return next()
+      if (!tweet) return res.status(400).send('Tweet not found.')
       tweet.tweetImages = []
       await tweet.save()
     }
     catch (reason) {
       console.error(reason)
-      res.status(400).send('Tweet not found.')
+      return res.status(400).send('Tweet not found.')
     }
-    finally {
-      tweetImages.forEach(image => {
-        tweet.tweetImages.push({
-          name: image.originalname,
-          type: image.mimetype,
-          url: image.path,
-          mediaId: image._id
-        })
-      })
-      await tweet.save()
 
-      req.body.doc = tweet
-      next()
-    }
+    userDirTweetImages.forEach(image => {
+      tweet.tweetImages.push({
+        name: image.originalname,
+        type: image.mimetype,
+        url: image.path,
+        mediaId: image.mediaId
+      })
+    })
+    await tweet.save()
+
+    req.body.doc = tweet
+    next()
   }
 
 export const removeReplyFromTweet = async (req: Request, res: Response,
