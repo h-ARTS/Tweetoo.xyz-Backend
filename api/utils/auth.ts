@@ -123,8 +123,9 @@ export const logout = async (
     delete req.user
     delete req.headers.authorization
     res.status(200).send({ blacklisted })
-  } catch (e) {
-    console.error(e)
+  }
+  catch (reason) {
+    console.error(reason)
     res.status(500).end()
   }
 }
