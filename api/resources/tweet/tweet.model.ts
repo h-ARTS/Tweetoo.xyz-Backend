@@ -1,4 +1,5 @@
-import { Schema, SchemaTypes, model, Document } from 'mongoose'
+import { Schema, SchemaTypes, model, Document, Types } from 'mongoose'
+import { ImageFileSchema, IImageFile } from '../user/user-assets/imagefile.schema'
 
 export interface ITweet extends Document {
   // TODO: Remove tweetId when exact type defined in crud.ts (reTweet)
@@ -6,12 +7,12 @@ export interface ITweet extends Document {
   fullText: string
   likeCount: number
   retweetCount: number
-  // TODO: Replace any with exact type
-  replies: any
+  replies: Types.Array<Schema.Types.ObjectId>
   fullName: string
   createdBy: Schema.Types.ObjectId
   handle: string
-  userImageUrl: string
+  userImageUrl: string,
+  tweetImages: Types.Array<IImageFile>
 }
 
 export interface IUserTweet extends Document {
@@ -54,6 +55,10 @@ export const TweetSchema: Schema = new Schema(
     userImageUrl: {
       type: String,
       default: ''
+    },
+    tweetImages: {
+      type: [ImageFileSchema],
+      default: []
     }
   },
   { timestamps: true }

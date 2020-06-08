@@ -1,10 +1,10 @@
 import { User } from '../user.model'
-import { removeFile } from './assets.controller'
+import { removeFile } from '../../../utils/filesystem.utils'
 import { IRequestUser } from '../../../utils/auth'
 import { Response } from 'express'
 
 export const assignImagePath = async (req: IRequestUser, res: Response):
-  Promise<Response<any>|void> => {
+  Promise<Response<any> | void> => {
   try {
     const { dimension } = req.body
     let originalname: string, mimetype: string, path: string

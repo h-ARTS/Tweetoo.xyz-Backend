@@ -1,8 +1,9 @@
 import { Router } from 'express'
-import controllers from './tweet.controllers'
+import controllers, { getCachedTweetImages, saveCachedTweetMedias, renameImagePaths } from './tweet.controllers'
 import { appendToUser, removeFromUser } from '../user/user.controllers'
 import { assignImagePath } from '../user/user-assets/upload.controller'
-import uploadImage from '../../utils/uploadImage'
+import { tweetImageUpload } from '../../utils/uploadImage'
+import { moveCachedImagesToTweetDir } from '../../utils/filesystem.utils'
 
 const router: Router = Router()
 
@@ -10,7 +11,7 @@ const router: Router = Router()
 router
   .route('/')
   .get(controllers.getOne)
-  .post(controllers.createOne, appendToUser)
+  .post(controllers.createOne, moveCachedImagesToTweetDir, renameImagePaths, appendToUser)
   .put(controllers.updateOne)
   .delete(controllers.removeOne)
 
@@ -34,6 +35,10 @@ router.route('/:tweetId/retweet').post(controllers.reTweet)
 router.route('/:tweetId/undoretweet').delete(controllers.undoRetweet)
 
 // /api/tweet/:tweetId/image
-router.route('/:tweetId/image').post(uploadImage, assignImagePath)
+router.route('/:tweetId/image').post(tweetImageUpload, assignImagePath)
+
+// /api/tweet/cache-tweet-image
+router.route('/cache-tweet-image')
+  .post(tweetImageUpload, saveCachedTweetMedias, getCachedTweetImages)
 
 export default router

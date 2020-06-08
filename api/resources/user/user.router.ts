@@ -6,7 +6,7 @@ import {
   followHandler,
   deleteProfile
 } from './user.controllers'
-import uploadImage from '../../utils/uploadImage'
+import { userImageUpload } from '../../utils/uploadImage'
 import { assignImagePath } from './user-assets/upload.controller'
 import { checkUserAssets } from './user-assets/assets.controller'
 
@@ -20,6 +20,6 @@ router
 
 router.get('/:handle', getUser)
 router.put('/:handle', followHandler)
-router.post('/:handle/image', uploadImage, assignImagePath)
+router.post('/:handle/image', userImageUpload, assignImagePath)
 
 export default router
