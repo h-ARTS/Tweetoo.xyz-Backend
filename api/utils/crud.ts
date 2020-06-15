@@ -16,6 +16,7 @@ export const getAll: ICrudType<Request> = model => async (req, res) => {
   try {
     const docs = await model
       .find()
+      .select('_id createdAt handle createdBy tweetImages')
       .lean()
       .exec()
 
@@ -34,12 +35,14 @@ export const getPaginated: ICrudType<IRequestUser> = model => async (req, res) =
       ? await model
         .find({ '_id': { $lt: last_id } })
         .sort('-createdAt')
+        .select('_id createdAt handle createdBy tweetId')
         .limit(10)
         .lean()
         .exec()
       : await model
         .find()
         .sort('-createdAt')
+        .select('_id createdAt handle createdBy tweetId')
         .limit(10)
         .lean()
         .exec()
