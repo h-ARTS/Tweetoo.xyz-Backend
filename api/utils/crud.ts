@@ -142,10 +142,14 @@ export const removeOne: ICrudType<IRequestUser> = model => async (req, res, next
     const removedDoc = await model.findOneAndRemove({
       createdBy: req.user._id,
       _id: docId
-    })
+    }).lean()
 
     if (!removedDoc) {
       return res.status(404).send({ message: 'Not found for removal' })
+    }
+
+    if (!removedDoc.hasOwnProperty('tweetId')) {
+      return res.status(200).json({ user: req.user, removed: removedDoc });
     }
 
     req.body.removed = removedDoc
