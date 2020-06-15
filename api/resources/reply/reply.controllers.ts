@@ -4,17 +4,22 @@ import { Reply } from './reply.model'
 import { Like } from '../like/like.model'
 import { IChangeEventDelete } from '../tweet/tweet.controllers'
 
-const watchReplies: ChangeStream = Reply.watch(undefined, {
+const watchReplies: ChangeStream = Reply.watch(null, {
   fullDocument: 'updateLookup'
 })
 
 watchReplies.on('change', async (change: IChangeEventDelete): Promise<void> => {
-  const reply = change.fullDocument
+  const reply = change.documentKey
+
   if (change.operationType === 'delete') {
-    await Like.find()
-      .where('docId')
-      .and([reply._id])
-      .remove()
+    try {
+      await Like.find()
+        .where('docId', reply._id)
+        .findOneAndRemove()
+    }
+    catch (reason) {
+      console.error(reason)
+    }
   }
 })
 

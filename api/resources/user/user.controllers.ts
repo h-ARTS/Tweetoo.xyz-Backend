@@ -14,20 +14,25 @@ watchUsers.on('change', async (result: ChangeEventDelete): Promise<void> => {
   if (result.operationType === 'delete') {
     const user = result.documentKey
 
-    await Tweet.find()
-      .where('createdBy')
-      .and([user._id])
-      .remove()
+    try {
+      await Tweet.find()
+        .where('createdBy')
+        .and([user._id])
+        .remove()
 
-    await Like.find()
-      .where('createdBy')
-      .and([user._id])
-      .remove()
+      await Like.find()
+        .where('createdBy')
+        .and([user._id])
+        .remove()
 
-    await Reply.find()
-      .where('createdBy')
-      .and([user._id])
-      .remove()
+      await Reply.find()
+        .where('createdBy')
+        .and([user._id])
+        .remove()
+    }
+    catch (reason) {
+      console.error(reason)
+    }
   }
 })
 

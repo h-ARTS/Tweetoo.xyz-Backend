@@ -13,24 +13,27 @@ export interface IChangeEventDelete extends ChangeEventDelete {
 }
 
 // Watcher works only on mongodb replica sets
-const watchTweets: ChangeStream = Tweet.watch(undefined, {
+const watchTweets: ChangeStream = Tweet.watch(null, {
   fullDocument: 'updateLookup'
 })
 
 watchTweets.on('change', async (result: IChangeEventDelete): Promise<void> => {
   if (result.operationType === 'delete') {
-    const tweet = result.fullDocument
-    console.log(tweet)
+    const tweet = result.documentKey
+    console.log('RESULT', result.documentKey._id)
 
-    await Like.find()
-      .where('docId')
-      .and([tweet._id])
-      .remove()
+    try {
+      await Like.find()
+        .where('docId', tweet._id)
+        .findOneAndRemove()
 
-    await Reply.find()
-      .where('tweetId')
-      .and([tweet._id])
-      .remove()
+      await Reply.find()
+        .where('tweetId', tweet._id)
+        .findOneAndRemove()
+    }
+    catch (reason) {
+      console.error(reason)
+    }
 
     removeFileRecursive(`./media/tweets/${tweet._id}`,
       () => console.log(`Tweet ${tweet._id} deleted`))
