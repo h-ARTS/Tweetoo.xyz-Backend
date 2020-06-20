@@ -75,11 +75,13 @@ export const getOne: ICrudType<Request> = model => async (req, res) => {
       .lean()
       .exec()
 
-    if (!doc) {
-      return res.status(404).end()
-    }
+    const author = await User.findById(doc.createdBy)
 
-    return res.status(200).json(doc)
+    const result: any = doc
+    result.userImageUrl = author.userImage.url
+    result.fullName = author.fullName
+
+    return res.status(200).json(result)
   } catch (reason) {
     console.error(reason)
     return res.status(404).end()

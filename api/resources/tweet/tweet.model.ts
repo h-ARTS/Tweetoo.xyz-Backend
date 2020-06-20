@@ -11,7 +11,6 @@ export interface ITweet extends Document {
   fullName: string
   createdBy: Schema.Types.ObjectId
   handle: string
-  userImageUrl: string,
   tweetImages: Types.Array<IImageFile>
 }
 
@@ -39,10 +38,6 @@ export const TweetSchema: Schema = new Schema(
       type: [SchemaTypes.ObjectId],
       default: []
     },
-    fullName: {
-      type: String,
-      required: true
-    },
     createdBy: {
       type: SchemaTypes.ObjectId,
       required: true,
@@ -51,10 +46,6 @@ export const TweetSchema: Schema = new Schema(
     handle: {
       type: String,
       required: true
-    },
-    userImageUrl: {
-      type: String,
-      default: ''
     },
     tweetImages: {
       type: [ImageFileSchema],
